@@ -1,0 +1,41 @@
+body {
+    font-family: sans-serif;
+    text-align: center;
+}
+
+#carro{
+    width: 300px; 
+        position: relative;
+        left: 0; 
+        transition: left 0.3s ease-out; 
+}
+
+#controles button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 0 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    color: #000000;
+    transition: background-color 0.3s ease, transform 0.1s ease; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#ligar{
+    background-color: #86eb43; 
+    transform: translateY(1px); 
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+#acelerar{
+    background-color: #cac142; 
+    transform: translateY(1px); 
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+#desligar{
+    background-color: #ca4242; 
+    transform: translateY(1px); 
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
