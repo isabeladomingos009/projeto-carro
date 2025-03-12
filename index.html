@@ -1,28 +1,49 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
     <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>Meu Carro Virtual</h1>
+    <title>Carro</title>
+    <h1>Carro</h1>
+    <img style="width: 250px;" src="imagens/carrodomal.png" alt="carro-imagem">
+    <img id="carroImagem" src="carro.jpg" alt="">
 
-    <img id="carro" src="imagens/carrodomal.png" alt="">
-    <div id="controles">
-
-        <p>Modelo: <span id="Modelo"></span></p>
-        <p>cor: <span id="Cor"></span></p>
-        <p>Velocidade: <span id="Velocidade"></span></p>
-
-        <button id="ligar">Ligar</button>
-        <button id="acelerar">Acelerar</button>
-        <button id="desligar">desligar</button>
+    <div class="resultado">
+        <p id="statusCarro">Carro desligado</p>
+        <p id="velocidade">Velocidade: 0 km/h</p>
     </div>
 
-    <p>Velocidade: <span id="velocidade">0</span> km/h</p>
+    <div>
+        <button class="button" onclick="ligarCarro()">Ligar</button>
+        <button class="button" onclick="desligarCarro()">Desligar</button>
+        <button class="button" onclick="acelerarCarro()">Acelerar</button>
+    </div>
 
-    <script src="script.js"></script>
+    <script src="carro.js"></script>
+
+    <div id="carro-esportivo">
+        <img style="width: 250px;" src="imagens/carroesportivo.png" alt="">
+        <h2>Carro Esportivo</h2>
+        <button id="ligar-esportivo">Ligar</button>
+        <button id="acelerar-esportivo">Acelerar</button>
+        <button id="ativar-turbo">Ativar Turbo</button>
+        <p>Velocidade: <span id="velocidade-esportivo">0</span> km/h</p>
+      </div>
+    
+      <!-- Seção para o Caminhão -->
+      <div id="caminhao">
+        <h2>Caminhão</h2>
+        <img style="width: 250px;" id="caminhao-imagem" src="imagens/caminhao.png" alt="">
+        <button id="ligar-caminhao">Ligar </button>
+        <button id="acelerar-caminhao">Acelerar </button>
+        <button id="carregar-caminhao">Carregar Caminhão</button>
+        <p>Velocidade: <span id="velocidade-caminhao">0</span> km/h</p>
+        <p>Carga Atual: <span id="carga-atual">0</span> kg</p>
+      </div>
+    
+      <script src="script.js"></script>
+    </body>
+    </html>
 </body>
 </html>

@@ -1,41 +1,125 @@
+
 body {
-    font-family: sans-serif;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
     text-align: center;
+    color: #333;
+    
 }
 
-#carro{
-    width: 300px; 
-        position: relative;
-        left: 0; 
-        transition: left 0.3s ease-out; 
+h1 {
+    color: #2c3e50;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+#carro-imagem {
+    width: 100px; 
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative; 
+    left: 0; 
+    transition: left 0.3s ease-out; 
+}
+
+#carro-imagem:hover {
+    transform: scale(1.05);
+}
+
+
+#controles {
+    margin-top: 30px;
 }
 
 #controles button {
-    padding: 10px 20px;
-    font-size: 16px;
-    margin: 0 10px;
+    padding: 12px 24px;
+    font-size: 18px;
+    margin: 0 15px;
     cursor: pointer;
     border: none;
     border-radius: 5px;
-    color: #000000;
+    color: #fff;
     transition: background-color 0.3s ease, transform 0.1s ease; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-#ligar{
-    background-color: #86eb43; 
-    transform: translateY(1px); 
+
+#ligar-desligar {
+    background-color: #a82112; 
+}
+
+#ligar-desligar:hover {
+    background-color: #be3121;
+}
+
+#ligar-desligar:active {
+    background-color: #a93226;
+    transform: translateY(1px);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-#acelerar{
-    background-color: #cac142; 
-    transform: translateY(1px); 
+#acelerar {
+    background-color: #c2b836; /* Azul */
+}
+
+#acelerar:hover {
+    background-color: #bac43b;
+}
+
+#acelerar:active {
+    background-color: #2471a3;
+    transform: translateY(1px);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-#desligar{
-    background-color: #ca4242; 
-    transform: translateY(1px); 
+#mudar-cor {
+    background-color: #8e44ad; /* Roxo */
+}
+
+#mudar-cor:hover {
+    background-color: #793a99;
+}
+
+#mudar-cor:active {
+    background-color: #6a2d8a;
+    transform: translateY(1px);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
+
+/* Estilos para a exibição da velocidade */
+p {
+    font-size: 20px;
+    margin-top: 30px;
+    color: #777;
+}
+
+#velocidade {
+    font-weight: bold;
+    color: #e74c3c;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+  
+  div {
+    margin: 20px;
+  }
+#caminhao-imagem{
+    justify-content: center;  /* Centraliza horizontalmente */
+    align-items: center;
+}  
