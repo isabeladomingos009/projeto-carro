@@ -1,49 +1,100 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garagem Inteligente com Polimorfismo</title>
     <link rel="stylesheet" href="style.css">
-    <title>Carro</title>
-    <h1>Carro</h1>
-    <img style="width: 250px;" src="imagens/carrodomal.png" alt="carro-imagem">
-    <img id="carroImagem" src="carro.jpg" alt="">
+</head>
 
-    <div class="resultado">
-        <p id="statusCarro">Carro desligado</p>
-        <p id="velocidade">Velocidade: 0 km/h</p>
+<body>
+    <h1>Garagem Inteligente com Polimorfismo</h1>
+
+    <!-- Carro Comum -->
+    <div id="carro" class="vehicle">
+        <h2>Carro Comum</h2>
+        <img src="imagens/carrodomal.png" id="imagem-carro" alt="Carro Comum">
+        <div class="info">
+            <p>Modelo:Jackson Storm</p>
+            <p>Cor: Preto</p>
+        </div>
+        <div class="controls">
+            <button onclick="interagirVeiculo('carro', 'ligar')">Ligar</button>
+            <button onclick="interagirVeiculo('carro', 'desligar')">Desligar</button>
+            <button onclick="interagirVeiculo('carro', 'acelerar')">Acelerar</button>
+            <button onclick="interagirVeiculo('carro', 'frear')">Frear</button>
+            <button onclick="interagirVeiculo('carro', 'mudarCor')">Mudar Cor</button>
+        </div>
+        <div class="status">
+            <p id="statusCarro">Carro desligado</p>
+            <p id="velocidade">Velocidade: 0 km/h</p>
+        </div>
     </div>
 
-    <div>
-        <button class="button" onclick="ligarCarro()">Ligar</button>
-        <button class="button" onclick="desligarCarro()">Desligar</button>
-        <button class="button" onclick="acelerarCarro()">Acelerar</button>
-    </div>
-
-    <script src="carro.js"></script>
-
-    <div id="carro-esportivo">
-        <img style="width: 250px;" src="imagens/carroesportivo.png" alt="">
+    <!-- Carro Esportivo -->
+    <div id="carro-esportivo" class="vehicle">
         <h2>Carro Esportivo</h2>
-        <button id="ligar-esportivo">Ligar</button>
-        <button id="acelerar-esportivo">Acelerar</button>
-        <button id="ativar-turbo">Ativar Turbo</button>
-        <p>Velocidade: <span id="velocidade-esportivo">0</span> km/h</p>
-      </div>
-    
-      <!-- Seção para o Caminhão -->
-      <div id="caminhao">
+        <img src="imagens/carroesportivo.png" id="imagemcarro-esportivo" alt="Carro Esportivo">
+        <div class="info">
+            <p>Modelo: Ferrari</p>
+            <p>Cor: preto</p>
+        </div>
+        <div class="controls">
+            <button onclick="interagirVeiculo('carroEsportivo', 'ligar')">Ligar</button>
+            <button onclick="interagirVeiculo('carroEsportivo', 'desligar')">Desligar</button>
+            <button onclick="interagirVeiculo('carroEsportivo', 'acelerar')">Acelerar</button>
+            <button onclick="interagirVeiculo('carroEsportivo', 'ativarTurbo')">Ativar Turbo</button>
+            <button onclick="interagirVeiculo('carroEsportivo', 'desativarTurbo')">Desativar Turbo</button>
+            <button onclick="interagirVeiculo('carroEsportivo', 'frear')">Frear</button>
+            <button onclick="interagirVeiculo('carroEsportivo', 'mudarCor')">Mudar Cor</button>
+        </div>
+        <div class="status">
+            <p id="turbo-status">Turbo: Desativado</p>
+            <p id="velocidade-esportivo">Velocidade: 0 km/h</p>
+        </div>
+    </div>
+
+    <!-- Caminhão -->
+    <div id="caminhao" class="vehicle">
         <h2>Caminhão</h2>
-        <img style="width: 250px;" id="caminhao-imagem" src="imagens/caminhao.png" alt="">
-        <button id="ligar-caminhao">Ligar </button>
-        <button id="acelerar-caminhao">Acelerar </button>
-        <button id="carregar-caminhao">Carregar Caminhão</button>
-        <p>Velocidade: <span id="velocidade-caminhao">0</span> km/h</p>
-        <p>Carga Atual: <span id="carga-atual">0</span> kg</p>
-      </div>
-    
-      <script src="script.js"></script>
-    </body>
-    </html>
+        <img src="imagens/caminhao.png" id="imagem-caminhão" alt="Caminhão">
+        <div class="info">
+            <p>Modelo: Scania</p>
+            <p>Cor: Vermelho</p>
+            <p>Capacidade de Carga: 10000 kg</p>
+        </div>
+        <div class="controls">
+            <button onclick="interagirVeiculo('caminhao', 'ligar')">Ligar</button>
+            <button onclick="interagirVeiculo('caminhao', 'desligar')">Desligar</button>
+            <button onclick="interagirVeiculo('caminhao', 'acelerar')">Acelerar</button>
+            <label for="carga">Carga (kg):</label>
+            <input type="number" id="carga" value="0">
+            <button onclick="interagirVeiculo('caminhao', 'carregar')">Carregar</button>
+            <button onclick="interagirVeiculo('caminhao', 'frear')">Frear</button>
+            <button onclick="interagirVeiculo('caminhao', 'mudarCor')">Mudar Cor</button>
+        </div>
+        <div class="status">
+            <p id="statusCarroCaminhao">Carro desligado</p>
+            <p id="velocidade-caminhao">Velocidade: 0 km/h</p>
+            <p id="carga-atual">Carga Atual: 0 kg</p>
+        </div>
+    </div>
+
+    <div id="garagem">
+        <h2>Garagem Inteligente</h2>
+        <div id="informacoesVeiculo">
+            <!-- As informações do veículo selecionado serão exibidas aqui -->
+        </div>
+
+        <div id="selecionarVeiculo">
+            <button onclick="selecionarVeiculo('carro')">Selecionar Carro</button>
+            <button onclick="selecionarVeiculo('carroEsportivo')">Selecionar Carro Esportivo</button>
+            <button onclick="selecionarVeiculo('caminhao')">Selecionar Caminhão</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
+
 </html>
