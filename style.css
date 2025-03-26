@@ -19,6 +19,14 @@ body {
     width: 300px;
 }
 
+#imagem-moto {
+    width: 300px;
+}
+
+#imagem-bicicleta {
+    width: 300px;
+}
+
 h1 {
     color: #2c3e50;
     margin-bottom: 30px;
@@ -96,7 +104,9 @@ h1 {
 
 .vehicle .status #velocidade,
 .vehicle .status #velocidade-esportivo,
-.vehicle .status #velocidade-caminhao {
+.vehicle .status #velocidade-caminhao,
+.vehicle .status #velocidade-moto,
+.vehicle .status #velocidade-bicicleta {
     font-weight: bold;
     color: #e74c3c;
     padding: 5px 10px;
@@ -186,4 +196,33 @@ h1 {
     font-size: 16px;
     margin: 5px;
     cursor: pointer;
+}
+
+/* Cores para o status do veículo */
+.ligado {
+    color: green;
+}
+
+.desligado {
+    color: red;
+}
+
+/* Estilos para a barra de progresso da velocidade */
+.velocidade-progress {
+    width: 100%;
+    height: 10px;
+    background-color: #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+    overflow: hidden;
+    /* Garante que a barra interna não ultrapasse os limites */
+}
+
+.velocidade-progress-bar {
+    height: 100%;
+    background-color: #3498db;
+    width: 0%;
+    /* A largura será atualizada via JavaScript */
+    transition: width 0.3s ease;
+    /* Animação suave */
 }

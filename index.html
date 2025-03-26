@@ -16,7 +16,7 @@
         <h2>Carro Comum</h2>
         <img src="imagens/carrodomal.png" id="imagem-carro" alt="Carro Comum">
         <div class="info">
-            <p>Modelo:Jackson Storm</p>
+            <p>Modelo: Jackson Storm</p>
             <p>Cor: Preto</p>
         </div>
         <div class="controls">
@@ -24,11 +24,15 @@
             <button onclick="interagirVeiculo('carro', 'desligar')">Desligar</button>
             <button onclick="interagirVeiculo('carro', 'acelerar')">Acelerar</button>
             <button onclick="interagirVeiculo('carro', 'frear')">Frear</button>
+            <button onclick="interagirVeiculo('carro', 'buzinar')">Buzinar</button>
             <button onclick="interagirVeiculo('carro', 'mudarCor')">Mudar Cor</button>
         </div>
         <div class="status">
-            <p id="statusCarro">Carro desligado</p>
+            <p id="statusCarro" class="desligado">Carro desligado</p>
             <p id="velocidade">Velocidade: 0 km/h</p>
+            <div class="velocidade-progress">
+                <div class="velocidade-progress-bar" id="velocidade-progress-carro"></div>
+            </div>
         </div>
     </div>
 
@@ -47,11 +51,16 @@
             <button onclick="interagirVeiculo('carroEsportivo', 'ativarTurbo')">Ativar Turbo</button>
             <button onclick="interagirVeiculo('carroEsportivo', 'desativarTurbo')">Desativar Turbo</button>
             <button onclick="interagirVeiculo('carroEsportivo', 'frear')">Frear</button>
+            <button onclick="interagirVeiculo('carroEsportivo', 'buzinar')">Buzinar</button>
             <button onclick="interagirVeiculo('carroEsportivo', 'mudarCor')">Mudar Cor</button>
         </div>
         <div class="status">
             <p id="turbo-status">Turbo: Desativado</p>
+            <p id="statusCarroEsportivo" class="desligado">Carro desligado</p>
             <p id="velocidade-esportivo">Velocidade: 0 km/h</p>
+            <div class="velocidade-progress">
+                <div class="velocidade-progress-bar" id="velocidade-progress-carroEsportivo"></div>
+            </div>
         </div>
     </div>
 
@@ -72,12 +81,59 @@
             <input type="number" id="carga" value="0">
             <button onclick="interagirVeiculo('caminhao', 'carregar')">Carregar</button>
             <button onclick="interagirVeiculo('caminhao', 'frear')">Frear</button>
+            <button onclick="interagirVeiculo('caminhao', 'buzinar')">Buzinar</button>
             <button onclick="interagirVeiculo('caminhao', 'mudarCor')">Mudar Cor</button>
         </div>
         <div class="status">
-            <p id="statusCarroCaminhao">Carro desligado</p>
+            <p id="statusCarroCaminhao" class="desligado">Carro desligado</p>
             <p id="velocidade-caminhao">Velocidade: 0 km/h</p>
             <p id="carga-atual">Carga Atual: 0 kg</p>
+            <div class="velocidade-progress">
+                <div class="velocidade-progress-bar" id="velocidade-progress-caminhao"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Moto -->
+    <div id="moto" class="vehicle">
+        <h2>Moto</h2>
+        <img src="imagens/moto.png" id="imagem-moto" alt="Moto">
+        <div class="info">
+            <p>Modelo: Esportiva</p>
+            <p>Cor: Vermelha</p>
+        </div>
+        <div class="controls">
+            <button onclick="interagirVeiculo('moto', 'ligar')">Ligar</button>
+            <button onclick="interagirVeiculo('moto', 'desligar')">Desligar</button>
+            <button onclick="interagirVeiculo('moto', 'acelerar')">Acelerar</button>
+            <button onclick="interagirVeiculo('moto', 'frear')">Frear</button>
+            <button onclick="interagirVeiculo('moto', 'buzinar')">Buzinar</button>
+            <button onclick="interagirVeiculo('moto', 'mudarCor')">Mudar Cor</button>
+        </div>
+        <div class="status">
+            <p id="statusMoto" class="desligado">Moto desligada</p>
+            <p id="velocidade-moto">Velocidade: 0 km/h</p>
+            <div class="velocidade-progress">
+                <div class="velocidade-progress-bar" id="velocidade-progress-moto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bicicleta -->
+    <div id="bicicleta" class="vehicle">
+        <h2>Bicicleta</h2>
+        <img src="imagens/bicicleta.png" id="imagem-bicicleta" alt="Bicicleta">
+        <div class="info">
+            <p>Modelo: Mountain Bike</p>
+            <p>Cor: Verde</p>
+        </div>
+        <div class="controls">
+            <button onclick="interagirVeiculo('bicicleta', 'acelerar')">Acelerar</button>
+            <button onclick="interagirVeiculo('bicicleta', 'frear')">Frear</button>
+            <button onclick="interagirVeiculo('bicicleta', 'buzinar')">Buzinar</button>
+        </div>
+        <div class="status">
+            <p id="velocidade-bicicleta">Velocidade: 0 km/h</p>
         </div>
     </div>
 
@@ -91,6 +147,8 @@
             <button onclick="selecionarVeiculo('carro')">Selecionar Carro</button>
             <button onclick="selecionarVeiculo('carroEsportivo')">Selecionar Carro Esportivo</button>
             <button onclick="selecionarVeiculo('caminhao')">Selecionar Caminhão</button>
+            <button onclick="selecionarVeiculo('moto')">Selecionar Moto</button>
+            <button onclick="selecionarVeiculo('bicicleta')">Selecionar Bicicleta</button>
         </div>
     </div>
 
