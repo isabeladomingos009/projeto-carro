@@ -39,7 +39,7 @@ h1 {
     border-radius: 8px;
     padding: 20px;
     margin: 20px auto;
-    max-width: 500px;
+    max-width: 600px; /* Aumentado para caber manutenção */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -62,6 +62,10 @@ h1 {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
+     /* ADICIONADO: Separação visual */
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .vehicle .controls button,
@@ -71,15 +75,15 @@ h1 {
 }
 
 .vehicle .controls button {
-    padding: 12px 24px;
-    font-size: 16px;
+    padding: 10px 20px; /* Ajustado */
+    font-size: 14px; /* Ajustado */
     cursor: pointer;
     border: none;
     border-radius: 5px;
     color: #fff;
     background-color: #3498db;
     transition: background-color 0.3s ease, transform 0.1s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .vehicle .controls button:hover {
@@ -88,18 +92,25 @@ h1 {
 
 .vehicle .controls button:active {
     transform: translateY(1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
+
+.vehicle .controls input[type="number"]#carga { /* Específico para carga */
+    width: 80px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
 
 /* Estilos para o status do veículo */
 .vehicle .status {
-    margin-top: 20px;
-    font-size: 18px;
+    margin-top: 10px; /* Ajustado */
+    font-size: 16px; /* Ajustado */
     color: #777;
 }
 
 .vehicle .status p {
-    margin: 8px 0;
+    margin: 6px 0; /* Ajustado */
 }
 
 .vehicle .status #velocidade,
@@ -109,120 +120,180 @@ h1 {
 .vehicle .status #velocidade-bicicleta {
     font-weight: bold;
     color: #e74c3c;
-    padding: 5px 10px;
+    padding: 4px 8px; /* Ajustado */
     border-radius: 5px;
     background-color: rgba(231, 76, 60, 0.1);
-}
-
-/* Cores específicas para os botões */
-#ligar {
-    background-color: #2ecc71;
-}
-
-#ligar:hover {
-    background-color: #27ae60;
-}
-
-#desligar {
-    background-color: #e74c3c;
-}
-
-#desligar:hover {
-    background-color: #c0392b;
-}
-
-#ativar-turbo {
-    background-color: #e655de;
-}
-
-#ativar-turbo:hover {
-    background-color: #e02020;
-}
-
-#desativar-turbo {
-    background-color: #d62d2d;
-}
-
-#desativar-turbo:hover {
-    background-color: #eb1313;
-}
-
-#carregar-caminhao {
-    background-color: #59abb6;
-}
-
-#carregar-caminhao:hover {
-    background-color: #8e44ad;
+    display: inline-block;
 }
 
 /* Estilos para as imagens dos veículos */
 .vehicle img {
-    width: 150px;
+    max-width: 150px; /* Reduzido e consistente */
     height: auto;
     margin-bottom: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos para a seção da garagem */
-#garagem {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px auto;
-    max-width: 600px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-#garagem h2 {
-    color: #333;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-#garagem #informacoesVeiculo {
-    margin-top: 20px;
-    font-size: 18px;
-    text-align: center;
-}
-
-#garagem #selecionarVeiculo {
-    margin-top: 20px;
-    text-align: center;
-}
-
-#garagem #selecionarVeiculo button {
-    padding: 10px 15px;
-    font-size: 16px;
-    margin: 5px;
-    cursor: pointer;
-}
-
 /* Cores para o status do veículo */
 .ligado {
     color: green;
+    font-weight: bold;
 }
 
 .desligado {
     color: red;
+    font-weight: bold;
 }
 
 /* Estilos para a barra de progresso da velocidade */
 .velocidade-progress {
-    width: 100%;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
     height: 10px;
     background-color: #ddd;
     border-radius: 5px;
     margin-top: 5px;
     overflow: hidden;
-    /* Garante que a barra interna não ultrapasse os limites */
 }
 
 .velocidade-progress-bar {
     height: 100%;
     background-color: #3498db;
     width: 0%;
-    /* A largura será atualizada via JavaScript */
     transition: width 0.3s ease;
-    /* Animação suave */
 }
+
+
+/* === ESTILOS DE MANUTENÇÃO - ADICIONADOS === */
+.manutencao-section {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    text-align: left;
+}
+
+.manutencao-section h3,
+.manutencao-section h4 {
+    color: #3498db;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.form-agendamento {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+}
+
+.form-agendamento label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+    margin-top: 8px;
+}
+
+.form-agendamento input[type="date"],
+.form-agendamento input[type="time"],
+.form-agendamento input[type="text"],
+.form-agendamento input[type="number"],
+.form-agendamento textarea {
+    width: calc(100% - 12px);
+    padding: 8px 6px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-agendamento textarea {
+    resize: vertical;
+}
+
+.form-agendamento button {
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #2ecc71;
+    margin-right: 5px;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+.form-agendamento button[type="button"].btn-cancelar-form {
+     background-color: #e74c3c;
+}
+
+.form-agendamento button:hover {
+    opacity: 0.9;
+}
+
+.manutencao-agendamentos ul,
+.manutencao-historico ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.manutencao-agendamentos li,
+.manutencao-historico li {
+    background-color: #f0f7fd;
+    border: 1px solid #d6eaf8;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.manutencao-agendamentos li:nth-child(odd),
+.manutencao-historico li:nth-child(odd) {
+    background-color: #eaf4fc;
+}
+
+.manutencao-agendamentos li p, /* Seletor adicionado */
+.manutencao-historico li p { /* Seletor adicionado */
+     margin: 0;
+     flex-grow: 1;
+     margin-right: 10px;
+     word-break: break-word; /* Quebra palavras longas */
+}
+
+.btn-manutencao-status,
+.btn-manutencao-remover {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 2px 5px;
+    margin-left: 5px;
+    flex-shrink: 0;
+}
+.btn-manutencao-status:hover,
+.btn-manutencao-remover:hover {
+    opacity: 0.7;
+}
+
+.btn-toggle-form {
+    display: block;
+    margin: 10px auto 15px auto;
+    padding: 8px 15px;
+    background-color: #5dade2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.btn-toggle-form:hover {
+     background-color: #3498db;
+}
+/* === FIM ESTILOS MANUTENÇÃO === */
