@@ -1,200 +1,369 @@
+/* Estilos Globais e Reset Mínimo */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
+    background-color: #dfe6e9; /* Tom de cinza/azul claro */
     margin: 0;
-    padding: 20px;
-    text-align: center;
+    padding: 15px;
     color: #333;
-}
-
-#imagem-carro {
-    width: 350px;
-}
-
-#imagemcarro-esportivo {
-    width: 300px;
-}
-
-#imagem-caminhão {
-    width: 300px;
-}
-
-#imagem-moto {
-    width: 300px;
-}
-
-#imagem-bicicleta {
-    width: 300px;
+    display: flex; /* Para H1 ficar acima do container */
+    flex-direction: column;
+    align-items: center; /* Centraliza o H1 e o app-container */
+    min-height: 100vh;
 }
 
 h1 {
     color: #2c3e50;
-    margin-bottom: 30px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos para cada veículo */
-.vehicle {
+h2, h3, h4 {
+    color: #3498db; /* Azul padrão para títulos */
+    margin-bottom: 10px;
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit; /* Herda a fonte do body */
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    background-color: #3498db;
+    color: white;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #2980b9; /* Azul mais escuro no hover */
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+/* --- LAYOUT PRINCIPAL --- */
+
+.app-container {
+    display: flex;
+    width: 100%;
+    max-width: 1300px; /* Aumenta um pouco a largura máxima */
+    background-color: #ecf0f1; /* Fundo do container */
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    overflow: hidden; /* Previne que filhos ultrapassem bordas arredondadas */
+    flex-grow: 1; /* Ocupa o espaço vertical restante */
+}
+
+.sidebar-nav {
+    width: 220px; /* Largura da barra lateral */
+    background-color: #34495e; /* Cor escura para a navegação */
+    padding: 20px;
+    color: #ecf0f1; /* Texto claro */
+    flex-shrink: 0; /* Impede que a barra encolha */
+    display: flex;
+    flex-direction: column; /* Organiza itens verticalmente */
+}
+
+.sidebar-nav h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #ecf0f1;
+    border-bottom: 1px solid #7f8c8d;
+    padding-bottom: 15px;
+    font-size: 1.4em;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1; /* Ocupa espaço para empurrar footer para baixo */
+}
+
+.sidebar-nav li {
+    margin-bottom: 12px;
+}
+
+.sidebar-nav .nav-button {
+    background-color: transparent;
+    border: 1px solid #7f8c8d;
+    color: #ecf0f1;
+    padding: 12px 18px; /* Aumenta padding */
+    width: 100%;
+    text-align: left;
+    border-radius: 4px;
+    font-size: 1em; /* Usa em para ser relativo */
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-nav .nav-button:hover {
+    background-color: rgba(236, 240, 241, 0.1); /* Fundo levemente claro no hover */
+    border-color: #95a5a6;
+    color: #fff; /* Garante texto branco */
+}
+
+.sidebar-nav .nav-button.active {
+    background-color: #3498db; /* Cor de destaque para ativo */
+    border-color: #3498db;
+    color: #fff;
+    font-weight: bold;
+}
+
+.nav-footer {
+    margin-top: auto; /* Empurra para o final */
+    padding-top: 20px;
+    border-top: 1px solid #7f8c8d;
+    font-size: 0.8em;
+    text-align: center;
+    color: #bdc3c7; /* Cinza claro */
+}
+
+.main-content {
+    flex-grow: 1; /* Ocupa o espaço restante */
+    padding: 25px;
+    background-color: #f8f9fa; /* Fundo mais claro para área principal */
+    overflow-y: auto; /* Habilita scroll se o conteúdo for maior */
+}
+
+/* --- VISUALIZAÇÃO DA GARAGEM (CARDS) --- */
+.garage-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* Grid responsivo, minmax ajustado */
+    gap: 25px; /* Espaçamento entre cards */
+}
+
+.vehicle-card {
     background-color: #fff;
     border-radius: 8px;
     padding: 20px;
-    margin: 20px auto;
-    max-width: 600px; /* Aumentado para caber manutenção */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #eee; /* Borda sutil */
+    display: flex;
+    flex-direction: column; /* Organiza imagem, título, etc. */
+    justify-content: space-between; /* Espaça conteúdo interno */
 }
 
-.vehicle h2 {
-    color: #3498db;
+.vehicle-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+}
+.vehicle-card:focus { /* Estilo para foco via teclado */
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+
+.vehicle-card img {
+    max-width: 100%; /* Imagem ocupa a largura do card */
+    height: 120px; /* Altura fixa para alinhar */
+    object-fit: contain; /* Garante que a imagem caiba sem distorcer */
     margin-bottom: 15px;
+    border-radius: 4px;
 }
 
-/* Estilos para informações do veículo */
-.vehicle .info p {
-    font-size: 16px;
+.vehicle-card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #3498db;
+    font-size: 1.2em;
+}
+
+.vehicle-card p {
+    font-size: 0.9em;
     color: #555;
-    margin: 5px 0;
+    margin: 4px 0;
 }
 
-/* Estilos para os controles dos veículos */
-.vehicle .controls {
+/* --- VISUALIZAÇÃO DE DETALHES DO VEÍCULO --- */
+/* Usa a classe .vehicle como base, que já tem fundo branco, padding, etc. */
+.vehicle-detail-view {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    margin: 10px auto; /* Centraliza com margem */
+    max-width: 700px; /* Limita largura da view de detalhes */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #eee;
+}
+
+.vehicle-detail-view h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.6em;
+}
+
+.vehicle-detail-view img {
+    display: block; /* Remove espaço extra abaixo da imagem */
+    max-width: 300px; /* Tamanho da imagem nos detalhes */
+    height: auto;
+    margin: 0 auto 20px auto; /* Centraliza imagem */
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.vehicle-detail-view .info {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    text-align: center; /* Centraliza informações */
+}
+
+.vehicle-detail-view .info p {
+    font-size: 1.1em;
+    color: #555;
+    margin: 6px 0;
+}
+
+.vehicle-detail-view .controls {
     margin-top: 20px;
+    margin-bottom: 25px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-     /* ADICIONADO: Separação visual */
+    justify-content: center; /* Centraliza botões */
+    gap: 10px; /* Espaçamento entre botões */
+    padding-bottom: 20px;
     border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
 }
 
-.vehicle .controls button,
-.vehicle .controls label,
-.vehicle .controls input {
-    margin: 5px;
+/* Ajustes específicos para controles dentro dos detalhes */
+.vehicle-detail-view .controls button {
+    flex-basis: calc(33.33% - 10px); /* Tenta 3 botões por linha */
+    min-width: 100px; /* Largura mínima */
 }
-
-.vehicle .controls button {
-    padding: 10px 20px; /* Ajustado */
-    font-size: 14px; /* Ajustado */
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    color: #fff;
-    background-color: #3498db;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Input e botão de carga do caminhão */
+.vehicle-detail-view .controls div { /* Wrapper do input/label/button de carga */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%; /* Ocupa linha inteira */
+    justify-content: center;
+    margin-top: 10px;
 }
-
-.vehicle .controls button:hover {
-    background-color: #2980b9;
-}
-
-.vehicle .controls button:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.vehicle .controls input[type="number"]#carga { /* Específico para carga */
-    width: 80px;
+.vehicle-detail-view .controls input[type="number"] {
     padding: 8px;
-    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 80px; /* Largura fixa para input */
 }
 
 
-/* Estilos para o status do veículo */
-.vehicle .status {
-    margin-top: 10px; /* Ajustado */
-    font-size: 16px; /* Ajustado */
-    color: #777;
+.vehicle-detail-view .status {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    font-size: 1.1em;
+    color: #666;
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
 }
 
-.vehicle .status p {
-    margin: 6px 0; /* Ajustado */
+.vehicle-detail-view .status p {
+    margin: 8px 0;
 }
 
-.vehicle .status #velocidade,
-.vehicle .status #velocidade-esportivo,
-.vehicle .status #velocidade-caminhao,
-.vehicle .status #velocidade-moto,
-.vehicle .status #velocidade-bicicleta {
-    font-weight: bold;
-    color: #e74c3c;
-    padding: 4px 8px; /* Ajustado */
-    border-radius: 5px;
-    background-color: rgba(231, 76, 60, 0.1);
-    display: inline-block;
-}
-
-/* Estilos para as imagens dos veículos */
-.vehicle img {
-    max-width: 150px; /* Reduzido e consistente */
-    height: auto;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Cores para o status do veículo */
-.ligado {
-    color: green;
+/* Cores para status ligado/desligado */
+.status .ligado {
+    color: #2ecc71; /* Verde */
     font-weight: bold;
 }
 
-.desligado {
-    color: red;
+.status .desligado {
+    color: #e74c3c; /* Vermelho */
     font-weight: bold;
 }
 
-/* Estilos para a barra de progresso da velocidade */
+/* Barra de progresso da velocidade */
 .velocidade-progress {
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-    height: 10px;
-    background-color: #ddd;
-    border-radius: 5px;
-    margin-top: 5px;
+    width: 80%; /* Barra não ocupa 100% da largura */
+    height: 12px; /* Pouco mais alta */
+    background-color: #e0e0e0; /* Fundo cinza claro */
+    border-radius: 6px;
+    margin: 10px auto 0 auto; /* Centraliza e adiciona margem */
     overflow: hidden;
+    border: 1px solid #ccc; /* Borda sutil */
 }
 
 .velocidade-progress-bar {
     height: 100%;
-    background-color: #3498db;
-    width: 0%;
-    transition: width 0.3s ease;
+    background-color: #3498db; /* Azul padrão */
+    width: 0%; /* Começa vazia */
+    transition: width 0.4s ease, background-color 0.4s ease; /* Animação suave */
+    border-radius: 5px; /* Arredonda barra interna também */
+}
+/* Cor da barra para turbo ativo */
+.velocidade-progress-bar[style*="background-color: rgb(231, 76, 60)"] { /* Seletor para cor vermelha do turbo */
+    /* Pode adicionar algum efeito extra se quiser */
 }
 
 
-/* === ESTILOS DE MANUTENÇÃO - ADICIONADOS === */
+/* --- SEÇÃO DE MANUTENÇÃO --- */
 .manutencao-section {
     margin-top: 25px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-    text-align: left;
+    padding-top: 20px;
+    border-top: 1px solid #eee; /* Separa visualmente */
 }
 
-.manutencao-section h3,
-.manutencao-section h4 {
-    color: #3498db;
-    margin-bottom: 10px;
+.manutencao-section h3 {
     text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+.manutencao-section h4 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed #ccc;
+    font-size: 1.2em;
+    color: #555;
 }
 
+/* Botão de Agendar Nova */
+.manutencao-section .btn-toggle-form {
+    display: block; /* Ocupa largura toda */
+    margin: 0 auto 15px auto; /* Centraliza */
+    width: 60%;
+    background-color: #2ecc71; /* Verde para agendar */
+}
+.manutencao-section .btn-toggle-form:hover {
+    background-color: #27ae60;
+}
+
+/* Formulário de Agendamento */
 .form-agendamento {
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 15px;
+    background-color: #fdfdfd;
     border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.form-agendamento h4 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: none; /* Remove borda do h4 dentro do form */
+    color: #3498db;
 }
 
 .form-agendamento label {
-    display: block;
+    display: block; /* Label acima do input */
     margin-bottom: 5px;
     font-weight: bold;
     color: #555;
-    margin-top: 8px;
+    font-size: 0.95em;
 }
 
 .form-agendamento input[type="date"],
@@ -202,98 +371,96 @@ h1 {
 .form-agendamento input[type="text"],
 .form-agendamento input[type="number"],
 .form-agendamento textarea {
-    width: calc(100% - 12px);
-    padding: 8px 6px;
-    margin-bottom: 10px;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box;
+    font-size: 1em;
 }
-
 .form-agendamento textarea {
-    resize: vertical;
+    resize: vertical; /* Permite redimensionar só verticalmente */
+    min-height: 60px;
 }
 
-.form-agendamento button {
-    padding: 10px 15px;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    color: #fff;
-    background-color: #2ecc71;
-    margin-right: 5px;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
+.form-agendamento button[type="submit"] {
+    background-color: #3498db; /* Azul para salvar */
+    margin-right: 10px;
 }
-.form-agendamento button[type="button"].btn-cancelar-form {
-     background-color: #e74c3c;
+.form-agendamento button[type="submit"]:hover {
+    background-color: #2980b9;
+}
+.form-agendamento .btn-cancelar-form {
+    background-color: #e74c3c; /* Vermelho para cancelar */
+}
+.form-agendamento .btn-cancelar-form:hover {
+    background-color: #c0392b;
 }
 
-.form-agendamento button:hover {
-    opacity: 0.9;
-}
-
+/* Lista de Manutenções */
 .manutencao-agendamentos ul,
 .manutencao-historico ul {
     list-style: none;
-    padding: 0;
-    margin: 0;
+    padding-left: 0; /* Remove padding padrão da ul */
 }
 
 .manutencao-agendamentos li,
 .manutencao-historico li {
-    background-color: #f0f7fd;
-    border: 1px solid #d6eaf8;
-    padding: 8px 12px;
-    margin-bottom: 5px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
     border-radius: 4px;
-    font-size: 14px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-}
-.manutencao-agendamentos li:nth-child(odd),
-.manutencao-historico li:nth-child(odd) {
-    background-color: #eaf4fc;
+    flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+    gap: 10px;
 }
 
-.manutencao-agendamentos li p, /* Seletor adicionado */
-.manutencao-historico li p { /* Seletor adicionado */
-     margin: 0;
-     flex-grow: 1;
-     margin-right: 10px;
-     word-break: break-word; /* Quebra palavras longas */
+.manutencao-info {
+    flex-grow: 1; /* Ocupa espaço disponível */
+    color: #333;
+    font-size: 0.95em;
+}
+.manutencao-info span { /* Para destacar status, etc. */
+    font-style: italic;
+    color: #777;
 }
 
-.btn-manutencao-status,
-.btn-manutencao-remover {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.1em;
-    padding: 2px 5px;
-    margin-left: 5px;
-    flex-shrink: 0;
-}
-.btn-manutencao-status:hover,
-.btn-manutencao-remover:hover {
-    opacity: 0.7;
+
+.manutencao-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0; /* Impede que os botões encolham */
 }
 
-.btn-toggle-form {
-    display: block;
-    margin: 10px auto 15px auto;
-    padding: 8px 15px;
-    background-color: #5dade2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
+.manutencao-actions button {
+    padding: 5px 8px; /* Botões menores */
+    font-size: 0.9em;
+    min-width: 30px; /* Largura mínima */
+    line-height: 1; /* Alinha ícones melhor */
 }
-.btn-toggle-form:hover {
-     background-color: #3498db;
+/* Cores específicas para botões de ação */
+.manutencao-actions button[data-novo-status="Realizada"] { background-color: #2ecc71; } /* Verde */
+.manutencao-actions button[data-novo-status="Realizada"]:hover { background-color: #27ae60; }
+.manutencao-actions button[data-novo-status="Cancelada"] { background-color: #f39c12; } /* Laranja */
+.manutencao-actions button[data-novo-status="Cancelada"]:hover { background-color: #e67e22; }
+.manutencao-actions .btn-manutencao-remover { background-color: #e74c3c; } /* Vermelho */
+.manutencao-actions .btn-manutencao-remover:hover { background-color: #c0392b; }
+
+
+/* --- Estilos para mensagens de erro/sucesso (opcional) --- */
+.error-message {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-top: 5px;
+    font-size: 0.9em;
 }
-/* === FIM ESTILOS MANUTENÇÃO === */
+
+.success-message {
+    color: #2ecc71;
+    font-weight: bold;
+    margin-top: 5px;
+    font-size: 0.9em;
+}

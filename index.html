@@ -4,275 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garagem Inteligente com Manutenção</title>
+    <title>Garagem Inteligente v2.0</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>Garagem Inteligente com Manutenção</h1>
+    <h1>Garagem Inteligente v2.0</h1>
 
-    <!-- ==================== Carro Comum ==================== -->
-    <div id="container-carro" class="vehicle">
-        <h2>Carro Comum</h2>
-        <img src="imagens/carrodomal.png" id="imagem-carro" alt="Carro Comum">
-        <div class="info">
-            <p>Modelo: Jackson Storm</p>
-            <p id="cor-carro">Cor: Preto</p>
-        </div>
-        <div class="controls">
-            <button onclick="interagirVeiculo('carro', 'ligar')">Ligar</button>
-            <button onclick="interagirVeiculo('carro', 'desligar')">Desligar</button>
-            <button onclick="interagirVeiculo('carro', 'acelerar')">Acelerar</button>
-            <button onclick="interagirVeiculo('carro', 'frear')">Frear</button>
-            <button onclick="interagirVeiculo('carro', 'buzinar')">Buzinar</button>
-            <button onclick="interagirVeiculo('carro', 'mudarCor')">Mudar Cor</button>
-        </div>
-        <div class="status">
-            <p id="statusCarro" class="desligado">Carro desligado</p>
-            <p id="velocidade">Velocidade: 0 km/h</p>
-            <div class="velocidade-progress">
-                <div class="velocidade-progress-bar" id="velocidade-progress-carro"></div>
+    <div class="app-container">
+        <aside class="sidebar-nav">
+            <h2>Navegação</h2>
+            <ul>
+                <li><button class="nav-button active" data-view="garagem">Minha Garagem</button></li>
+                <!-- BOTÃO NOVO ADICIONADO -->
+                <li><button class="nav-button" data-view="agendar">Agendar Manutenções</button></li>
+                <!-- FIM DO BOTÃO NOVO -->
+                <!-- Futuramente: <li><button class="nav-button" data-view="adicionar">Adicionar Veículo</button></li> -->
+                <!-- Futuramente: <li><button class="nav-button" data-view="manutencoes">Manutenções</button></li> -->
+            </ul>
+            <div class="nav-footer" style="margin-top: 30px; font-size: 12px; text-align: center; color: #bdc3c7;">
+                <p>IFPR - Informática</p>
+                <p>Isabela</p>
             </div>
-        </div>
+        </aside>
 
-        <!-- === Seção de Manutenção - ADICIONADA === -->
-        <div class="manutencao-section">
-            <h3>Manutenção</h3>
-            <button class="btn-toggle-form" data-target-form="#form-agendamento-carro">Agendar Nova</button>
-            <form id="form-agendamento-carro" class="form-agendamento" style="display: none;">
-                <h4>Agendar Manutenção</h4>
-                <input type="hidden" name="veiculoId" value="carro">
-                <label for="data-manutencao-carro">Data:</label>
-                <input type="date" id="data-manutencao-carro" name="data" required>
-                <label for="hora-manutencao-carro">Hora:</label>
-                <input type="time" id="hora-manutencao-carro" name="hora" required>
-                <label for="tipo-manutencao-carro">Tipo Serviço:</label>
-                <input type="text" id="tipo-manutencao-carro" name="tipo" required placeholder="Ex: Troca de Óleo">
-                <label for="custo-manutencao-carro">Custo (R$):</label>
-                <input type="number" id="custo-manutencao-carro" name="custo" min="0" step="0.01" placeholder="0.00">
-                <label for="desc-manutencao-carro">Descrição:</label>
-                <textarea id="desc-manutencao-carro" name="descricao" rows="2"></textarea>
-                <button type="submit">Salvar Agendamento</button>
-                <button type="button" class="btn-cancelar-form">Cancelar</button>
-            </form>
-            <h4>Agendamentos Futuros</h4>
-            <div class="manutencao-agendamentos"><!-- Gerado pelo JS --></div>
-            <h4>Histórico Completo</h4>
-            <div class="manutencao-historico"><!-- Gerado pelo JS --></div>
-        </div>
-        <!-- === Fim Seção de Manutenção === -->
+        <main id="main-content" class="main-content">
+            <!-- O conteúdo será carregado aqui pelo JavaScript -->
+            <p>Carregando garagem...</p>
+        </main>
     </div>
 
-    <!-- ==================== Carro Esportivo ==================== -->
-    <div id="container-carroEsportivo" class="vehicle"> <!-- ID ajustado -->
-        <h2>Carro Esportivo</h2>
-        <img src="imagens/carroesportivo.png" id="imagemcarro-esportivo" alt="Carro Esportivo">
-        <div class="info">
-            <p>Modelo: Ferrari</p>
-            <p id="cor-carro-esportivo">Cor: Vermelha</p> <!-- ID/Cor ajustados -->
-        </div>
-        <div class="controls">
-            <button onclick="interagirVeiculo('carroEsportivo', 'ligar')">Ligar</button>
-            <button onclick="interagirVeiculo('carroEsportivo', 'desligar')">Desligar</button>
-            <button onclick="interagirVeiculo('carroEsportivo', 'acelerar')">Acelerar</button>
-            <button onclick="interagirVeiculo('carroEsportivo', 'ativarTurbo')">Ativar Turbo</button>
-            <button onclick="interagirVeiculo('carroEsportivo', 'desativarTurbo')">Desativar Turbo</button>
-            <button onclick="interagirVeiculo('carroEsportivo', 'frear')">Frear</button>
-            <button onclick="interagirVeiculo('carroEsportivo', 'buzinar')">Buzinar</button>
-            <button onclick="interagirVeiculo('carroEsportivo', 'mudarCor')">Mudar Cor</button>
-        </div>
-        <div class="status">
-            <p id="turbo-status">Turbo: Desativado</p>
-            <p id="statusCarroEsportivo" class="desligado">Carro desligado</p>
-            <p id="velocidade-esportivo">Velocidade: 0 km/h</p>
-            <div class="velocidade-progress">
-                <div class="velocidade-progress-bar" id="velocidade-progress-carroEsportivo"></div>
-            </div>
-        </div>
-
-         <!-- === Seção de Manutenção - ADICIONADA === -->
-        <div class="manutencao-section">
-            <h3>Manutenção</h3>
-            <button class="btn-toggle-form" data-target-form="#form-agendamento-carroEsportivo">Agendar Nova</button>
-            <form id="form-agendamento-carroEsportivo" class="form-agendamento" style="display: none;">
-                <h4>Agendar Manutenção</h4>
-                <input type="hidden" name="veiculoId" value="carroEsportivo"> <!-- ID Atualizado -->
-                <label for="data-manutencao-carroEsportivo">Data:</label>
-                <input type="date" id="data-manutencao-carroEsportivo" name="data" required> <!-- ID Atualizado -->
-                <label for="hora-manutencao-carroEsportivo">Hora:</label>
-                <input type="time" id="hora-manutencao-carroEsportivo" name="hora" required> <!-- ID Atualizado -->
-                <label for="tipo-manutencao-carroEsportivo">Tipo Serviço:</label>
-                <input type="text" id="tipo-manutencao-carroEsportivo" name="tipo" required placeholder="Ex: Revisão de Freios"> <!-- ID Atualizado -->
-                <label for="custo-manutencao-carroEsportivo">Custo (R$):</label>
-                <input type="number" id="custo-manutencao-carroEsportivo" name="custo" min="0" step="0.01" placeholder="0.00"> <!-- ID Atualizado -->
-                <label for="desc-manutencao-carroEsportivo">Descrição:</label>
-                <textarea id="desc-manutencao-carroEsportivo" name="descricao" rows="2"></textarea> <!-- ID Atualizado -->
-                <button type="submit">Salvar Agendamento</button>
-                <button type="button" class="btn-cancelar-form">Cancelar</button>
-            </form>
-            <h4>Agendamentos Futuros</h4>
-            <div class="manutencao-agendamentos"><!-- Gerado pelo JS --></div>
-            <h4>Histórico Completo</h4>
-            <div class="manutencao-historico"><!-- Gerado pelo JS --></div>
-        </div>
-         <!-- === Fim Seção de Manutenção === -->
-    </div>
-
-    <!-- ==================== Caminhão ==================== -->
-    <div id="container-caminhao" class="vehicle">
-        <h2>Caminhão</h2>
-        <img src="imagens/caminhao.png" id="imagem-caminhão" alt="Caminhão">
-        <div class="info">
-            <p>Modelo: Scania</p>
-            <p id="cor-caminhao">Cor: Vermelho</p>
-            <p>Capacidade de Carga: 10000 kg</p>
-        </div>
-        <div class="controls">
-            <button onclick="interagirVeiculo('caminhao', 'ligar')">Ligar</button>
-            <button onclick="interagirVeiculo('caminhao', 'desligar')">Desligar</button>
-            <button onclick="interagirVeiculo('caminhao', 'acelerar')">Acelerar</button>
-            <label for="carga">Carga (kg):</label>
-            <input type="number" id="carga" value="0" min="0">
-            <button onclick="interagirVeiculo('caminhao', 'carregar')">Carregar</button>
-            <button onclick="interagirVeiculo('caminhao', 'frear')">Frear</button>
-            <button onclick="interagirVeiculo('caminhao', 'buzinar')">Buzinar</button>
-            <button onclick="interagirVeiculo('caminhao', 'mudarCor')">Mudar Cor</button>
-        </div>
-        <div class="status">
-            <p id="statusCarroCaminhao" class="desligado">Caminhão desligado</p>
-            <p id="velocidade-caminhao">Velocidade: 0 km/h</p>
-            <p id="carga-atual">Carga Atual: 0 kg</p>
-            <div class="velocidade-progress">
-                <div class="velocidade-progress-bar" id="velocidade-progress-caminhao"></div>
-            </div>
-        </div>
-
-         <!-- === Seção de Manutenção - ADICIONADA === -->
-        <div class="manutencao-section">
-            <h3>Manutenção</h3>
-            <button class="btn-toggle-form" data-target-form="#form-agendamento-caminhao">Agendar Nova</button>
-            <form id="form-agendamento-caminhao" class="form-agendamento" style="display: none;">
-                <h4>Agendar Manutenção</h4>
-                <input type="hidden" name="veiculoId" value="caminhao"> <!-- ID Atualizado -->
-                <label for="data-manutencao-caminhao">Data:</label>
-                <input type="date" id="data-manutencao-caminhao" name="data" required> <!-- ID Atualizado -->
-                <label for="hora-manutencao-caminhao">Hora:</label>
-                <input type="time" id="hora-manutencao-caminhao" name="hora" required> <!-- ID Atualizado -->
-                <label for="tipo-manutencao-caminhao">Tipo Serviço:</label>
-                <input type="text" id="tipo-manutencao-caminhao" name="tipo" required placeholder="Ex: Troca de Pneus"> <!-- ID Atualizado -->
-                <label for="custo-manutencao-caminhao">Custo (R$):</label>
-                <input type="number" id="custo-manutencao-caminhao" name="custo" min="0" step="0.01" placeholder="0.00"> <!-- ID Atualizado -->
-                <label for="desc-manutencao-caminhao">Descrição:</label>
-                <textarea id="desc-manutencao-caminhao" name="descricao" rows="2"></textarea> <!-- ID Atualizado -->
-                <button type="submit">Salvar Agendamento</button>
-                <button type="button" class="btn-cancelar-form">Cancelar</button>
-            </form>
-            <h4>Agendamentos Futuros</h4>
-            <div class="manutencao-agendamentos"><!-- Gerado pelo JS --></div>
-            <h4>Histórico Completo</h4>
-            <div class="manutencao-historico"><!-- Gerado pelo JS --></div>
-        </div>
-         <!-- === Fim Seção de Manutenção === -->
-    </div>
-
-    <!-- ==================== Moto ==================== -->
-    <div id="container-moto" class="vehicle">
-        <h2>Moto</h2>
-        <img src="imagens/moto.png" id="imagem-moto" alt="Moto">
-        <div class="info">
-            <p>Modelo: Esportiva</p>
-            <p id="cor-moto">Cor: Vermelha</p>
-        </div>
-        <div class="controls">
-            <button onclick="interagirVeiculo('moto', 'ligar')">Ligar</button>
-            <button onclick="interagirVeiculo('moto', 'desligar')">Desligar</button>
-            <button onclick="interagirVeiculo('moto', 'acelerar')">Acelerar</button>
-            <button onclick="interagirVeiculo('moto', 'frear')">Frear</button>
-            <button onclick="interagirVeiculo('moto', 'buzinar')">Buzinar</button>
-            <button onclick="interagirVeiculo('moto', 'mudarCor')">Mudar Cor</button>
-        </div>
-        <div class="status">
-            <p id="statusMoto" class="desligado">Moto desligada</p>
-            <p id="velocidade-moto">Velocidade: 0 km/h</p>
-            <div class="velocidade-progress">
-                <div class="velocidade-progress-bar" id="velocidade-progress-moto"></div>
-            </div>
-        </div>
-
-         <!-- === Seção de Manutenção - ADICIONADA === -->
-        <div class="manutencao-section">
-            <h3>Manutenção</h3>
-            <button class="btn-toggle-form" data-target-form="#form-agendamento-moto">Agendar Nova</button>
-            <form id="form-agendamento-moto" class="form-agendamento" style="display: none;">
-                <h4>Agendar Manutenção</h4>
-                <input type="hidden" name="veiculoId" value="moto"> <!-- ID Atualizado -->
-                <label for="data-manutencao-moto">Data:</label>
-                <input type="date" id="data-manutencao-moto" name="data" required> <!-- ID Atualizado -->
-                <label for="hora-manutencao-moto">Hora:</label>
-                <input type="time" id="hora-manutencao-moto" name="hora" required> <!-- ID Atualizado -->
-                <label for="tipo-manutencao-moto">Tipo Serviço:</label>
-                <input type="text" id="tipo-manutencao-moto" name="tipo" required placeholder="Ex: Troca de Óleo"> <!-- ID Atualizado -->
-                <label for="custo-manutencao-moto">Custo (R$):</label>
-                <input type="number" id="custo-manutencao-moto" name="custo" min="0" step="0.01" placeholder="0.00"> <!-- ID Atualizado -->
-                <label for="desc-manutencao-moto">Descrição:</label>
-                <textarea id="desc-manutencao-moto" name="descricao" rows="2"></textarea> <!-- ID Atualizado -->
-                <button type="submit">Salvar Agendamento</button>
-                <button type="button" class="btn-cancelar-form">Cancelar</button>
-            </form>
-            <h4>Agendamentos Futuros</h4>
-            <div class="manutencao-agendamentos"><!-- Gerado pelo JS --></div>
-            <h4>Histórico Completo</h4>
-            <div class="manutencao-historico"><!-- Gerado pelo JS --></div>
-        </div>
-         <!-- === Fim Seção de Manutenção === -->
-    </div>
-
-    <!-- ==================== Bicicleta ==================== -->
-    <div id="container-bicicleta" class="vehicle">
-        <h2>Bicicleta</h2>
-        <img src="imagens/bicicleta.png" id="imagem-bicicleta" alt="Bicicleta">
-        <div class="info">
-            <p>Modelo: Mountain Bike</p>
-            <p id="cor-bicicleta">Cor: Verde</p>
-        </div>
-        <div class="controls">
-            <button onclick="interagirVeiculo('bicicleta', 'acelerar')">Acelerar</button>
-            <button onclick="interagirVeiculo('bicicleta', 'frear')">Frear</button>
-            <button onclick="interagirVeiculo('bicicleta', 'buzinar')">Buzinar</button>
-        </div>
-        <div class="status">
-            <p id="velocidade-bicicleta">Velocidade: 0 km/h</p>
-        </div>
-
-         <!-- === Seção de Manutenção - ADICIONADA === -->
-        <div class="manutencao-section">
-            <h3>Manutenção</h3>
-            <button class="btn-toggle-form" data-target-form="#form-agendamento-bicicleta">Agendar Nova</button>
-            <form id="form-agendamento-bicicleta" class="form-agendamento" style="display: none;">
-                <h4>Agendar Manutenção</h4>
-                <input type="hidden" name="veiculoId" value="bicicleta"> <!-- ID Atualizado -->
-                <label for="data-manutencao-bicicleta">Data:</label>
-                <input type="date" id="data-manutencao-bicicleta" name="data" required> <!-- ID Atualizado -->
-                <label for="hora-manutencao-bicicleta">Hora:</label>
-                <input type="time" id="hora-manutencao-bicicleta" name="hora" required> <!-- ID Atualizado -->
-                <label for="tipo-manutencao-bicicleta">Tipo Serviço:</label>
-                <input type="text" id="tipo-manutencao-bicicleta" name="tipo" required placeholder="Ex: Lubrificação"> <!-- ID Atualizado -->
-                <label for="custo-manutencao-bicicleta">Custo (R$):</label>
-                <input type="number" id="custo-manutencao-bicicleta" name="custo" min="0" step="0.01" placeholder="0.00"> <!-- ID Atualizado -->
-                <label for="desc-manutencao-bicicleta">Descrição:</label>
-                <textarea id="desc-manutencao-bicicleta" name="descricao" rows="2"></textarea> <!-- ID Atualizado -->
-                <button type="submit">Salvar Agendamento</button>
-                <button type="button" class="btn-cancelar-form">Cancelar</button>
-            </form>
-            <h4>Agendamentos Futuros</h4>
-            <div class="manutencao-agendamentos"><!-- Gerado pelo JS --></div>
-            <h4>Histórico Completo</h4>
-            <div class="manutencao-historico"><!-- Gerado pelo JS --></div>
-        </div>
-         <!-- === Fim Seção de Manutenção === -->
-    </div>
-
-
+    <!-- O Script continua no final -->
     <script src="script.js"></script>
 </body>
 
