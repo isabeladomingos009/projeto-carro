@@ -1,41 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garagem Inteligente v2.0</title>
+    <title>Garagem Inteligente v2.0 - Com API</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <h1>Garagem Inteligente v2.0</h1>
-
+    <h1>Garagem Inteligente v2.0 - APIs</h1>
     <div class="app-container">
         <aside class="sidebar-nav">
             <h2>Navegação</h2>
             <ul>
                 <li><button class="nav-button active" data-view="garagem">Minha Garagem</button></li>
-                <!-- BOTÃO NOVO ADICIONADO -->
                 <li><button class="nav-button" data-view="agendar">Agendar Manutenções</button></li>
-                <!-- FIM DO BOTÃO NOVO -->
-                <!-- Futuramente: <li><button class="nav-button" data-view="adicionar">Adicionar Veículo</button></li> -->
-                <!-- Futuramente: <li><button class="nav-button" data-view="manutencoes">Manutenções</button></li> -->
+                 <li><button class="nav-button" data-view="planejar">Planejar Viagem</button></li> <!-- NOVO BOTÃO -->
             </ul>
-            <div class="nav-footer" style="margin-top: 30px; font-size: 12px; text-align: center; color: #bdc3c7;">
+            <div class="nav-footer">
                 <p>IFPR - Informática</p>
                 <p>Isabela</p>
             </div>
         </aside>
 
-        <main id="main-content" class="main-content">
-            <!-- O conteúdo será carregado aqui pelo JavaScript -->
-            <p>Carregando garagem...</p>
-        </main>
-    </div>
+        <div class="content-wrapper"> <!-- Novo Wrapper -->
+            <main id="main-content" class="main-content">
+                <!-- Conteúdo das views (Garagem, Detalhes, Agendar) aqui -->
+                <p>Carregando...</p>
+            </main>
 
-    <!-- O Script continua no final -->
+            <!-- Planejador de Viagem FORA do main-content -->
+            <section id="planejador-viagem-container" style="display: none;"> <!-- Começa escondido -->
+                 <div class="planejador-viagem-section"> <!-- Não precisa mais do ID aqui se o wrapper controla -->
+                    <h2>Planejar Viagem</h2>
+                    <div class="form-planejador">
+                        <label for="destino-viagem">Destino:</label>
+                        <input type="text" id="destino-viagem" placeholder="Digite a cidade de destino">
+                        <button id="verificar-clima-btn" data-action="verificar-clima">Verificar Clima</button>
+                    </div>
+                    <div id="previsao-tempo-resultado" class="resultado-previsao">
+                         <p>Digite uma cidade e clique em "Verificar Clima".</p>
+                    </div>
+                </div>
+            </section>
+        </div> <!-- Fim do content-wrapper -->
+
+    </div>
     <script src="script.js"></script>
 </body>
-
 </html>

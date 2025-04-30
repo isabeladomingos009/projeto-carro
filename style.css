@@ -48,12 +48,34 @@ button:active {
     transform: translateY(1px);
 }
 
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    font-family: inherit;
+    margin-bottom: 10px; /* Espaçamento padrão abaixo dos inputs */
+}
+
+label {
+    display: block; /* Label acima do input por padrão */
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+    font-size: 0.95em;
+}
+
 /* --- LAYOUT PRINCIPAL --- */
 
 .app-container {
     display: flex;
     width: 100%;
-    max-width: 1300px; /* Aumenta um pouco a largura máxima */
+    max-width: 1300px; /* Largura máxima */
     background-color: #ecf0f1; /* Fundo do container */
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.15);
@@ -126,17 +148,26 @@ button:active {
     color: #bdc3c7; /* Cinza claro */
 }
 
-.main-content {
-    flex-grow: 1; /* Ocupa o espaço restante */
-    padding: 25px;
+/* Wrapper para o conteúdo principal e planejador (se estiver fora do main) */
+.content-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column; /* Empilha main e planejador */
+    overflow-y: auto; /* Scroll se necessário */
     background-color: #f8f9fa; /* Fundo mais claro para área principal */
-    overflow-y: auto; /* Habilita scroll se o conteúdo for maior */
+}
+
+.main-content {
+    flex-grow: 1; /* Ocupa o espaço vertical disponível */
+    padding: 25px;
+    /* Background removido daqui, colocado no wrapper */
+    /* overflow-y: auto; */ /* Movido para o wrapper */
 }
 
 /* --- VISUALIZAÇÃO DA GARAGEM (CARDS) --- */
 .garage-view {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* Grid responsivo, minmax ajustado */
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* Grid responsivo */
     gap: 25px; /* Espaçamento entre cards */
 }
 
@@ -154,7 +185,8 @@ button:active {
     justify-content: space-between; /* Espaça conteúdo interno */
 }
 
-.vehicle-card:hover {
+.vehicle-card:hover,
+.vehicle-card:focus { /* Adiciona foco */
     transform: translateY(-4px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.12);
 }
@@ -162,7 +194,6 @@ button:active {
     outline: 2px solid #3498db;
     outline-offset: 2px;
 }
-
 
 .vehicle-card img {
     max-width: 100%; /* Imagem ocupa a largura do card */
@@ -186,13 +217,12 @@ button:active {
 }
 
 /* --- VISUALIZAÇÃO DE DETALHES DO VEÍCULO --- */
-/* Usa a classe .vehicle como base, que já tem fundo branco, padding, etc. */
 .vehicle-detail-view {
     background-color: #fff;
     border-radius: 8px;
     padding: 25px;
-    margin: 10px auto; /* Centraliza com margem */
-    max-width: 700px; /* Limita largura da view de detalhes */
+    margin: 0 auto 20px auto; /* Margem inferior, centraliza horizontalmente */
+    max-width: 800px; /* Um pouco mais largo */
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     border: 1px solid #eee;
 }
@@ -212,11 +242,27 @@ button:active {
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
+.vehicle-detail-view .info,
+.vehicle-detail-view .controls,
+.vehicle-detail-view .status,
+.manutencao-section,
+.detalhes-api-section { /* Seções dentro dos detalhes */
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee; /* Separador entre seções */
+}
+.vehicle-detail-view > *:last-child { /* Remove borda inferior do último elemento */
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+
 .vehicle-detail-view .info {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
     text-align: center; /* Centraliza informações */
+    border-bottom: 1px solid #eee; /* Adiciona borda aqui */
+    margin-bottom: 20px; /* Espaçamento */
+    padding-bottom: 15px; /* Espaçamento interno */
 }
 
 .vehicle-detail-view .info p {
@@ -226,14 +272,10 @@ button:active {
 }
 
 .vehicle-detail-view .controls {
-    margin-top: 20px;
-    margin-bottom: 25px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center; /* Centraliza botões */
     gap: 10px; /* Espaçamento entre botões */
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
 }
 
 /* Ajustes específicos para controles dentro dos detalhes */
@@ -259,13 +301,9 @@ button:active {
 
 
 .vehicle-detail-view .status {
-    margin-top: 20px;
-    margin-bottom: 25px;
     font-size: 1.1em;
     color: #666;
     text-align: center;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
 }
 
 .vehicle-detail-view .status p {
@@ -273,194 +311,175 @@ button:active {
 }
 
 /* Cores para status ligado/desligado */
-.status .ligado {
-    color: #2ecc71; /* Verde */
-    font-weight: bold;
-}
-
-.status .desligado {
-    color: #e74c3c; /* Vermelho */
-    font-weight: bold;
-}
+.status .ligado { color: #2ecc71; font-weight: bold; }
+.status .desligado { color: #e74c3c; font-weight: bold; }
 
 /* Barra de progresso da velocidade */
-.velocidade-progress {
-    width: 80%; /* Barra não ocupa 100% da largura */
-    height: 12px; /* Pouco mais alta */
-    background-color: #e0e0e0; /* Fundo cinza claro */
-    border-radius: 6px;
-    margin: 10px auto 0 auto; /* Centraliza e adiciona margem */
-    overflow: hidden;
-    border: 1px solid #ccc; /* Borda sutil */
-}
-
-.velocidade-progress-bar {
-    height: 100%;
-    background-color: #3498db; /* Azul padrão */
-    width: 0%; /* Começa vazia */
-    transition: width 0.4s ease, background-color 0.4s ease; /* Animação suave */
-    border-radius: 5px; /* Arredonda barra interna também */
-}
-/* Cor da barra para turbo ativo */
-.velocidade-progress-bar[style*="background-color: rgb(231, 76, 60)"] { /* Seletor para cor vermelha do turbo */
-    /* Pode adicionar algum efeito extra se quiser */
-}
+.velocidade-progress { width: 80%; height: 12px; background-color: #e0e0e0; border-radius: 6px; margin: 10px auto 0 auto; overflow: hidden; border: 1px solid #ccc; }
+.velocidade-progress-bar { height: 100%; background-color: #3498db; width: 0%; transition: width 0.4s ease, background-color 0.4s ease; border-radius: 5px; }
+.velocidade-progress-bar[style*="background-color: rgb(231, 76, 60)"] {} /* Estilo para turbo (vermelho) já aplicado inline */
 
 
-/* --- SEÇÃO DE MANUTENÇÃO --- */
-.manutencao-section {
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid #eee; /* Separa visualmente */
+/* --- SEÇÃO DE MANUTENÇÃO (Detalhes) --- */
+.manutencao-section h3 { text-align: center; font-size: 1.4em; }
+.manutencao-section h4 { margin-top: 20px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dashed #ccc; font-size: 1.2em; color: #555; }
+
+/* Lista de Manutenções */
+.manutencao-agendamentos ul,
+.manutencao-historico ul { list-style: none; padding-left: 0; }
+
+.manutencao-agendamentos li,
+.manutencao-historico li {
+    background-color: #f9f9f9; border: 1px solid #eee; border-radius: 4px;
+    padding: 12px 15px; margin-bottom: 10px; display: flex;
+    justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
 }
 
-.manutencao-section h3 {
-    text-align: center;
+.manutencao-info { flex-grow: 1; color: #333; font-size: 0.95em; }
+.manutencao-info span { font-style: italic; color: #777; }
+.manutencao-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.manutencao-actions button { padding: 5px 8px; font-size: 0.9em; min-width: 30px; line-height: 1; }
+.manutencao-actions button[data-novo-status="Realizada"] { background-color: #2ecc71; }
+.manutencao-actions button[data-novo-status="Realizada"]:hover { background-color: #27ae60; }
+.manutencao-actions button[data-novo-status="Cancelada"] { background-color: #f39c12; }
+.manutencao-actions button[data-novo-status="Cancelada"]:hover { background-color: #e67e22; }
+.manutencao-actions .btn-manutencao-remover { background-color: #e74c3c; }
+.manutencao-actions .btn-manutencao-remover:hover { background-color: #c0392b; }
+
+
+/* --- SEÇÃO DETALHES EXTRAS API (Detalhes) --- */
+.detalhes-api-section {
+    text-align: center; /* Centraliza botão e texto */
+}
+
+.detalhes-api-section h4 {
     margin-bottom: 15px;
-    font-size: 1.4em;
-}
-.manutencao-section h4 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-    border-bottom: 1px dashed #ccc;
+    color: #555; /* Cor um pouco diferente */
     font-size: 1.2em;
-    color: #555;
 }
 
-/* Botão de Agendar Nova */
-.manutencao-section .btn-toggle-form {
-    display: block; /* Ocupa largura toda */
-    margin: 0 auto 15px auto; /* Centraliza */
-    width: 60%;
-    background-color: #2ecc71; /* Verde para agendar */
-}
-.manutencao-section .btn-toggle-form:hover {
-    background-color: #27ae60;
-}
-
-/* Formulário de Agendamento */
-.form-agendamento {
-    background-color: #fdfdfd;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 20px;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.form-agendamento h4 {
-    text-align: center;
-    margin-top: 0;
+.btn-buscar-api {
+    background-color: #9b59b6; /* Cor roxa para diferenciar */
+    color: white;
     margin-bottom: 15px;
-    border-bottom: none; /* Remove borda do h4 dentro do form */
-    color: #3498db;
+    padding: 10px 20px;
 }
 
-.form-agendamento label {
-    display: block; /* Label acima do input */
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
+.btn-buscar-api:hover {
+    background-color: #8e44ad;
+}
+
+.resultado-api {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #f8f9fa; /* Fundo levemente cinza */
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    min-height: 50px; /* Altura mínima para feedback */
+    text-align: left; /* Alinha o texto dos resultados à esquerda */
+    color: #333;
     font-size: 0.95em;
+    line-height: 1.5;
 }
 
+.resultado-api p { margin-bottom: 8px; }
+.resultado-api strong { color: #34495e; } /* Destaca labels */
+
+/* --- VIEW AGENDAR MANUTENÇÃO --- */
+.agendar-view {
+     padding: 20px;
+}
+.agendar-view h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+.vehicle-selector {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.vehicle-selector label {
+    margin-bottom: 0; /* Remove margem inferior do label aqui */
+}
+.vehicle-selector select {
+     min-width: 250px;
+     margin-bottom: 0; /* Remove margem inferior do select aqui */
+}
+
+/* Formulário de Agendamento (na view Agendar) */
+.form-agendamento {
+    background-color: #fdfdfd; border: 1px solid #ddd; border-radius: 6px;
+    padding: 20px; margin-top: 10px; margin-bottom: 20px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    max-width: 500px; /* Limita largura do form */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-agendamento h4 { text-align: center; margin-top: 0; margin-bottom: 15px; border-bottom: none; color: #3498db; }
+.form-agendamento label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 0.95em; }
 .form-agendamento input[type="date"],
 .form-agendamento input[type="time"],
 .form-agendamento input[type="text"],
 .form-agendamento input[type="number"],
-.form-agendamento textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1em;
+.form-agendamento textarea { width: 100%; margin-bottom: 15px; } /* Garante largura total e espaçamento */
+.form-agendamento textarea { resize: vertical; min-height: 60px; }
+
+.form-agendamento div { /* Container dos botões */
+    margin-top: 15px;
+    text-align: right; /* Alinha botões à direita */
 }
-.form-agendamento textarea {
-    resize: vertical; /* Permite redimensionar só verticalmente */
-    min-height: 60px;
+.form-agendamento button[type="submit"] { background-color: #3498db; margin-right: 10px; }
+.form-agendamento button[type="submit"]:hover { background-color: #2980b9; }
+.form-agendamento .btn-cancelar-form { background-color: #e74c3c; }
+.form-agendamento .btn-cancelar-form:hover { background-color: #c0392b; }
+
+
+/* --- SEÇÃO PLANEJADOR DE VIAGEM (Fora do main) --- */
+#planejador-viagem-container {
+    padding: 25px; /* Espaçamento ao redor */
+    background-color: #fff; /* Fundo diferente para destacar */
+    border-top: 2px solid #3498db; /* Linha separadora */
 }
 
-.form-agendamento button[type="submit"] {
-    background-color: #3498db; /* Azul para salvar */
-    margin-right: 10px;
-}
-.form-agendamento button[type="submit"]:hover {
-    background-color: #2980b9;
-}
-.form-agendamento .btn-cancelar-form {
-    background-color: #e74c3c; /* Vermelho para cancelar */
-}
-.form-agendamento .btn-cancelar-form:hover {
-    background-color: #c0392b;
+.planejador-viagem-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #16a085; /* Verde/Azul diferente */
 }
 
-/* Lista de Manutenções */
-.manutencao-agendamentos ul,
-.manutencao-historico ul {
-    list-style: none;
-    padding-left: 0; /* Remove padding padrão da ul */
-}
-
-.manutencao-agendamentos li,
-.manutencao-historico li {
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    border-radius: 4px;
-    padding: 12px 15px;
-    margin-bottom: 10px;
+.form-planejador {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
-    gap: 10px;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-.manutencao-info {
-    flex-grow: 1; /* Ocupa espaço disponível */
-    color: #333;
-    font-size: 0.95em;
+.form-planejador label { margin-bottom: 0; }
+.form-planejador input[type="text"] { min-width: 200px; flex-grow: 1; margin-bottom: 0; }
+#verificar-clima-btn { background-color: #1abc9c; padding: 10px 20px; }
+#verificar-clima-btn:hover { background-color: #16a085; }
+
+.resultado-previsao {
+    margin-top: 15px; padding: 15px; background-color: #ecf0f1;
+    border: 1px solid #bdc3c7; border-radius: 4px; min-height: 60px;
+    color: #34495e; font-size: 1em; line-height: 1.6;
 }
-.manutencao-info span { /* Para destacar status, etc. */
-    font-style: italic;
-    color: #777;
-}
+.resultado-previsao p { margin-bottom: 8px; }
+.resultado-previsao strong { color: #2c3e50; }
+.resultado-previsao img { vertical-align: middle; width: 50px; height: 50px; margin-right: 5px; } /* Estilo para ícone do tempo */
 
 
-.manutencao-actions {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0; /* Impede que os botões encolham */
-}
+/* --- Estilos Comuns para Mensagens (Loading, Error) --- */
+.loading-message { font-style: italic; color: #777; }
+.error-message { color: #e74c3c; font-weight: bold; }
+.success-message { color: #2ecc71; font-weight: bold; }
 
-.manutencao-actions button {
-    padding: 5px 8px; /* Botões menores */
-    font-size: 0.9em;
-    min-width: 30px; /* Largura mínima */
-    line-height: 1; /* Alinha ícones melhor */
-}
-/* Cores específicas para botões de ação */
-.manutencao-actions button[data-novo-status="Realizada"] { background-color: #2ecc71; } /* Verde */
-.manutencao-actions button[data-novo-status="Realizada"]:hover { background-color: #27ae60; }
-.manutencao-actions button[data-novo-status="Cancelada"] { background-color: #f39c12; } /* Laranja */
-.manutencao-actions button[data-novo-status="Cancelada"]:hover { background-color: #e67e22; }
-.manutencao-actions .btn-manutencao-remover { background-color: #e74c3c; } /* Vermelho */
-.manutencao-actions .btn-manutencao-remover:hover { background-color: #c0392b; }
-
-
-/* --- Estilos para mensagens de erro/sucesso (opcional) --- */
-.error-message {
-    color: #e74c3c;
-    font-weight: bold;
-    margin-top: 5px;
-    font-size: 0.9em;
-}
-
-.success-message {
-    color: #2ecc71;
-    font-weight: bold;
-    margin-top: 5px;
-    font-size: 0.9em;
+/* --- Classes Utilitárias --- */
+.hidden {
+    display: none; /* Para esconder o form de agendamento inicialmente */
 }
