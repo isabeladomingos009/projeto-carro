@@ -4,6 +4,12 @@ const STORAGE_KEY = 'garagemInteligenteData_v2';
 let currentView = 'garagem';
 let currentVehicleId = null;
 
+// ATENÇÃO: ARMAZENAR A API KEY DIRETAMENTE NO CÓDIGO FRONTEND É INSEGURO!
+// Em uma aplicação real, a chave NUNCA deve ficar exposta aqui.
+// A forma correta envolve um backend (Node.js, Serverless Function, etc.) atuando como proxy.
+// Para FINS DIDÁTICOS nesta atividade, vamos usá-la aqui temporariamente.
+const OPENWEATHER_API_KEY = "27d6e4bc840fecf1f4a43650e2736924"; // <-- SUBSTITUA PELA SUA CHAVE REAL DA OPENWEATHERMAP (ou mantenha esta se for sua e estiver ativa)
+
 // --- FUNÇÕES DE SOM ---
 function tocarSom(nomeArquivo) { try { new Audio(`${nomeArquivo}`).play(); } catch (e) { console.warn(`Erro ao tocar o som '${nomeArquivo}':`, e); } }
 function tocarBuzina() { tocarSom('buzina.mp3'); }
@@ -56,8 +62,6 @@ class Veiculo {
     _getHistoricoManutencaoHTML(apenasFuturas, apenasAgendadas) { const historicoFiltrado = this.getHistoricoManutencao(apenasFuturas, apenasAgendadas); let titulo = ""; let msgVazio = ""; if (apenasFuturas && apenasAgendadas) {titulo="<h4>Agendamentos Futuros</h4>"; msgVazio="<p>Nenhum agendamento futuro ativo.</p>";} else if (!apenasFuturas && !apenasAgendadas) {titulo="<h4>Histórico Completo</h4>"; msgVazio="<p>Nenhum registro encontrado.</p>";} else {titulo="<h4>Registros Filtrados</h4>"; msgVazio="<p>Nenhum registro encontrado.</p>";} if (historicoFiltrado.length === 0) return titulo + msgVazio; let html = titulo + '<ul>'; try { historicoFiltrado.forEach(m => { let botoesAcao = ''; if (m.status === 'Agendada') { botoesAcao += `<button class="btn-manutencao-status" data-action="marcar-status" data-manutencao-id="${m.id}" data-novo-status="Realizada" title="Marcar como Realizada">✅</button>`; botoesAcao += `<button class="btn-manutencao-status" data-action="marcar-status" data-manutencao-id="${m.id}" data-novo-status="Cancelada" title="Cancelar Agendamento">❌</button>`;} botoesAcao += `<button class="btn-manutencao-remover" data-action="remover-manutencao" data-manutencao-id="${m.id}" title="Remover Registro">🗑️</button>`; const itemFormatado = m.formatar(); const statusInfo = m.status !== 'Agendada' ? ` <span>(${m.status})</span>` : ''; html += `<li data-manutencao-id="${m.id}"><span class="manutencao-info">${itemFormatado}${statusInfo}</span><div class="manutencao-actions">${botoesAcao}</div></li>`; }); html += '</ul>'; return html; } catch (e) { console.error(`[${this.idVeiculo}] Erro ao gerar HTML da lista:`, e); return titulo + '<p style="color:red;">Erro ao gerar lista.</p>'; } }
     toPlainObject(){return{idVeiculo:this.idVeiculo,tipoVeiculo:this.tipoVeiculo,modelo:this.modelo,cor:this.cor,ligado:this.ligado,velocidade:this.velocidade,cores:this.cores,indiceCorAtual:this.indiceCorAtual,maxVelocidade:this.maxVelocidade,historicoManutencao:this.historicoManutencao.map(m=>m.toPlainObject())};}
 }
-
-// --- CLASSES FILHAS --- (Compactadas)
 class Carro extends Veiculo{static CORES_CARRO=["Prata","Branco","Preto","Cinza","Vermelho","Azul"];constructor(m,c,id){super(m,c,'Carro',id);this.maxVelocidade=180;this.cores=[...Carro.CORES_CARRO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}_executarAceleracao(){const i=10,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar();this.atualizarTela();salvarGaragem();}}else{alert(`O ${this.modelo} atingiu vel. máx (${this.maxVelocidade} km/h)!`);}}buzinar(){tocarBuzina();alert(`${this.modelo}: Fom Fom!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Carro)`);}toPlainObject(){return super.toPlainObject();}}
 class CarroEsportivo extends Carro{static CORES_ESPORTIVO=["Vermelha","Amarela","Azul Esportivo","Verde Limão","Preto Fosco"];constructor(m,c,id,idTS){super(m,c,id);this.tipoVeiculo='CarroEsportivo';this.maxVelocidadeNormal=250;this.maxVelocidadeTurbo=320;this.maxVelocidade=this.maxVelocidadeNormal;this.turboAtivado=false;this.idTurboStatusElement=idTS||`turbo-status-${id}`;this.cores=[...CarroEsportivo.CORES_ESPORTIVO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}ativarTurbo(){if(!this.ligado){alert("Ligue o carro!");return;}if(!this.turboAtivado){this.turboAtivado=true;this.maxVelocidade=this.maxVelocidadeTurbo;console.log("Turbo Ativado!");alert("Turbo Ativado!");this.atualizarTela();salvarGaragem();}else{alert("Turbo já ativado!");}}desativarTurbo(a=true){if(this.turboAtivado){this.turboAtivado=false;this.maxVelocidade=this.maxVelocidadeNormal;if(this.velocidade>this.maxVelocidade)this.velocidade=this.maxVelocidade;console.log("Turbo Desativado!");if(a)alert("Turbo Desativado!");this.atualizarTela();salvarGaragem();}else if(a){alert("Turbo já desativado!");}}_executarAceleracao(){const i=this.turboAtivado?25:15,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar();this.atualizarTela();salvarGaragem();}}else{alert(`O ${this.modelo} na vel. máx (${this.maxVelocidade} km/h)!`);}}desligar(){super.desligar();}buzinar(){tocarBuzina();alert(`${this.modelo}: VRUUUUUM!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Esportivo)`);}atualizarTelaTurbo(c){if(!c)return;const tE=c.querySelector(`#${this.idTurboStatusElement}`);if(tE)tE.textContent=`Turbo: ${this.turboAtivado?"Ativado":"Desativado"}`;const pB=c.querySelector('.velocidade-progress-bar');if(pB)pB.style.backgroundColor=this.turboAtivado?'#e74c3c':'#3498db';}toPlainObject(){const p=super.toPlainObject();p.turboAtivado=this.turboAtivado;p.maxVelocidadeNormal=this.maxVelocidadeNormal;p.maxVelocidadeTurbo=this.maxVelocidadeTurbo;p.idTurboStatus=this.idTurboStatusElement;return p;}}
 class Caminhao extends Carro{static CORES_CAMINHAO=["Azul Escuro","Laranja","Verde Musgo","Marrom","Branco Gelo"];constructor(m,c,id,cap,idC){super(m,c,id);this.tipoVeiculo='Caminhao';this.maxVelocidade=120;this.capacidadeCarga=cap>0?cap:10000;this.cargaAtual=0;this.idCargaAtualElement=idC||`carga-atual-${id}`;this.cores=[...Caminhao.CORES_CAMINHAO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}carregar(inputId){const cI=document.getElementById(inputId);if(!cI){console.error(`Input #${inputId} não encontrado!`);alert("Erro: Campo carga não encontrado.");return;}const cV=cI.value;const cN=Number(cV);if(isNaN(cN)||cN<=0){alert("Insira carga válida.");return;}if(this.cargaAtual+cN<=this.capacidadeCarga){this.cargaAtual+=cN;console.log(`Caminhão ${this.idVeiculo} carregado: ${cN.toFixed(0)}kg. Total: ${this.cargaAtual.toFixed(0)}kg`);alert(`Carregado ${cN.toFixed(0)}kg. Total: ${this.cargaAtual.toFixed(0)}kg.`);cI.value='';this.atualizarTela();salvarGaragem();}else{const eL=this.capacidadeCarga-this.cargaAtual;alert(`Carga excessiva! Espaço: ${eL.toFixed(0)} kg.`);}}_executarAceleracao(){const fC=this.capacidadeCarga>0?Math.max(0.4,1-(this.cargaAtual/(this.capacidadeCarga*1.5))):1;const iB=8;const i=Math.round(iB*fC);const vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar();this.atualizarTela();salvarGaragem();}}else{alert(`O ${this.modelo} atingiu vel. máx!`);}}getFreioIncremento(){const fC=this.capacidadeCarga>0?1+(this.cargaAtual/this.capacidadeCarga)*0.5:1;const fB=10;return Math.max(4,Math.round(fB/fC));}buzinar(){tocarBuzina();alert(`${this.modelo}: PÓÓÓÓÓÓM!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Caminhao)`);}atualizarTelaCarga(c){if(!c)return;const cE=c.querySelector(`#${this.idCargaAtualElement}`);if(cE)cE.textContent=`Carga: ${this.cargaAtual.toFixed(0)} kg / ${this.capacidadeCarga.toFixed(0)} kg`;}toPlainObject(){const p=super.toPlainObject();p.capacidadeCarga=this.capacidadeCarga;p.cargaAtual=this.cargaAtual;p.idCargaAtual=this.idCargaAtualElement;return p;}}
@@ -78,13 +82,13 @@ function renderApp() {
     console.log(`Renderizando view: ${currentView}`+(currentVehicleId?` (${currentVehicleId})`:''));
 
     if (currentView === 'planejar') {
-        mainContentElement.innerHTML = ''; // Limpa área principal
-         mainContentElement.style.display = 'none'; // Esconde o main
-         planejadorContainerElement.style.display = 'block'; // Mostra o planejador
+        mainContentElement.innerHTML = ''; 
+         mainContentElement.style.display = 'none'; 
+         planejadorContainerElement.style.display = 'block'; 
     } else {
-         planejadorContainerElement.style.display = 'none'; // Esconde o planejador
-         mainContentElement.style.display = 'block'; // Mostra o main
-        mainContentElement.innerHTML = '<p>Carregando...</p>'; // Limpa e mostra carregando
+         planejadorContainerElement.style.display = 'none'; 
+         mainContentElement.style.display = 'block'; 
+        mainContentElement.innerHTML = '<p>Carregando...</p>'; 
     }
 
     updateNavButtons();
@@ -94,68 +98,291 @@ function renderApp() {
             case 'garagem': renderGarageView(); break;
             case 'detalhes': if (currentVehicleId && veiculos[currentVehicleId]) { renderVehicleDetailView(veiculos[currentVehicleId]); } else { console.error(`Erro render detalhes: ID inválido ${currentVehicleId}`); alert("Erro: Veículo não encontrado."); navigateToView('garagem'); } break;
             case 'agendar': renderAgendarView(); break;
-            case 'planejar': console.log("Exibindo a seção Planejar Viagem."); break; // Já tratado acima
+            case 'planejar': console.log("Exibindo a seção Planejar Viagem."); break; 
             default: console.warn(`View desconhecida: ${currentView}. Voltando p/ garagem.`); navigateToView('garagem');
         }
     } catch (error) {
         console.error(`Erro renderizando view '${currentView}':`, error);
          if (currentView !== 'planejar') { mainContentElement.innerHTML = `<h2>Erro ao Renderizar</h2><p>Ocorreu um erro.</p><p style="color:red; font-size:0.8em;">${error.message}</p>`; }
     }
-    setupDynamicEventListeners(); // Configura listeners que dependem do conteúdo
+    setupDynamicEventListeners(); 
 }
 
-function renderGarageView() { mainContentElement.innerHTML = '<h2>Minha Garagem</h2>'; const container = document.createElement('div'); container.className = 'garage-view'; const ids = Object.keys(veiculos); if (ids.length === 0) { container.innerHTML = '<p>Sua garagem está vazia.</p>'; } else { ids.forEach(id => { const v = veiculos[id]; const card = document.createElement('div'); card.className = 'vehicle-card'; card.dataset.vehicleId = id; card.setAttribute('role', 'button'); card.tabIndex = 0; let img='carrodomal.png'; if(v.tipoVeiculo==='CarroEsportivo')img='carroesportivo.png';else if(v.tipoVeiculo==='Caminhao')img='caminhao.png';else if(v.tipoVeiculo==='Moto')img='moto.png';else if(v.tipoVeiculo==='Bicicleta')img='bicicleta.png';else if(v.tipoVeiculo==='Carro')img='carro.png'; card.innerHTML = `<img src="imagens/${img}" alt="${v.tipoVeiculo} ${v.modelo}"><h3>${v.modelo}</h3><p>Tipo: ${v.tipoVeiculo}</p><p class="info-cor">Cor: ${v.cor}</p>`; container.appendChild(card); }); } mainContentElement.appendChild(container); }
-function renderVehicleDetailView(veiculo) { if (!veiculo) return; const container = document.createElement('div'); container.className = 'vehicle vehicle-detail-view'; container.id = `vehicle-detail-${veiculo.idVeiculo}`; let img='carrodomal.png'; if(veiculo.tipoVeiculo==='CarroEsportivo')img='carroesportivo.png';else if(veiculo.tipoVeiculo==='Caminhao')img='caminhao.png';else if(veiculo.tipoVeiculo==='Moto')img='moto.png';else if(veiculo.tipoVeiculo==='Bicicleta')img='bicicleta.png';else if(veiculo.tipoVeiculo==='Carro')img='carro.png'; let header = `<h2>${veiculo.modelo} <span style="font-weight:normal; font-size: 0.8em; color: #555;">(${veiculo.tipoVeiculo})</span></h2><img src="imagens/${img}" id="imagem-${veiculo.idVeiculo}" alt="${veiculo.tipoVeiculo} ${veiculo.modelo}">`; let info = `<div class="info"><p>Modelo: ${veiculo.modelo}</p><p class="info-cor">Cor: ${veiculo.cor}</p>${(veiculo instanceof Caminhao)?`<p>Capacidade: ${veiculo.capacidadeCarga.toFixed(0)} kg</p>`:''}</div>`; let controls = '<div class="controls">'; if(veiculo.tipoVeiculo!=='Bicicleta'){controls+=`<button data-action="ligar" data-vehicle-id="${veiculo.idVeiculo}">Ligar</button><button data-action="desligar" data-vehicle-id="${veiculo.idVeiculo}">Desligar</button>`;} controls+=`<button data-action="acelerar" data-vehicle-id="${veiculo.idVeiculo}">Acelerar</button><button data-action="frear" data-vehicle-id="${veiculo.idVeiculo}">Frear</button><button data-action="buzinar" data-vehicle-id="${veiculo.idVeiculo}">Buzinar</button>`; if(veiculo.cores&&veiculo.cores.length>1)controls+=`<button data-action="mudarCor" data-vehicle-id="${veiculo.idVeiculo}">Mudar Cor</button>`; if(veiculo instanceof CarroEsportivo)controls+=`<button data-action="ativarTurbo" data-vehicle-id="${veiculo.idVeiculo}">Ativar Turbo</button><button data-action="desativarTurbo" data-vehicle-id="${veiculo.idVeiculo}">Desativar Turbo</button>`; if(veiculo instanceof Caminhao){const cId=`carga-input-${veiculo.idVeiculo}`;controls+=`<div><label for="${cId}">Carga (kg):</label><input type="number" id="${cId}" min="0" placeholder="0" step="100"><button data-action="carregar" data-vehicle-id="${veiculo.idVeiculo}" data-input-id="${cId}">Carregar</button></div>`;} controls+='</div>'; let status = '<div class="status">'; if(veiculo.tipoVeiculo!=='Bicicleta')status+=`<p class="status-ligado ${veiculo.ligado?'ligado':'desligado'}">${veiculo.ligado?veiculo.tipoVeiculo+' ligado':veiculo.tipoVeiculo+' desligado'}</p>`; if(veiculo instanceof CarroEsportivo)status+=`<p id="${veiculo.idTurboStatusElement}">Turbo: ${veiculo.turboAtivado?"Ativado":"Desativado"}</p>`; status+=`<p class="status-velocidade">Velocidade: ${veiculo.velocidade} km/h</p>`; if(veiculo instanceof Caminhao)status+=`<p id="${veiculo.idCargaAtualElement}">Carga: ${veiculo.cargaAtual.toFixed(0)} kg / ${veiculo.capacidadeCarga.toFixed(0)} kg</p>`; if(veiculo.maxVelocidade>0){const p=Math.min((veiculo.velocidade/veiculo.maxVelocidade)*100,100);const bC=(veiculo instanceof CarroEsportivo&&veiculo.turboAtivado)?'#e74c3c':'#3498db';status+=`<div class="velocidade-progress" title="${veiculo.velocidade} km/h / ${veiculo.maxVelocidade} km/h"><div class="velocidade-progress-bar" style="width: ${p}%; background-color: ${bC};"></div></div>`;} status+='</div>'; const agendamentosContainerClass = `manutencao-agendamentos`; const historicoContainerClass = `manutencao-historico`; let manutencaoHTML = `<div class="manutencao-section"><h3>Histórico e Agendamentos</h3><div class="${agendamentosContainerClass}">${veiculo._getHistoricoManutencaoHTML(true, true)}</div><div class="${historicoContainerClass}">${veiculo._getHistoricoManutencaoHTML(false, false)}</div></div>`; let detalhesApiHTML = `<div class="detalhes-api-section"><h4>Detalhes Adicionais (Simulado)</h4><button class="btn-buscar-api" data-action="buscar-detalhes-api" data-vehicle-id="${veiculo.idVeiculo}">Ver Detalhes Extras</button><div id="resultado-api-${veiculo.idVeiculo}" class="resultado-api" style="display: none;"></div></div>`; container.innerHTML = header + info + controls + status + manutencaoHTML + detalhesApiHTML; mainContentElement.innerHTML = ''; mainContentElement.appendChild(container); veiculo.atualizarTela(); }
+function renderGarageView() {
+    mainContentElement.innerHTML = '<h2>Minha Garagem</h2>';
+    const container = document.createElement('div');
+    container.className = 'garage-view';
+    const ids = Object.keys(veiculos);
+    if (ids.length === 0) {
+        container.innerHTML = '<p>Sua garagem está vazia.</p>';
+    } else {
+        ids.forEach(id => {
+            const v = veiculos[id];
+            const card = document.createElement('div');
+            card.className = 'vehicle-card';
+            card.dataset.vehicleId = id;
+            card.setAttribute('role', 'button');
+            card.tabIndex = 0;
+
+            let img = 'carrodomal.png'; // Default
+            if (v.modelo === 'Jackson Storm') {
+                img = 'jackson_storm.jpg'; // Imagem específica para Jackson Storm
+            } else if (v.tipoVeiculo === 'CarroEsportivo') {
+                img = 'carroesportivo.png';
+            } else if (v.tipoVeiculo === 'Caminhao') {
+                img = 'caminhao.png';
+            } else if (v.tipoVeiculo === 'Moto') {
+                img = 'moto.png';
+            } else if (v.tipoVeiculo === 'Bicicleta') {
+                img = 'bicicleta.png';
+            } else if (v.tipoVeiculo === 'Carro') { // Carros genéricos
+                img = 'carro.png';
+            }
+
+            card.innerHTML = `<img src="imagens/${img}" alt="${v.tipoVeiculo} ${v.modelo}"><h3>${v.modelo}</h3><p>Tipo: ${v.tipoVeiculo}</p><p class="info-cor">Cor: ${v.cor}</p>`;
+            container.appendChild(card);
+        });
+    }
+    mainContentElement.appendChild(container);
+}
+
+function renderVehicleDetailView(veiculo) {
+    if (!veiculo) return;
+    const container = document.createElement('div');
+    container.className = 'vehicle vehicle-detail-view';
+    container.id = `vehicle-detail-${veiculo.idVeiculo}`;
+
+    let img = 'carrodomal.png'; // Default
+    if (veiculo.modelo === 'Jackson Storm') {
+        img = 'jackson_storm.jpg'; // Imagem específica para Jackson Storm
+    } else if (veiculo.tipoVeiculo === 'CarroEsportivo') {
+        img = 'carroesportivo.png';
+    } else if (veiculo.tipoVeiculo === 'Caminhao') {
+        img = 'caminhao.png';
+    } else if (veiculo.tipoVeiculo === 'Moto') {
+        img = 'moto.png';
+    } else if (veiculo.tipoVeiculo === 'Bicicleta') {
+        img = 'bicicleta.png';
+    } else if (veiculo.tipoVeiculo === 'Carro') { // Carros genéricos
+        img = 'carro.png';
+    }
+
+    let header = `<h2>${veiculo.modelo} <span style="font-weight:normal; font-size: 0.8em; color: #555;">(${veiculo.tipoVeiculo})</span></h2><img src="imagens/${img}" id="imagem-${veiculo.idVeiculo}" alt="${veiculo.tipoVeiculo} ${veiculo.modelo}">`;
+    let info = `<div class="info"><p>Modelo: ${veiculo.modelo}</p><p class="info-cor">Cor: ${veiculo.cor}</p>${(veiculo instanceof Caminhao)?`<p>Capacidade: ${veiculo.capacidadeCarga.toFixed(0)} kg</p>`:''}</div>`;
+    let controls = '<div class="controls">';
+    if (veiculo.tipoVeiculo !== 'Bicicleta') {
+        controls += `<button data-action="ligar" data-vehicle-id="${veiculo.idVeiculo}">Ligar</button><button data-action="desligar" data-vehicle-id="${veiculo.idVeiculo}">Desligar</button>`;
+    }
+    controls += `<button data-action="acelerar" data-vehicle-id="${veiculo.idVeiculo}">Acelerar</button><button data-action="frear" data-vehicle-id="${veiculo.idVeiculo}">Frear</button><button data-action="buzinar" data-vehicle-id="${veiculo.idVeiculo}">Buzinar</button>`;
+    if (veiculo.cores && veiculo.cores.length > 1) controls += `<button data-action="mudarCor" data-vehicle-id="${veiculo.idVeiculo}">Mudar Cor</button>`;
+    if (veiculo instanceof CarroEsportivo) controls += `<button data-action="ativarTurbo" data-vehicle-id="${veiculo.idVeiculo}">Ativar Turbo</button><button data-action="desativarTurbo" data-vehicle-id="${veiculo.idVeiculo}">Desativar Turbo</button>`;
+    if (veiculo instanceof Caminhao) {
+        const cId = `carga-input-${veiculo.idVeiculo}`;
+        controls += `<div><label for="${cId}">Carga (kg):</label><input type="number" id="${cId}" min="0" placeholder="0" step="100"><button data-action="carregar" data-vehicle-id="${veiculo.idVeiculo}" data-input-id="${cId}">Carregar</button></div>`;
+    }
+    controls += '</div>';
+    let status = '<div class="status">';
+    if (veiculo.tipoVeiculo !== 'Bicicleta') status += `<p class="status-ligado ${veiculo.ligado?'ligado':'desligado'}">${veiculo.ligado?veiculo.tipoVeiculo+' ligado':veiculo.tipoVeiculo+' desligado'}</p>`;
+    if (veiculo instanceof CarroEsportivo) status += `<p id="${veiculo.idTurboStatusElement}">Turbo: ${veiculo.turboAtivado?"Ativado":"Desativado"}</p>`;
+    status += `<p class="status-velocidade">Velocidade: ${veiculo.velocidade} km/h</p>`;
+    if (veiculo instanceof Caminhao) status += `<p id="${veiculo.idCargaAtualElement}">Carga: ${veiculo.cargaAtual.toFixed(0)} kg / ${veiculo.capacidadeCarga.toFixed(0)} kg</p>`;
+    if (veiculo.maxVelocidade > 0) {
+        const p = Math.min((veiculo.velocidade / veiculo.maxVelocidade) * 100, 100);
+        const bC = (veiculo instanceof CarroEsportivo && veiculo.turboAtivado) ? '#e74c3c' : '#3498db';
+        status += `<div class="velocidade-progress" title="${veiculo.velocidade} km/h / ${veiculo.maxVelocidade} km/h"><div class="velocidade-progress-bar" style="width: ${p}%; background-color: ${bC};"></div></div>`;
+    }
+    status += '</div>';
+    const agendamentosContainerClass = `manutencao-agendamentos`;
+    const historicoContainerClass = `manutencao-historico`;
+    let manutencaoHTML = `<div class="manutencao-section"><h3>Histórico e Agendamentos</h3><div class="${agendamentosContainerClass}">${veiculo._getHistoricoManutencaoHTML(true, true)}</div><div class="${historicoContainerClass}">${veiculo._getHistoricoManutencaoHTML(false, false)}</div></div>`;
+    let detalhesApiHTML = `<div class="detalhes-api-section"><h4>Detalhes Adicionais (Simulado)</h4><button class="btn-buscar-api" data-action="buscar-detalhes-api" data-vehicle-id="${veiculo.idVeiculo}">Ver Detalhes Extras</button><div id="resultado-api-${veiculo.idVeiculo}" class="resultado-api" style="display: none;"></div></div>`;
+    container.innerHTML = header + info + controls + status + manutencaoHTML + detalhesApiHTML;
+    mainContentElement.innerHTML = '';
+    mainContentElement.appendChild(container);
+    veiculo.atualizarTela();
+}
+
 function renderAgendarView() { const container = document.createElement('div'); container.className = 'agendar-view'; container.innerHTML = '<h2>Agendar Nova Manutenção</h2>'; const selectorDiv = document.createElement('div'); selectorDiv.className = 'vehicle-selector'; let selectorHTML = `<label for="vehicle-select-schedule">Selecione o Veículo:</label><select id="vehicle-select-schedule" name="vehicleId"><option value="">-- Selecione --</option>`; const vehicleIds = Object.keys(veiculos); if (vehicleIds.length > 0) { vehicleIds.forEach(id => { selectorHTML += `<option value="${id}">${veiculos[id].modelo} (${veiculos[id].tipoVeiculo})</option>`; }); } else { selectorHTML += `<option value="" disabled>Nenhum veículo</option>`; } selectorHTML += `</select>`; selectorDiv.innerHTML = selectorHTML; container.appendChild(selectorDiv); const formContainer = document.createElement('div'); formContainer.id = 'agendar-maintenance-form-container'; formContainer.className = 'hidden'; formContainer.innerHTML = `<p id="select-vehicle-message">Selecione um veículo.</p>`; container.appendChild(formContainer); mainContentElement.innerHTML = ''; mainContentElement.appendChild(container); const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } else { console.error("Erro: Select #vehicle-select-schedule não encontrado."); } }
 
 // --- FUNÇÕES API SIMULADA ---
 async function buscarDetalhesVeiculoAPI(identificadorVeiculo) { const apiUrl = './dados_veiculos_api.json'; console.log(`[API SIMULADA] Buscando: ${identificadorVeiculo}`); try { const response = await fetch(apiUrl); if (!response.ok) { throw new Error(`Erro HTTP: ${response.status}`); } const dadosTodosVeiculos = await response.json(); const detalhesVeiculo = dadosTodosVeiculos.find(v => v.idVeiculo === identificadorVeiculo); if (detalhesVeiculo) { console.log(`[API SIMULADA] Encontrado:`, detalhesVeiculo); return detalhesVeiculo; } else { console.log(`[API SIMULADA] Não encontrado.`); return null; } } catch (error) { console.error("[API SIMULADA] Falha:", error); return null; } }
 async function exibirDetalhesVeiculoAPI(vehicleId) { const resultadoDiv = document.getElementById(`resultado-api-${vehicleId}`); if (!resultadoDiv) { console.error(`Div #resultado-api-${vehicleId} não encontrada.`); return; } resultadoDiv.innerHTML = '<p class="loading-message">Carregando...</p>'; resultadoDiv.style.display = 'block'; const detalhes = await buscarDetalhesVeiculoAPI(vehicleId); if (detalhes) { let htmlResultado = `<p><strong>Valor FIPE:</strong> ${detalhes.valorFIPE || 'N/D'}</p>`; htmlResultado += `<p><strong>Recall:</strong> ${detalhes.ultimoRecall || 'N/D'}</p>`; htmlResultado += `<p><strong>Dica:</strong> ${detalhes.dicaManutencao || 'N/D'}</p>`; htmlResultado += `<p><strong>Consumo:</strong> ${detalhes.consumoMedio || 'N/D'}</p>`; resultadoDiv.innerHTML = htmlResultado; } else { resultadoDiv.innerHTML = '<p class="error-message">Detalhes não encontrados ou erro.</p>'; } }
 
-// --- FUNÇÕES API REAL (OpenWeatherMap) ---
-async function buscarPrevisaoTempo(nomeCidade) {
-    // ========================================================================
-    //                 🚨🚨🚨 ATENÇÃO ISABELA! 🚨🚨🚨
-    // SUBSTITUA A LINHA ABAIXO PELA SUA CHAVE REAL DA OPENWEATHERMAP
-    // VERIFIQUE SE ELA ESTÁ ATIVA NO SITE DELES.
-    // NÃO ENVIE ESTA CHAVE PARA O GITHUB SE SEU REPOSITÓRIO FOR PÚBLICO!
-    const apiKey = "27d6e4bc840fecf1f4a43650e2736924"; // <--- SUBSTITUA AQUI!!!
-    // ========================================================================
 
-    // Verificação extra para garantir que a chave foi alterada
-    if (!apiKey || apiKey === "SUA_CHAVE_API_REAL_AQUI" || apiKey.length < 30) { // Chaves geralmente têm 32 caracteres
-         const errorMsg = "ERRO: Chave da API OpenWeatherMap inválida ou não configurada no script.js!";
-         console.error("[OpenWeatherAPI]", errorMsg);
-         // Retorna um objeto de erro claro para a UI
-         return { error: true, message: errorMsg };
+// --- FUNÇÕES API REAL (OpenWeatherMap) ---
+
+/**
+ * Busca a previsão do tempo detalhada (5 dias, a cada 3 horas) para uma cidade usando a API OpenWeatherMap.
+ * @async
+ * @param {string} nomeCidade - O nome da cidade para buscar a previsão.
+ * @returns {Promise<Object|null>} Um objeto com os dados da previsão da API, ou um objeto de erro { error: true, message: string }.
+ */
+async function buscarPrevisaoDetalhada(nomeCidade) {
+    // A constante OPENWEATHER_API_KEY é definida no topo do script.
+    // O alerta de segurança sobre a chave no frontend está lá.
+    const apiKey = OPENWEATHER_API_KEY;
+
+    if (!apiKey || apiKey === "SUA_CHAVE_API_REAL_AQUI" || apiKey.length < 30) { // Validação básica da chave
+        const errorMsg = "ERRO: Chave da API OpenWeatherMap inválida ou não configurada corretamente no script.js!";
+        console.error("[OpenWeatherAPI - Forecast]", errorMsg);
+        return { error: true, message: errorMsg };
     }
 
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(nomeCidade)}&appid=${apiKey}&units=metric&lang=pt_br`;
-    console.log(`[OpenWeatherAPI] Buscando previsão para: ${nomeCidade}`);
+    // Endpoint para "5 day / 3 hour forecast"
+    const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(nomeCidade)}&appid=${apiKey}&units=metric&lang=pt_br`;
+    console.log(`[OpenWeatherAPI - Forecast] Buscando previsão para: ${nomeCidade} em ${apiUrl}`);
+
     try {
         const response = await fetch(apiUrl);
-        const data = await response.json();
+        const data = await response.json(); // Tenta parsear JSON mesmo se não for ok, para pegar a mensagem de erro da API
+
         if (!response.ok) {
-            // O erro 401 (Invalid API key) será capturado aqui
-            console.error(`[OpenWeatherAPI] Erro ${response.status}:`, data.message || 'Erro desconhecido da API');
-            throw new Error(data.message || `Erro ${response.status}`);
+            // data.message pode ser "city not found", "Invalid API key", etc.
+            const errorMessage = data.message || `Erro HTTP: ${response.status}`;
+            console.error(`[OpenWeatherAPI - Forecast] Erro ${response.status}:`, errorMessage, data);
+            throw new Error(errorMessage);
         }
-        const previsaoFormatada = {
-            cidade: data.name, pais: data.sys.country,
-            temperatura: data.main.temp, sensacaoTermica: data.main.feels_like,
-            tempMin: data.main.temp_min, tempMax: data.main.temp_max,
-            descricao: data.weather[0].description, icone: data.weather[0].icon,
-            umidade: data.main.humidity, ventoVelocidade: data.wind.speed,
-            urlIcone: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
-        };
-        console.log(`[OpenWeatherAPI] Previsão encontrada:`, previsaoFormatada);
-        return previsaoFormatada;
+        
+        console.log(`[OpenWeatherAPI - Forecast] Previsão detalhada encontrada:`, data);
+        return data; // Retorna o objeto completo da API (que inclui a 'list')
     } catch (error) {
-        console.error("[OpenWeatherAPI] Falha na requisição ou processamento:", error);
-        // Retorna o erro para a UI tratar
-        return { error: true, message: error.message || "Não foi possível buscar a previsão." };
+        console.error("[OpenWeatherAPI - Forecast] Falha na requisição ou processamento:", error);
+        return { error: true, message: error.message || "Não foi possível buscar a previsão detalhada." };
     }
 }
+
+/**
+ * Processa os dados brutos da API de forecast da OpenWeatherMap e agrupa as informações por dia.
+ * @param {Object} dataApi - O objeto JSON completo retornado pela API de forecast (espera-se que tenha uma propriedade 'list').
+ * @returns {Array<Object>|null} Um array de objetos, onde cada objeto representa um dia com dados resumidos
+ *                                (data, temp_min, temp_max, descricao, icone), ordenados por data. Retorna null se os dados forem inválidos.
+ * Exemplo de objeto em um dia: { data: '2024-07-28', temp_min: 15.5, temp_max: 25.2, descricao: 'céu limpo', icone: '01d' }
+ */
+function processarDadosForecast(dataApi) {
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+
+    const previsoesAgrupadasPorDia = {};
+
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0]; // Formato "AAAA-MM-DD"
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = {
+                data: diaStr,
+                entradas: [] // Armazena todas as previsões de 3h para este dia
+            };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5), // Formato "HH:MM"
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon
+        });
+    });
+
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const temp_min = Math.min(...temperaturas);
+        const temp_max = Math.max(...temperaturas);
+
+        // Lógica para escolher uma descrição/ícone representativo para o dia:
+        // Tenta pegar a previsão das 12:00 ou 15:00. Se não houver, pega a primeira do dia.
+        let previsaoRepresentativa =
+            diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00") ||
+            diaData.entradas.find(e => e.hora === "12:00") || // Caso apenas 12:00 exista
+            diaData.entradas.find(e => e.hora === "09:00") || // Outra opção se 12/15 não existir
+            diaData.entradas[0]; // Fallback para a primeira entrada do dia
+
+        resultadoFinal.push({
+            data: diaData.data,
+            temp_min: parseFloat(temp_min.toFixed(1)),
+            temp_max: parseFloat(temp_max.toFixed(1)),
+            descricao: previsaoRepresentativa.descricao,
+            icone: previsaoRepresentativa.icone
+        });
+    }
+
+    // Ordenar os dias pela data
+    resultadoFinal.sort((a, b) => new Date(a.data) - new Date(b.data));
+    
+    console.log("[Processamento Forecast] Dados processados por dia:", resultadoFinal);
+    return resultadoFinal;
+}
+
+/**
+ * Formata uma string de data "AAAA-MM-DD" para um formato mais legível (ex: "dom, 28 de jul").
+ * @param {string} dataStr - A string de data no formato "AAAA-MM-DD".
+ * @returns {string} A data formatada ou "Data inválida" em caso de erro.
+ */
+function formatarDataParaExibicao(dataStr) {
+    if (!dataStr || typeof dataStr !== 'string') return "Data inválida";
+    try {
+        const [year, month, day] = dataStr.split('-');
+        // new Date() espera mês 0-indexado.
+        const dataObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (isNaN(dataObj.getTime())) { // Verifica se a data é válida
+            throw new Error("Data inválida após parse.");
+        }
+        return dataObj.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+    } catch (e) {
+        console.error("Erro ao formatar data:", dataStr, e);
+        return "Data inválida";
+    }
+}
+
+/**
+ * Exibe a previsão do tempo detalhada (por dia) na interface do usuário, dentro do elemento #previsao-tempo-resultado.
+ * @param {Array<Object>|null} previsaoDiariaProcessada - Array de objetos, cada um representando um dia com dados de previsão.
+ *                                                      Se null ou vazio, exibe uma mensagem apropriada.
+ * @param {string} nomeCidade - O nome da cidade para exibir no título da previsão.
+ */
+function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!resultadoDiv) {
+        console.error("Div #previsao-tempo-resultado não encontrada para exibir previsão detalhada.");
+        return;
+    }
+    resultadoDiv.innerHTML = ''; // Limpa conteúdo anterior
+
+    const tituloEl = document.createElement('h3'); // Usar H3 para semântica dentro da seção
+    tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
+    resultadoDiv.appendChild(tituloEl);
+
+    const previsaoContainer = document.createElement('div');
+    previsaoContainer.className = 'previsao-dias-container'; // Classe para estilização com CSS
+    resultadoDiv.appendChild(previsaoContainer);
+
+    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
+        previsaoContainer.innerHTML = '<p>Nenhuma previsão disponível para os próximos dias ou erro ao processar.</p>';
+        return;
+    }
+
+    previsaoDiariaProcessada.forEach(dia => {
+        const diaCard = document.createElement('div');
+        diaCard.className = 'previsao-dia-card'; // Classe para estilização individual do card do dia
+
+        const dataFormatada = formatarDataParaExibicao(dia.data);
+        const descricaoCapitalizada = dia.descricao.charAt(0).toUpperCase() + dia.descricao.slice(1);
+
+        diaCard.innerHTML = `
+            <h4>${dataFormatada}</h4>
+            <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
+            <p class="descricao-tempo">${descricaoCapitalizada}</p>
+            <p class="temperaturas">
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> / 
+                <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
+            </p>
+        `;
+        previsaoContainer.appendChild(diaCard);
+    });
+}
+
 
 // --- NAVEGAÇÃO E EVENTOS ---
 function updateNavButtons() { const b=document.querySelectorAll('.sidebar-nav .nav-button'); b.forEach(btn=>{ if(btn.dataset.view===currentView)btn.classList.add('active'); else btn.classList.remove('active'); }); }
@@ -165,7 +392,50 @@ function setupEventListeners() { console.log("Configurando listeners globais..."
 function setupDynamicEventListeners() { if (currentView === 'agendar') { const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.removeEventListener('change', handleVehicleSelectionChange); vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } } }
 function handleMainContentClick(event) { const target = event.target; const vehicleCard = target.closest('.vehicle-card'); if (vehicleCard && vehicleCard.dataset.vehicleId) { event.preventDefault(); navigateToDetails(vehicleCard.dataset.vehicleId); return; } const button = target.closest('button[data-action]'); if (button) { const action = button.dataset.action; const vehicleId = button.dataset.vehicleId || target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); const manutencaoId = button.dataset.manutencaoId; console.log(`Click Action: ${action}`, { vehicleId, manutencaoId }); if (vehicleId && veiculos[vehicleId]) { const v = veiculos[vehicleId]; try{ switch(action){ case 'ligar': v.ligar(); break; case 'desligar': v.desligar(); break; case 'acelerar': v.acelerar(); break; case 'frear': v.frear(); break; case 'mudarCor': v.mudarCor(); break; case 'ativarTurbo': if(v.ativarTurbo)v.ativarTurbo(); else alert("Sem turbo."); break; case 'desativarTurbo': if(v.desativarTurbo)v.desativarTurbo(); else alert("Sem turbo."); break; case 'carregar': if(v.carregar&&button.dataset.inputId)v.carregar(button.dataset.inputId); else if(v.carregar)console.error("Botão carregar s/ data-input-id."); else alert("Não carrega."); break; case 'buzinar': v.buzinar(); break; case 'buscar-detalhes-api': exibirDetalhesVeiculoAPI(vehicleId); break; default: console.warn(`Ação de botão desconhecida: ${action}`); } }catch(e){console.error(`Erro ação '${action}' veículo ${vehicleId}:`,e);alert(`Erro ação '${action}'.`);} } else if (action === 'marcar-status' && manutencaoId) { const nS = button.dataset.novoStatus; const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext] && nS) { const v=veiculos[vIdContext];const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`Marcar "${m.tipo}" como "${nS}"?`))v.marcarManutencaoComo(manutencaoId,nS); } else console.error("Dados incompletos marcar status:",{vIdContext,manutencaoId,nS}); } else if (action === 'remover-manutencao' && manutencaoId) { const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext]) { const v=veiculos[vIdContext]; const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`REMOVER registro "${m.tipo}" de ${m.getFormattedDate()}?`))v.removerManutencao(manutencaoId); } else console.error("Dados incompletos remover manut:",{vIdContext,manutencaoId}); } else if (action === 'cancelar-form') { handleCancelForm(button); } } const formAgendamento = target.closest('form.form-agendamento'); if (formAgendamento && event.type === 'submit') { handleFormSubmit(event); } }
 function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('vehicle-card')){ const vId=event.target.dataset.vehicleId; if(vId){event.preventDefault();navigateToDetails(vId);} } }
-async function handleVerificarClimaClick() { const destinoInput = document.getElementById('destino-viagem'); const resultadoDiv = document.getElementById('previsao-tempo-resultado'); if (!destinoInput || !resultadoDiv) { console.error("Elementos do planejador não encontrados."); return; } const nomeCidade = destinoInput.value.trim(); if (!nomeCidade) { alert("Digite a cidade de destino."); resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>'; return; } resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>'; const previsao = await buscarPrevisaoTempo(nomeCidade); if (previsao && !previsao.error) { let htmlResultado = `<p><strong>Tempo em ${previsao.cidade}, ${previsao.pais}:</strong></p><p><img src="${previsao.urlIcone}" alt="${previsao.descricao}" style="vertical-align: middle; width: 50px; height: 50px;"> ${previsao.descricao.charAt(0).toUpperCase() + previsao.descricao.slice(1)}</p><p><strong>Temp:</strong> ${previsao.temperatura.toFixed(1)}°C (Sensação: ${previsao.sensacaoTermica.toFixed(1)}°C)</p><p><strong>Min/Max:</strong> ${previsao.tempMin.toFixed(1)}°C / ${previsao.tempMax.toFixed(1)}°C</p><p><strong>Umidade:</strong> ${previsao.umidade}%</p><p><strong>Vento:</strong> ${previsao.ventoVelocidade.toFixed(1)} m/s</p>`; resultadoDiv.innerHTML = htmlResultado; } else { resultadoDiv.innerHTML = `<p class="error-message">Erro: ${previsao?.message || 'Não foi possível obter a previsão.'}</p>`; } }
+
+/**
+ * Manipulador de evento para o clique no botão "Verificar Clima".
+ * Busca a previsão detalhada, processa os dados e os exibe na UI.
+ * @async
+ */
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+
+    if (!destinoInput || !resultadoDiv) {
+        console.error("Elementos do DOM para o planejador de viagem não foram encontrados.");
+        alert("Erro interno: Não foi possível encontrar os campos necessários para verificar o clima.");
+        return;
+    }
+
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade de destino.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade para verificar a previsão.</p>';
+        destinoInput.focus();
+        return;
+    }
+
+    resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão detalhada...</p>';
+
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade); // Chama a nova função de busca
+
+    if (dadosApi && !dadosApi.error) {
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada && previsaoProcessada.length > 0) {
+            exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
+        } else {
+            // Esta mensagem pode aparecer se a API retornar uma lista vazia ou dados inesperados
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console para mais detalhes ou tente uma cidade diferente.</p>';
+            console.warn("A função processarDadosForecast retornou nulo ou um array vazio. Dados da API:", dadosApi);
+        }
+    } else {
+        // Erro retornado pela função buscarPrevisaoDetalhada (ex: chave inválida, cidade não encontrada, problema de rede)
+        resultadoDiv.innerHTML = `<p class="error-message">Erro ao buscar previsão: ${dadosApi?.message || 'Não foi possível obter a previsão do tempo.'}</p>`;
+    }
+}
+
+// --- FUNÇÕES DE FORMULÁRIO DE MANUTENÇÃO ---
 function handleVehicleSelectionChange(event) { const selectedVehicleId = event.target.value; const formContainer = document.getElementById('agendar-maintenance-form-container'); if (!formContainer) { console.error("Container do formulário não encontrado!"); return; } if (selectedVehicleId && veiculos[selectedVehicleId]) { console.log(`Veículo selecionado: ${selectedVehicleId}`); formContainer.innerHTML = getMaintenanceFormHTML(selectedVehicleId); formContainer.classList.remove('hidden'); formContainer.style.display = 'block'; const formElement = formContainer.querySelector('form.form-agendamento'); if (formElement) { setupFormSubmitListener(formElement); } else { console.error("Erro: Formulário não encontrado."); } } else { console.log("Nenhum veículo selecionado."); formContainer.innerHTML = `<p id="select-vehicle-message">Selecione um veículo.</p>`; formContainer.classList.add('hidden'); formContainer.style.display = 'none'; } }
 function getMaintenanceFormHTML(vehicleId) { const formId = `form-agendamento-agendarview-${vehicleId}`; return `<form id="${formId}" class="form-agendamento"><h4>Agendar para: ${veiculos[vehicleId].modelo} (${veiculos[vehicleId].tipoVeiculo})</h4><label for="data-man-${formId}">Data:*</label><input type="date" id="data-man-${formId}" name="data" required><label for="hora-man-${formId}">Hora:</label><input type="time" id="hora-man-${formId}" name="hora"><label for="tipo-man-${formId}">Tipo Serviço:*</label><input type="text" id="tipo-man-${formId}" name="tipo" required placeholder="Ex: Troca de Óleo..."><label for="custo-man-${formId}">Custo (R$):</label><input type="number" id="custo-man-${formId}" name="custo" min="0" step="0.01" placeholder="0.00"><label for="desc-man-${formId}">Descrição:</label><textarea id="desc-man-${formId}" name="descricao" rows="2" placeholder="Detalhes..."></textarea><div><button type="submit" data-action="salvar-agendamento" data-vehicle-id-target="${vehicleId}">Salvar</button><button type="button" class="btn-cancelar-form" data-action="cancelar-form">Cancelar</button></div></form>`; }
 function setupFormSubmitListener(formElement) { if (formElement) { formElement.removeEventListener('submit', handleFormSubmit); formElement.addEventListener('submit', handleFormSubmit); console.log(`Listener submit adicionado: #${formElement.id}`); } else { console.error("setupFormSubmitListener: formElement inválido."); } }
@@ -178,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM carregado. Inicializando Garagem v2.0 com APIs...");
     carregarGaragem();
     renderApp(); // Renderiza a view inicial ('garagem')
-    setupEventListeners(); // Configura listeners estáticos
+    setupEventListeners(); // Configura listeners estáticos (incluindo o de #verificar-clima-btn)
     console.log("Aplicação inicializada.");
 });
 // FIM DO SCRIPT

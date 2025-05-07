@@ -468,10 +468,88 @@ label {
     margin-top: 15px; padding: 15px; background-color: #ecf0f1;
     border: 1px solid #bdc3c7; border-radius: 4px; min-height: 60px;
     color: #34495e; font-size: 1em; line-height: 1.6;
+    text-align: left; /* Garante que o conteúdo interno comece à esquerda */
 }
 .resultado-previsao p { margin-bottom: 8px; }
 .resultado-previsao strong { color: #2c3e50; }
-.resultado-previsao img { vertical-align: middle; width: 50px; height: 50px; margin-right: 5px; } /* Estilo para ícone do tempo */
+/* Removido o estilo específico para ícone aqui, pois será tratado no card */
+/* .resultado-previsao img { vertical-align: middle; width: 50px; height: 50px; margin-right: 5px; } */
+
+
+/* --- NOVOS ESTILOS PARA PREVISÃO DETALHADA --- */
+.resultado-previsao h3 { /* Estilo para o título "Previsão para NOME_CIDADE" */
+    text-align: center;
+    margin-bottom: 15px;
+    color: #2c3e50; /* Cor escura, como um título principal */
+    font-size: 1.3em; /* Um pouco maior */
+    font-weight: 600;
+}
+.resultado-previsao h3 strong {
+    color: #16a085; /* Cor de destaque para o nome da cidade */
+}
+
+.previsao-dias-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite que os cards quebrem para a próxima linha em telas menores */
+    gap: 15px;       /* Espaçamento entre os cards de cada dia */
+    justify-content: space-around; /* Distribui os cards no espaço disponível */
+    margin-top: 10px; /* Espaço abaixo do título da previsão */
+}
+
+.previsao-dia-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0; /* Borda mais sutil */
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    min-width: 120px;   /* Largura mínima de cada card */
+    flex: 1 1 120px;    /* Flex: crescer, encolher, base de 120px. Permite responsividade. */
+    max-width: 150px;   /* Largura máxima para não ficarem muito grandes em telas largas */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.previsao-dia-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.12);
+}
+
+.previsao-dia-card h4 { /* Data formatada do dia */
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 1em;    /* Tamanho da data */
+    color: #34495e;    /* Cor escura para a data */
+    font-weight: bold;
+}
+
+.previsao-dia-card img {
+    width: 50px;       /* Tamanho do ícone do tempo */
+    height: 50px;
+    margin-bottom: 5px;
+    object-fit: contain; /* Garante que a imagem não seja distorcida */
+}
+
+.previsao-dia-card .descricao-tempo {
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 8px;
+    min-height: 2.2em; /* Ajuda a alinhar cards com descrições de 1 ou 2 linhas */
+    line-height: 1.1em; /* Ajusta o espaçamento entre linhas da descrição */
+}
+
+.previsao-dia-card .temperaturas {
+    font-size: 1em; /* Tamanho das temperaturas */
+    font-weight: 500;
+    color: #333;
+}
+.previsao-dia-card .temperaturas .temp-max {
+    color: #e74c3c; /* Vermelho para temperatura máxima */
+    font-weight: bold;
+}
+.previsao-dia-card .temperaturas .temp-min {
+    color: #3498db; /* Azul para temperatura mínima */
+    font-weight: bold;
+}
 
 
 /* --- Estilos Comuns para Mensagens (Loading, Error) --- */
