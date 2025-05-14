@@ -7,13 +7,13 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #dfe6e9; /* Tom de cinza/azul claro */
+    background-color: #dfe6e9;
     margin: 0;
     padding: 15px;
     color: #333;
-    display: flex; /* Para H1 ficar acima do container */
+    display: flex;
     flex-direction: column;
-    align-items: center; /* Centraliza o H1 e o app-container */
+    align-items: center;
     min-height: 100vh;
 }
 
@@ -24,13 +24,13 @@ h1 {
 }
 
 h2, h3, h4 {
-    color: #3498db; /* Azul padrão para títulos */
+    color: #3498db;
     margin-bottom: 10px;
 }
 
 button {
     cursor: pointer;
-    font-family: inherit; /* Herda a fonte do body */
+    font-family: inherit;
     padding: 10px 15px;
     border-radius: 5px;
     border: none;
@@ -41,7 +41,7 @@ button {
 }
 
 button:hover {
-    background-color: #2980b9; /* Azul mais escuro no hover */
+    background-color: #2980b9;
 }
 
 button:active {
@@ -59,11 +59,11 @@ select {
     border-radius: 4px;
     font-size: 1em;
     font-family: inherit;
-    margin-bottom: 10px; /* Espaçamento padrão abaixo dos inputs */
+    margin-bottom: 10px;
 }
 
 label {
-    display: block; /* Label acima do input por padrão */
+    display: block;
     margin-bottom: 5px;
     font-weight: bold;
     color: #555;
@@ -71,26 +71,25 @@ label {
 }
 
 /* --- LAYOUT PRINCIPAL --- */
-
 .app-container {
     display: flex;
     width: 100%;
-    max-width: 1300px; /* Largura máxima */
-    background-color: #ecf0f1; /* Fundo do container */
+    max-width: 1300px;
+    background-color: #ecf0f1;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-    overflow: hidden; /* Previne que filhos ultrapassem bordas arredondadas */
-    flex-grow: 1; /* Ocupa o espaço vertical restante */
+    overflow: hidden;
+    flex-grow: 1;
 }
 
 .sidebar-nav {
-    width: 220px; /* Largura da barra lateral */
-    background-color: #34495e; /* Cor escura para a navegação */
+    width: 220px;
+    background-color: #34495e;
     padding: 20px;
-    color: #ecf0f1; /* Texto claro */
-    flex-shrink: 0; /* Impede que a barra encolha */
+    color: #ecf0f1;
+    flex-shrink: 0;
     display: flex;
-    flex-direction: column; /* Organiza itens verticalmente */
+    flex-direction: column;
 }
 
 .sidebar-nav h2 {
@@ -107,7 +106,7 @@ label {
     list-style: none;
     padding: 0;
     margin: 0;
-    flex-grow: 1; /* Ocupa espaço para empurrar footer para baixo */
+    flex-grow: 1;
 }
 
 .sidebar-nav li {
@@ -118,57 +117,54 @@ label {
     background-color: transparent;
     border: 1px solid #7f8c8d;
     color: #ecf0f1;
-    padding: 12px 18px; /* Aumenta padding */
+    padding: 12px 18px;
     width: 100%;
     text-align: left;
     border-radius: 4px;
-    font-size: 1em; /* Usa em para ser relativo */
+    font-size: 1em;
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .sidebar-nav .nav-button:hover {
-    background-color: rgba(236, 240, 241, 0.1); /* Fundo levemente claro no hover */
+    background-color: rgba(236, 240, 241, 0.1);
     border-color: #95a5a6;
-    color: #fff; /* Garante texto branco */
+    color: #fff;
 }
 
 .sidebar-nav .nav-button.active {
-    background-color: #3498db; /* Cor de destaque para ativo */
+    background-color: #3498db;
     border-color: #3498db;
     color: #fff;
     font-weight: bold;
 }
 
 .nav-footer {
-    margin-top: auto; /* Empurra para o final */
+    margin-top: auto;
     padding-top: 20px;
     border-top: 1px solid #7f8c8d;
     font-size: 0.8em;
     text-align: center;
-    color: #bdc3c7; /* Cinza claro */
+    color: #bdc3c7;
 }
 
-/* Wrapper para o conteúdo principal e planejador (se estiver fora do main) */
 .content-wrapper {
     flex-grow: 1;
     display: flex;
-    flex-direction: column; /* Empilha main e planejador */
-    overflow-y: auto; /* Scroll se necessário */
-    background-color: #f8f9fa; /* Fundo mais claro para área principal */
+    flex-direction: column;
+    overflow-y: auto;
+    background-color: #f8f9fa;
 }
 
 .main-content {
-    flex-grow: 1; /* Ocupa o espaço vertical disponível */
+    flex-grow: 1;
     padding: 25px;
-    /* Background removido daqui, colocado no wrapper */
-    /* overflow-y: auto; */ /* Movido para o wrapper */
 }
 
 /* --- VISUALIZAÇÃO DA GARAGEM (CARDS) --- */
 .garage-view {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* Grid responsivo */
-    gap: 25px; /* Espaçamento entre cards */
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 25px;
 }
 
 .vehicle-card {
@@ -179,26 +175,26 @@ label {
     text-align: center;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid #eee; /* Borda sutil */
+    border: 1px solid #eee;
     display: flex;
-    flex-direction: column; /* Organiza imagem, título, etc. */
-    justify-content: space-between; /* Espaça conteúdo interno */
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .vehicle-card:hover,
-.vehicle-card:focus { /* Adiciona foco */
+.vehicle-card:focus {
     transform: translateY(-4px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.12);
 }
-.vehicle-card:focus { /* Estilo para foco via teclado */
+.vehicle-card:focus {
     outline: 2px solid #3498db;
     outline-offset: 2px;
 }
 
 .vehicle-card img {
-    max-width: 100%; /* Imagem ocupa a largura do card */
-    height: 120px; /* Altura fixa para alinhar */
-    object-fit: contain; /* Garante que a imagem caiba sem distorcer */
+    max-width: 100%;
+    height: 120px;
+    object-fit: contain;
     margin-bottom: 15px;
     border-radius: 4px;
 }
@@ -221,8 +217,8 @@ label {
     background-color: #fff;
     border-radius: 8px;
     padding: 25px;
-    margin: 0 auto 20px auto; /* Margem inferior, centraliza horizontalmente */
-    max-width: 800px; /* Um pouco mais largo */
+    margin: 0 auto 20px auto;
+    max-width: 800px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     border: 1px solid #eee;
 }
@@ -234,10 +230,10 @@ label {
 }
 
 .vehicle-detail-view img {
-    display: block; /* Remove espaço extra abaixo da imagem */
-    max-width: 300px; /* Tamanho da imagem nos detalhes */
+    display: block;
+    max-width: 300px;
     height: auto;
-    margin: 0 auto 20px auto; /* Centraliza imagem */
+    margin: 0 auto 20px auto;
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
@@ -246,23 +242,22 @@ label {
 .vehicle-detail-view .controls,
 .vehicle-detail-view .status,
 .manutencao-section,
-.detalhes-api-section { /* Seções dentro dos detalhes */
+.detalhes-api-section {
     margin-bottom: 25px;
     padding-bottom: 20px;
-    border-bottom: 1px solid #eee; /* Separador entre seções */
+    border-bottom: 1px solid #eee;
 }
-.vehicle-detail-view > *:last-child { /* Remove borda inferior do último elemento */
+.vehicle-detail-view > *:last-child {
     border-bottom: none;
     margin-bottom: 0;
     padding-bottom: 0;
 }
 
-
 .vehicle-detail-view .info {
-    text-align: center; /* Centraliza informações */
-    border-bottom: 1px solid #eee; /* Adiciona borda aqui */
-    margin-bottom: 20px; /* Espaçamento */
-    padding-bottom: 15px; /* Espaçamento interno */
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
 }
 
 .vehicle-detail-view .info p {
@@ -274,21 +269,19 @@ label {
 .vehicle-detail-view .controls {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center; /* Centraliza botões */
-    gap: 10px; /* Espaçamento entre botões */
+    justify-content: center;
+    gap: 10px;
 }
 
-/* Ajustes específicos para controles dentro dos detalhes */
 .vehicle-detail-view .controls button {
-    flex-basis: calc(33.33% - 10px); /* Tenta 3 botões por linha */
-    min-width: 100px; /* Largura mínima */
+    flex-basis: calc(33.33% - 10px); 
+    min-width: 100px; 
 }
-/* Input e botão de carga do caminhão */
-.vehicle-detail-view .controls div { /* Wrapper do input/label/button de carga */
+.vehicle-detail-view .controls div { 
     display: flex;
     align-items: center;
     gap: 8px;
-    width: 100%; /* Ocupa linha inteira */
+    width: 100%; 
     justify-content: center;
     margin-top: 10px;
 }
@@ -296,9 +289,8 @@ label {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: 80px; /* Largura fixa para input */
+    width: 80px; 
 }
-
 
 .vehicle-detail-view .status {
     font-size: 1.1em;
@@ -310,21 +302,16 @@ label {
     margin: 8px 0;
 }
 
-/* Cores para status ligado/desligado */
 .status .ligado { color: #2ecc71; font-weight: bold; }
 .status .desligado { color: #e74c3c; font-weight: bold; }
 
-/* Barra de progresso da velocidade */
 .velocidade-progress { width: 80%; height: 12px; background-color: #e0e0e0; border-radius: 6px; margin: 10px auto 0 auto; overflow: hidden; border: 1px solid #ccc; }
 .velocidade-progress-bar { height: 100%; background-color: #3498db; width: 0%; transition: width 0.4s ease, background-color 0.4s ease; border-radius: 5px; }
-.velocidade-progress-bar[style*="background-color: rgb(231, 76, 60)"] {} /* Estilo para turbo (vermelho) já aplicado inline */
-
 
 /* --- SEÇÃO DE MANUTENÇÃO (Detalhes) --- */
 .manutencao-section h3 { text-align: center; font-size: 1.4em; }
 .manutencao-section h4 { margin-top: 20px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dashed #ccc; font-size: 1.2em; color: #555; }
 
-/* Lista de Manutenções */
 .manutencao-agendamentos ul,
 .manutencao-historico ul { list-style: none; padding-left: 0; }
 
@@ -346,211 +333,140 @@ label {
 .manutencao-actions .btn-manutencao-remover { background-color: #e74c3c; }
 .manutencao-actions .btn-manutencao-remover:hover { background-color: #c0392b; }
 
-
 /* --- SEÇÃO DETALHES EXTRAS API (Detalhes) --- */
-.detalhes-api-section {
-    text-align: center; /* Centraliza botão e texto */
-}
-
-.detalhes-api-section h4 {
-    margin-bottom: 15px;
-    color: #555; /* Cor um pouco diferente */
-    font-size: 1.2em;
-}
-
-.btn-buscar-api {
-    background-color: #9b59b6; /* Cor roxa para diferenciar */
-    color: white;
-    margin-bottom: 15px;
-    padding: 10px 20px;
-}
-
-.btn-buscar-api:hover {
-    background-color: #8e44ad;
-}
-
-.resultado-api {
-    margin-top: 10px;
-    padding: 15px;
-    background-color: #f8f9fa; /* Fundo levemente cinza */
-    border: 1px dashed #ccc;
-    border-radius: 4px;
-    min-height: 50px; /* Altura mínima para feedback */
-    text-align: left; /* Alinha o texto dos resultados à esquerda */
-    color: #333;
-    font-size: 0.95em;
-    line-height: 1.5;
-}
-
+.detalhes-api-section { text-align: center; }
+.detalhes-api-section h4 { margin-bottom: 15px; color: #555; font-size: 1.2em; }
+.btn-buscar-api { background-color: #9b59b6; color: white; margin-bottom: 15px; padding: 10px 20px; }
+.btn-buscar-api:hover { background-color: #8e44ad; }
+.resultado-api { margin-top: 10px; padding: 15px; background-color: #f8f9fa; border: 1px dashed #ccc; border-radius: 4px; min-height: 50px; text-align: left; color: #333; font-size: 0.95em; line-height: 1.5; }
 .resultado-api p { margin-bottom: 8px; }
-.resultado-api strong { color: #34495e; } /* Destaca labels */
+.resultado-api strong { color: #34495e; } 
 
 /* --- VIEW AGENDAR MANUTENÇÃO --- */
-.agendar-view {
-     padding: 20px;
-}
-.agendar-view h2 {
-    text-align: center;
-    margin-bottom: 25px;
-}
-.vehicle-selector {
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-.vehicle-selector label {
-    margin-bottom: 0; /* Remove margem inferior do label aqui */
-}
-.vehicle-selector select {
-     min-width: 250px;
-     margin-bottom: 0; /* Remove margem inferior do select aqui */
-}
+.agendar-view { padding: 20px; }
+.agendar-view h2 { text-align: center; margin-bottom: 25px; }
+.vehicle-selector { margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.vehicle-selector label { margin-bottom: 0; }
+.vehicle-selector select { min-width: 250px; margin-bottom: 0; }
 
-/* Formulário de Agendamento (na view Agendar) */
-.form-agendamento {
-    background-color: #fdfdfd; border: 1px solid #ddd; border-radius: 6px;
-    padding: 20px; margin-top: 10px; margin-bottom: 20px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-    max-width: 500px; /* Limita largura do form */
-    margin-left: auto;
-    margin-right: auto;
-}
-
+.form-agendamento { background-color: #fdfdfd; border: 1px solid #ddd; border-radius: 6px; padding: 20px; margin-top: 10px; margin-bottom: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); max-width: 500px; margin-left: auto; margin-right: auto; }
 .form-agendamento h4 { text-align: center; margin-top: 0; margin-bottom: 15px; border-bottom: none; color: #3498db; }
 .form-agendamento label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 0.95em; }
 .form-agendamento input[type="date"],
 .form-agendamento input[type="time"],
 .form-agendamento input[type="text"],
 .form-agendamento input[type="number"],
-.form-agendamento textarea { width: 100%; margin-bottom: 15px; } /* Garante largura total e espaçamento */
+.form-agendamento textarea { width: 100%; margin-bottom: 15px; } 
 .form-agendamento textarea { resize: vertical; min-height: 60px; }
-
-.form-agendamento div { /* Container dos botões */
-    margin-top: 15px;
-    text-align: right; /* Alinha botões à direita */
-}
+.form-agendamento div { margin-top: 15px; text-align: right; }
 .form-agendamento button[type="submit"] { background-color: #3498db; margin-right: 10px; }
 .form-agendamento button[type="submit"]:hover { background-color: #2980b9; }
 .form-agendamento .btn-cancelar-form { background-color: #e74c3c; }
 .form-agendamento .btn-cancelar-form:hover { background-color: #c0392b; }
 
-
-/* --- SEÇÃO PLANEJADOR DE VIAGEM (Fora do main) --- */
-#planejador-viagem-container {
-    padding: 25px; /* Espaçamento ao redor */
-    background-color: #fff; /* Fundo diferente para destacar */
-    border-top: 2px solid #3498db; /* Linha separadora */
-}
-
-.planejador-viagem-section h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #16a085; /* Verde/Azul diferente */
-}
-
-.form-planejador {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
+/* --- SEÇÃO PLANEJADOR DE VIAGEM --- */
+#planejador-viagem-container { padding: 25px; background-color: #fff; border-top: 2px solid #3498db; }
+.planejador-viagem-section h2 { text-align: center; margin-bottom: 20px; color: #16a085; }
+.form-planejador { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
 .form-planejador label { margin-bottom: 0; }
 .form-planejador input[type="text"] { min-width: 200px; flex-grow: 1; margin-bottom: 0; }
 #verificar-clima-btn { background-color: #1abc9c; padding: 10px 20px; }
 #verificar-clima-btn:hover { background-color: #16a085; }
-
-.resultado-previsao {
-    margin-top: 15px; padding: 15px; background-color: #ecf0f1;
-    border: 1px solid #bdc3c7; border-radius: 4px; min-height: 60px;
-    color: #34495e; font-size: 1em; line-height: 1.6;
-    text-align: left; /* Garante que o conteúdo interno comece à esquerda */
-}
+.resultado-previsao { margin-top: 15px; padding: 15px; background-color: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 4px; min-height: 60px; color: #34495e; font-size: 1em; line-height: 1.6; text-align: left; }
 .resultado-previsao p { margin-bottom: 8px; }
 .resultado-previsao strong { color: #2c3e50; }
-/* Removido o estilo específico para ícone aqui, pois será tratado no card */
-/* .resultado-previsao img { vertical-align: middle; width: 50px; height: 50px; margin-right: 5px; } */
 
-
-/* --- NOVOS ESTILOS PARA PREVISÃO DETALHADA --- */
-.resultado-previsao h3 { /* Estilo para o título "Previsão para NOME_CIDADE" */
-    text-align: center;
-    margin-bottom: 15px;
-    color: #2c3e50; /* Cor escura, como um título principal */
-    font-size: 1.3em; /* Um pouco maior */
-    font-weight: 600;
-}
-.resultado-previsao h3 strong {
-    color: #16a085; /* Cor de destaque para o nome da cidade */
-}
+/* --- NOVOS ESTILOS PARA PREVISÃO DETALHADA (COM BOTÃO) --- */
+.resultado-previsao h3 { text-align: center; margin-bottom: 15px; color: #2c3e50; font-size: 1.3em; font-weight: 600; }
+.resultado-previsao h3 strong { color: #16a085; }
 
 .previsao-dias-container {
     display: flex;
-    flex-wrap: wrap; /* Permite que os cards quebrem para a próxima linha em telas menores */
-    gap: 15px;       /* Espaçamento entre os cards de cada dia */
-    justify-content: space-around; /* Distribui os cards no espaço disponível */
-    margin-top: 10px; /* Espaço abaixo do título da previsão */
+    flex-wrap: wrap; 
+    gap: 15px;       
+    justify-content: space-around; 
+    margin-top: 10px; 
 }
 
+/* ▼▼▼ CLASSE MODIFICADA (REMOÇÃO DE justify-content) ▼▼▼ */
 .previsao-dia-card {
     background-color: #fff;
-    border: 1px solid #e0e0e0; /* Borda mais sutil */
+    border: 1px solid #e0e0e0; 
     border-radius: 8px;
     padding: 15px;
     text-align: center;
-    min-width: 120px;   /* Largura mínima de cada card */
-    flex: 1 1 120px;    /* Flex: crescer, encolher, base de 120px. Permite responsividade. */
-    max-width: 150px;   /* Largura máxima para não ficarem muito grandes em telas largas */
+    min-width: 140px;   
+    flex: 1 1 140px;    
+    max-width: 170px; 
     box-shadow: 0 2px 5px rgba(0,0,0,0.08);
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    display: flex; 
+    flex-direction: column;
+    /* justify-content: space-between; */ /* REMOVIDO/COMENTADO */
 }
+/* ▲▲▲ CLASSE MODIFICADA ▲▲▲ */
 
 .previsao-dia-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 5px 12px rgba(0,0,0,0.12);
 }
 
-.previsao-dia-card h4 { /* Data formatada do dia */
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-size: 1em;    /* Tamanho da data */
-    color: #34495e;    /* Cor escura para a data */
-    font-weight: bold;
-}
+.previsao-dia-card h4 { margin-top: 0; margin-bottom: 8px; font-size: 1em; color: #34495e; font-weight: bold; }
+.previsao-dia-card img { width: 50px; height: 50px; margin-bottom: 5px; object-fit: contain; }
+.previsao-dia-card .descricao-tempo { font-size: 0.9em; color: #555; margin-bottom: 8px; min-height: 2.2em; line-height: 1.1em; }
+.previsao-dia-card .temperaturas { font-size: 1em; font-weight: 500; color: #333; }
+.previsao-dia-card .temperaturas .temp-max { color: #e74c3c; font-weight: bold; }
+.previsao-dia-card .temperaturas .temp-min { color: #3498db; font-weight: bold; }
 
-.previsao-dia-card img {
-    width: 50px;       /* Tamanho do ícone do tempo */
-    height: 50px;
+.previsao-dia-card .detalhes-dia-info { font-size: 0.8em; color: #555; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e0e0e0; }
+.previsao-dia-card .detalhes-dia-info p { margin: 3px 0; line-height: 1.2; }
+
+.btn-ver-detalhes-dia {
+    background-color: #6c757d; 
+    color: white;
+    border: none;
+    padding: 8px 10px; 
+    border-radius: 4px;
+    font-size: 0.8em; 
+    margin-top: auto; 
     margin-bottom: 5px;
-    object-fit: contain; /* Garante que a imagem não seja distorcida */
+    margin-left: 5px; 
+    margin-right: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: calc(100% - 10px); 
+    box-sizing: border-box;
+    line-height: 1.4; 
 }
 
-.previsao-dia-card .descricao-tempo {
-    font-size: 0.9em;
-    color: #555;
-    margin-bottom: 8px;
-    min-height: 2.2em; /* Ajuda a alinhar cards com descrições de 1 ou 2 linhas */
-    line-height: 1.1em; /* Ajusta o espaçamento entre linhas da descrição */
+.btn-ver-detalhes-dia:hover { background-color: #5a6268; }
+.btn-ver-detalhes-dia:active { background-color: #545b62; }
+
+.previsao-dia-detalhes-expansivel {
+    margin-top: 10px; 
+    padding: 12px;
+    background-color: #f8f9fa; 
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    text-align: left; 
+    font-size: 0.85em; 
+    max-height: 200px; 
+    overflow-y: auto; 
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    width: 100%; 
+    box-sizing: border-box;
 }
 
-.previsao-dia-card .temperaturas {
-    font-size: 1em; /* Tamanho das temperaturas */
-    font-weight: 500;
-    color: #333;
-}
-.previsao-dia-card .temperaturas .temp-max {
-    color: #e74c3c; /* Vermelho para temperatura máxima */
-    font-weight: bold;
-}
-.previsao-dia-card .temperaturas .temp-min {
-    color: #3498db; /* Azul para temperatura mínima */
-    font-weight: bold;
-}
-
+.previsao-dia-detalhes-expansivel h5 { margin-top: 0; margin-bottom: 10px; color: #343a40; font-size: 1.1em; padding-bottom: 5px; border-bottom: 1px solid #ced4da; }
+.previsao-dia-detalhes-expansivel ul { list-style: none; padding-left: 0; margin: 0; }
+.previsao-dia-detalhes-expansivel li { padding: 8px 5px; border-bottom: 1px dotted #e9ecef; display: flex; align-items: center; gap: 10px; }
+.previsao-dia-detalhes-expansivel li:last-child { border-bottom: none; }
+.previsao-dia-detalhes-expansivel .hora-icone { display: flex; flex-direction: column; align-items: center; min-width: 50px; }
+.previsao-dia-detalhes-expansivel .hora-icone strong { color: #007bff; font-size: 1.1em; }
+.previsao-dia-detalhes-expansivel .hora-icone img { width: 32px; height: 32px; margin-top: 2px; }
+.previsao-dia-detalhes-expansivel .info-horaria { display: flex; flex-direction: column; font-size: 0.95em; line-height: 1.4; }
+.previsao-dia-detalhes-expansivel .info-horaria span { display: block; }
+.previsao-dia-detalhes-expansivel .info-horaria span:first-child { font-weight: 500; }
 
 /* --- Estilos Comuns para Mensagens (Loading, Error) --- */
 .loading-message { font-style: italic; color: #777; }
@@ -558,6 +474,4 @@ label {
 .success-message { color: #2ecc71; font-weight: bold; }
 
 /* --- Classes Utilitárias --- */
-.hidden {
-    display: none; /* Para esconder o form de agendamento inicialmente */
-}
+.hidden { display: none; }
