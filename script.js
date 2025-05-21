@@ -5,7 +5,8 @@ let currentView = 'garagem';
 let currentVehicleId = null;
 let dadosPrevisaoAtual = null;
 
-const OPENWEATHER_API_KEY = "27d6e4bc840fecf1f4a43650e2736924"; 
+// A CHAVE DA API FOI MOVIDA PARA O BACKEND (server.js e .env)
+// const OPENWEATHER_API_KEY = "SUA_CHAVE_AQUI_FOI_REMOVIDA"; 
 
 // --- FUNÇÕES DE SOM ---
 function tocarSom(nomeArquivo) { try { new Audio(`${nomeArquivo}`).play(); } catch (e) { console.warn(`Erro ao tocar o som '${nomeArquivo}':`, e); } }
@@ -153,8 +154,8 @@ function renderVehicleDetailView(veiculo) {
     container.id = `vehicle-detail-${veiculo.idVeiculo}`;
 
     let img = 'carrodomal.png'; 
-    if (veiculo.modelo === 'carro') {
-        img = 'carrobranco.webp'; // ALTERADO AQUI
+    if (veiculo.modelo === 'carro') { // Atenção: na renderGarageView é 'Jackson Storm', aqui 'carro'. Consistência é importante.
+        img = 'carrobranco.webp'; 
     } else if (veiculo.tipoVeiculo === 'CarroEsportivo') {
         img = 'carroesportivo.png';
     } else if (veiculo.tipoVeiculo === 'Caminhao') {
@@ -206,38 +207,54 @@ function renderVehicleDetailView(veiculo) {
 
 function renderAgendarView() { const container = document.createElement('div'); container.className = 'agendar-view'; container.innerHTML = '<h2>Agendar Nova Manutenção</h2>'; const selectorDiv = document.createElement('div'); selectorDiv.className = 'vehicle-selector'; let selectorHTML = `<label for="vehicle-select-schedule">Selecione o Veículo:</label><select id="vehicle-select-schedule" name="vehicleId"><option value="">-- Selecione --</option>`; const vehicleIds = Object.keys(veiculos); if (vehicleIds.length > 0) { vehicleIds.forEach(id => { selectorHTML += `<option value="${id}">${veiculos[id].modelo} (${veiculos[id].tipoVeiculo})</option>`; }); } else { selectorHTML += `<option value="" disabled>Nenhum veículo</option>`; } selectorHTML += `</select>`; selectorDiv.innerHTML = selectorHTML; container.appendChild(selectorDiv); const formContainer = document.createElement('div'); formContainer.id = 'agendar-maintenance-form-container'; formContainer.className = 'hidden'; formContainer.innerHTML = `<p id="select-vehicle-message">Selecione um veículo.</p>`; container.appendChild(formContainer); mainContentElement.innerHTML = ''; mainContentElement.appendChild(container); const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } else { console.error("Erro: Select #vehicle-select-schedule não encontrado."); } }
 
-// --- FUNÇÕES API SIMULADA ---
+// --- FUNÇÕES API SIMULADA (para detalhes do veículo) ---
 async function buscarDetalhesVeiculoAPI(identificadorVeiculo) { const apiUrl = './dados_veiculos_api.json'; console.log(`[API SIMULADA] Buscando: ${identificadorVeiculo}`); try { const response = await fetch(apiUrl); if (!response.ok) { throw new Error(`Erro HTTP: ${response.status}`); } const dadosTodosVeiculos = await response.json(); const detalhesVeiculo = dadosTodosVeiculos.find(v => v.idVeiculo === identificadorVeiculo); if (detalhesVeiculo) { console.log(`[API SIMULADA] Encontrado:`, detalhesVeiculo); return detalhesVeiculo; } else { console.log(`[API SIMULADA] Não encontrado.`); return null; } } catch (error) { console.error("[API SIMULADA] Falha:", error); return null; } }
 async function exibirDetalhesVeiculoAPI(vehicleId) { const resultadoDiv = document.getElementById(`resultado-api-${vehicleId}`); if (!resultadoDiv) { console.error(`Div #resultado-api-${vehicleId} não encontrada.`); return; } resultadoDiv.innerHTML = '<p class="loading-message">Carregando...</p>'; resultadoDiv.style.display = 'block'; const detalhes = await buscarDetalhesVeiculoAPI(vehicleId); if (detalhes) { let htmlResultado = `<p><strong>Valor FIPE:</strong> ${detalhes.valorFIPE || 'N/D'}</p>`; htmlResultado += `<p><strong>Recall:</strong> ${detalhes.ultimoRecall || 'N/D'}</p>`; htmlResultado += `<p><strong>Dica:</strong> ${detalhes.dicaManutencao || 'N/D'}</p>`; htmlResultado += `<p><strong>Consumo:</strong> ${detalhes.consumoMedio || 'N/D'}</p>`; resultadoDiv.innerHTML = htmlResultado; } else { resultadoDiv.innerHTML = '<p class="error-message">Detalhes não encontrados ou erro.</p>'; } }
 
 
-// --- FUNÇÕES API REAL (OpenWeatherMap) ---
+// --- FUNÇÕES API REAL (OpenWeatherMap via Backend) ---
 async function buscarPrevisaoDetalhada(nomeCidade) {
-    const apiKey = OPENWEATHER_API_KEY;
-    if (!apiKey || apiKey === "SUA_CHAVE_API_REAL_AQUI" || apiKey.length < 30) {
-        const errorMsg = "ERRO: Chave da API OpenWeatherMap inválida ou não configurada corretamente no script.js!";
-        console.error("[OpenWeatherAPI - Forecast]", errorMsg);
-        return { error: true, message: errorMsg };
-    }
-    const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(nomeCidade)}&appid=${apiKey}&units=metric&lang=pt_br`;
-    console.log(`[OpenWeatherAPI - Forecast] Buscando previsão para: ${nomeCidade} em ${apiUrl}`);
+    // A URL agora aponta para o seu servidor backend
+    // Atenção à porta! Deve ser a porta do seu server.js (padrão 3001)
+    const apiUrl = `http://localhost:3001/api/previsao/${encodeURIComponent(nomeCidade)}`;
+    
+    console.log(`[Frontend] Buscando previsão para: ${nomeCidade} via backend (${apiUrl})`);
+
     try {
         const response = await fetch(apiUrl);
-        const data = await response.json();
+
+        // Tenta pegar a mensagem de erro do JSON retornado pelo backend, mesmo que !response.ok
+        const errorData = await response.json().catch(() => ({ message: `Erro ${response.status} ao contatar o servidor.` })); 
+
         if (!response.ok) {
-            const errorMessage = data.message || `Erro HTTP: ${response.status}`;
-            console.error(`[OpenWeatherAPI - Forecast] Erro ${response.status}:`, errorMessage, data);
+            const errorMessage = errorData.error || errorData.message || `Erro ${response.status} ao buscar previsão no servidor.`;
+            console.error(`[Frontend] Erro ${response.status} ao buscar previsão:`, errorMessage, errorData);
             throw new Error(errorMessage);
         }
-        console.log(`[OpenWeatherAPI - Forecast] Previsão detalhada encontrada:`, data);
-        return data;
+
+        // 'errorData' aqui seria o 'data' da OpenWeatherMap se response.ok for true
+        const data = errorData; 
+        console.log("[Frontend] Dados da previsão recebidos do backend:", data);
+
+        // Verifica se a resposta do backend, que é o 'data' da OpenWeatherMap,
+        // contém um 'cod' que não seja '200', indicando erro da OpenWeatherMap.
+        if (data.cod && String(data.cod) !== "200" && data.message) {
+            console.error(`[Frontend] Erro da API OpenWeatherMap (via backend): ${data.message} (cod: ${data.cod})`);
+            // Retorna um objeto de erro para ser tratado pelo handleVerificarClimaClick
+            return { error: true, message: data.message };
+        }
+        
+        return data; // Retorna os dados da previsão (o objeto JSON completo da OpenWeatherMap)
     } catch (error) {
-        console.error("[OpenWeatherAPI - Forecast] Falha na requisição ou processamento:", error);
+        console.error("[Frontend] Falha na requisição ou processamento da previsão:", error);
+        // Retorna um objeto de erro compatível com a lógica existente no handleVerificarClimaClick
         return { error: true, message: error.message || "Não foi possível buscar a previsão detalhada." };
     }
 }
 
 function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
     if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
         console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
         return null;
@@ -292,7 +309,7 @@ function formatarDataParaExibicao(dataStr) {
 }
 
 function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
-    dadosPrevisaoAtual = previsaoDiariaProcessada;
+    dadosPrevisaoAtual = previsaoDiariaProcessada; // Armazena para o clique nos detalhes
 
     const resultadoDiv = document.getElementById('previsao-tempo-resultado');
     if (!resultadoDiv) {
@@ -424,21 +441,38 @@ function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===
 async function handleVerificarClimaClick() {
     const destinoInput = document.getElementById('destino-viagem');
     const resultadoDiv = document.getElementById('previsao-tempo-resultado');
-    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM não encontrados."); alert("Erro interno."); return; }
+    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
+    
     const nomeCidade = destinoInput.value.trim();
-    if (!nomeCidade) { alert("Por favor, digite o nome da cidade."); resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>'; destinoInput.focus(); return; }
+    if (!nomeCidade) { 
+        alert("Por favor, digite o nome da cidade."); 
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>'; 
+        destinoInput.focus(); 
+        return; 
+    }
+    
     resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
+    
+    // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
     const dadosApi = await buscarPrevisaoDetalhada(nomeCidade); 
+    
     if (dadosApi && !dadosApi.error) {
+        // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
+        // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
+        // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
+        // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
+        
         const previsaoProcessada = processarDadosForecast(dadosApi);
         if (previsaoProcessada && previsaoProcessada.length > 0) {
             exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
         } else {
-            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar dados. Verifique o console.</p>';
-            console.warn("processarDadosForecast retornou nulo/vazio. API:", dadosApi);
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console.</p>';
+            console.warn("[Frontend] processarDadosForecast retornou nulo/vazio. API Response:", dadosApi);
         }
     } else {
-        resultadoDiv.innerHTML = `<p class="error-message">Erro: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
+        // Trata erros de rede, erros retornados pelo nosso backend (ex: chave API não configurada no servidor),
+        // ou erros da API OpenWeatherMap já formatados por buscarPrevisaoDetalhada.
+        resultadoDiv.innerHTML = `<p class="error-message">Falha: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
     }
 }
 
