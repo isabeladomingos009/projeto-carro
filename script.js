@@ -54,14 +54,14 @@ class Veiculo {
     adicionarManutencao(manutencaoObj) { console.log(`[${this.idVeiculo}] Iniciando adicionarManutencao...`); if (!(manutencaoObj instanceof Manutencao)) { console.error(`[${this.idVeiculo}] Tentativa de adicionar objeto inválido.`); alert("Erro interno: O objeto de manutenção é inválido."); return false; } if (!manutencaoObj.validar(true)) { console.error(`[${this.idVeiculo}] Falha na validação da manutenção.`); alert("Erro: Dados de manutenção inválidos. Verifique o console."); return false; } try { this.historicoManutencao.push(manutencaoObj); this.historicoManutencao.sort((a, b) => (a.data?.getTime() || Infinity) - (b.data?.getTime() || Infinity)); console.log(`[${this.idVeiculo}] Manutenção ${manutencaoObj.id} adicionada e histórico ordenado.`); salvarGaragem(); verificarAgendamentosProximos(); if (currentView === 'detalhes' && currentVehicleId === this.idVeiculo) { this.atualizarDisplayManutencao(); } return true; } catch(e) { console.error(`[${this.idVeiculo}] Erro ao adicionar/ordenar/salvar manutenção:`, e); alert("Erro interno ao processar a manutenção."); return false; } }
     removerManutencao(idManutencao){const i=this.historicoManutencao.findIndex(m=>m.id===idManutencao);if(i>-1){const r=this.historicoManutencao.splice(i,1)[0];console.log(`Manut. removida p/ ${this.idVeiculo}: ID ${r.id}, Tipo ${r.tipo}`);if(currentView === 'detalhes' && currentVehicleId === this.idVeiculo){this.atualizarDisplayManutencao();}salvarGaragem();return true;}console.warn(`Manut. ${idManutencao} não encontrada em ${this.idVeiculo}.`);return false;}
     marcarManutencaoComo(idManutencao, novoStatus){const m=this.historicoManutencao.find(m=>m.id===idManutencao);if(!m){console.warn(`Manut. ${idManutencao} não encontrada em ${this.idVeiculo}.`);return false;}const sV=['Agendada','Realizada','Cancelada'];if(!sV.includes(novoStatus)){console.error(`Status inválido: ${novoStatus}`);alert(`Status inválido: ${novoStatus}`);return false;}m.status=novoStatus;console.log(`Status manut. ${idManutencao}(${m.tipo}) alterado p/ ${novoStatus} em ${this.idVeiculo}`);if(currentView === 'detalhes' && currentVehicleId === this.idVeiculo){this.atualizarDisplayManutencao();}salvarGaragem();if(novoStatus!=='Agendada')verificarAgendamentosProximos();return true;}
-    getHistoricoManutencao(apenasFuturas=false, apenasAgendadas=false){const agora=new Date();agora.setHours(0,0,0,0);return this.historicoManutencao.filter(m=>{if(!m||!(m.data instanceof Date)||isNaN(m.data.getTime()))return false;const dS=new Date(m.data);dS.setHours(0,0,0,0);const fH=dS>=agora;const a=m.status==='Agendada';if(apenasAgendadas&&!a)return false;if(apenasFuturas&&!fH)return false;return true;});}
+    getHistoricoManutencao(apenasFuturas=false, apenasAgendadas=false){const agora=new Date();agora.setHours(0,0,0,0);const umDia=24*60*60*1000;return this.historicoManutencao.filter(m=>{if(!m||!(m.data instanceof Date)||isNaN(m.data.getTime()))return false;const dS=new Date(m.data);dS.setHours(0,0,0,0);const fH=dS>=agora;const a=m.status==='Agendada';if(apenasAgendadas&&!a)return false;if(apenasFuturas&&!fH)return false;return true;});}
     atualizarTela(){ if(currentView!=='detalhes'||currentVehicleId!==this.idVeiculo)return; const c=document.getElementById(`vehicle-detail-${this.idVeiculo}`); if(!c){console.error(`Container #vehicle-detail-${this.idVeiculo} não encontrado.`);return;} const cE=c.querySelector('.info-cor');if(cE)cE.textContent=`Cor: ${this.cor}`; if(this.tipoVeiculo!=='Bicicleta'){const sE=c.querySelector('.status-ligado');if(sE){sE.textContent=this.ligado?`${this.tipoVeiculo} ligado`:`${this.tipoVeiculo} desligado`;sE.className=`status-ligado ${this.ligado?"ligado":"desligado"}`;}} const vE=c.querySelector('.status-velocidade');if(vE)vE.textContent=`Velocidade: ${this.velocidade} km/h`; const pB=c.querySelector('.velocidade-progress-bar'); const pC=c.querySelector('.velocidade-progress'); if(pB&&this.maxVelocidade>0){ const p=Math.min((this.velocidade/this.maxVelocidade)*100,100); pB.style.width=`${p}%`; pB.style.backgroundColor='#3498db'; if(pC)pC.title=`${this.velocidade} km/h / ${this.maxVelocidade} km/h`; }else if(pB){ pB.style.width="0%"; pB.style.backgroundColor='#3498db'; if(pC)pC.title=`0 km/h`; } if(typeof this.atualizarTelaTurbo === 'function')this.atualizarTelaTurbo(c); if(typeof this.atualizarTelaCarga === 'function')this.atualizarTelaCarga(c); this.atualizarDisplayManutencao(c); }
     atualizarDisplayManutencao(containerElement = null) { if (!containerElement && currentView === 'detalhes' && currentVehicleId === this.idVeiculo) { containerElement = document.getElementById(`vehicle-detail-${this.idVeiculo}`); } if (!containerElement) return; console.log(`[${this.idVeiculo}] Atualizando display de manutenção na view de detalhes.`); const agendamentosDiv = containerElement.querySelector('.manutencao-agendamentos'); const historicoDiv = containerElement.querySelector('.manutencao-historico'); if (!agendamentosDiv || !historicoDiv) { console.error(`[${this.idVeiculo}] Erro: Divs de manutenção não encontradas.`); return; } try { agendamentosDiv.innerHTML = this._getHistoricoManutencaoHTML(true, true); historicoDiv.innerHTML = this._getHistoricoManutencaoHTML(false, false); } catch(e) { console.error(`[${this.idVeiculo}] Erro ao atualizar display de manutenção:`, e); } }
     _getHistoricoManutencaoHTML(apenasFuturas, apenasAgendadas) { const historicoFiltrado = this.getHistoricoManutencao(apenasFuturas, apenasAgendadas); let titulo = ""; let msgVazio = ""; if (apenasFuturas && apenasAgendadas) {titulo="<h4>Agendamentos Futuros</h4>"; msgVazio="<p>Nenhum agendamento futuro ativo.</p>";} else if (!apenasFuturas && !apenasAgendadas) {titulo="<h4>Histórico Completo</h4>"; msgVazio="<p>Nenhum registro encontrado.</p>";} else {titulo="<h4>Registros Filtrados</h4>"; msgVazio="<p>Nenhum registro encontrado.</p>";} if (historicoFiltrado.length === 0) return titulo + msgVazio; let html = titulo + '<ul>'; try { historicoFiltrado.forEach(m => { let botoesAcao = ''; if (m.status === 'Agendada') { botoesAcao += `<button class="btn-manutencao-status" data-action="marcar-status" data-manutencao-id="${m.id}" data-novo-status="Realizada" title="Marcar como Realizada">✅</button>`; botoesAcao += `<button class="btn-manutencao-status" data-action="marcar-status" data-manutencao-id="${m.id}" data-novo-status="Cancelada" title="Cancelar Agendamento">❌</button>`;} botoesAcao += `<button class="btn-manutencao-remover" data-action="remover-manutencao" data-manutencao-id="${m.id}" title="Remover Registro">🗑️</button>`; const itemFormatado = m.formatar(); const statusInfo = m.status !== 'Agendada' ? ` <span>(${m.status})</span>` : ''; html += `<li data-manutencao-id="${m.id}"><span class="manutencao-info">${itemFormatado}${statusInfo}</span><div class="manutencao-actions">${botoesAcao}</div></li>`; }); html += '</ul>'; return html; } catch (e) { console.error(`[${this.idVeiculo}] Erro ao gerar HTML da lista:`, e); return titulo + '<p style="color:red;">Erro ao gerar lista.</p>'; } }
     toPlainObject(){return{idVeiculo:this.idVeiculo,tipoVeiculo:this.tipoVeiculo,modelo:this.modelo,cor:this.cor,ligado:this.ligado,velocidade:this.velocidade,cores:this.cores,indiceCorAtual:this.indiceCorAtual,maxVelocidade:this.maxVelocidade,historicoManutencao:this.historicoManutencao.map(m=>m.toPlainObject())};}
 }
 class Carro extends Veiculo{static CORES_CARRO=["Prata","Branco","Preto","Cinza","Vermelho","Azul"];constructor(m,c,id){super(m,c,'Carro',id);this.maxVelocidade=180;this.cores=[...Carro.CORES_CARRO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}_executarAceleracao(){const i=10,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar();this.atualizarTela();salvarGaragem();}}else{alert(`O ${this.modelo} atingiu vel. máx (${this.maxVelocidade} km/h)!`);}}buzinar(){tocarBuzina();alert(`${this.modelo}: Fom Fom!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Carro)`);}toPlainObject(){return super.toPlainObject();}}
-class CarroEsportivo extends Carro{static CORES_ESPORTIVO=["Vermelha","Amarela","Azul Esportivo","Verde Limão","Preto Fosco"];constructor(m,c,id,idTS){super(m,c,id);this.tipoVeiculo='CarroEsportivo';this.maxVelocidadeNormal=250;this.maxVelocidadeTurbo=320;this.maxVelocidade=this.maxVelocidadeNormal;this.turboAtivado=false;this.idTurboStatusElement=idTS||`turbo-status-${id}`;this.cores=[...CarroEsportivo.CORES_ESPORTIVO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}ativarTurbo(){if(!this.ligado){alert("Ligue o carro!");return;}if(!this.turboAtivado){this.turboAtivado=true;this.maxVelocidade=this.maxVelocidadeTurbo;console.log("Turbo Ativado!");alert("Turbo Ativado!");this.atualizarTela();salvarGaragem();}else{alert("Turbo já ativado!");}}desativarTurbo(a=true){if(this.turboAtivado){this.turboAtivado=false;this.maxVelocidade=this.maxVelocidadeNormal;if(this.velocidade>this.maxVelocidade)this.velocidade=this.maxVelocidade;console.log("Turbo Desativado!");if(a)alert("Turbo Desativado!");this.atualizarTela();salvarGaragem();}else if(a){alert("Turbo já desativado!");}}_executarAceleracao(){const i=this.turboAtivado?25:15,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar();this.atualizarTela();salvarGaragem();}}else{alert(`O ${this.modelo} na vel. máx (${this.maxVelocidade} km/h)!`);}}desligar(){super.desligar();}buzinar(){tocarBuzina();alert(`${this.modelo}: VRUUUUUM!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Esportivo)`);}atualizarTelaTurbo(c){if(!c)return;const tE=c.querySelector(`#${this.idTurboStatusElement}`);if(tE)tE.textContent=`Turbo: ${this.turboAtivado?"Ativado":"Desativado"}`;const pB=c.querySelector('.velocidade-progress-bar');if(pB)pB.style.backgroundColor=this.turboAtivado?'#e74c3c':'#3498db';}toPlainObject(){const p=super.toPlainObject();p.turboAtivado=this.turboAtivado;p.maxVelocidadeNormal=this.maxVelocidadeNormal;p.maxVelocidadeTurbo=this.maxVelocidadeTurbo;p.idTurboStatus=this.idTurboStatusElement;return p;}}
+class CarroEsportivo extends Carro{static CORES_ESPORTIVO=["Vermelha","Amarela","Azul Esportivo","Verde Limão","Preto Fosco"];constructor(m,c,id,idTS){super(m,c,id);this.tipoVeiculo='CarroEsportivo';this.maxVelocidadeNormal=250;this.maxVelocidadeTurbo=320;this.maxVelocidade=this.maxVelocidadeNormal;this.turboAtivado=false;this.idTurboStatusElement=idTS||`turbo-status-${id}`;this.cores=[...CarroEsportivo.CORES_ESPORTIVO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}ativarTurbo(){if(!this.ligado){alert("Ligue o carro!");return;}if(!this.turboAtivado){this.turboAtivado=true;this.maxVelocidade=this.maxVelocidadeTurbo;console.log("Turbo Ativado!");alert("Turbo Ativado!");this.atualizarTela();salvarGaragem();}else{alert("Turbo já ativado!");}}desativarTurbo(a=true){if(this.turboAtivado){this.turboAtivado=false;this.maxVelocidade=this.maxVelocidadeNormal;if(this.velocidade>this.maxVelocidade)this.velocidade=this.maxVelocidade;console.log("Turbo Desativado!");if(a)alert("Turbo Desativado!");this.atualizarTela();salvarGaragem();}else if(a){alert("Turbo já desativado!");}}_executarAceleracao(){const i=this.turboAtivado?25:15,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelererar();this.atualizarTela();salvarGaragem();}}else{alert(`O ${this.modelo} na vel. máx (${this.maxVelocidade} km/h)!`);}}desligar(){super.desligar();}buzinar(){tocarBuzina();alert(`${this.modelo}: VRUUUUUM!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Esportivo)`);}atualizarTelaTurbo(c){if(!c)return;const tE=c.querySelector(`#${this.idTurboStatusElement}`);if(tE)tE.textContent=`Turbo: ${this.turboAtivado?"Ativado":"Desativado"}`;const pB=c.querySelector('.velocidade-progress-bar');if(pB)pB.style.backgroundColor=this.turboAtivado?'#e74c3c':'#3498db';}toPlainObject(){const p=super.toPlainObject();p.turboAtivado=this.turboAtivado;p.maxVelocidadeNormal=this.maxVelocidadeNormal;p.maxVelocidadeTurbo=this.maxVelocidadeTurbo;p.idTurboStatus=this.idTurboStatusElement;return p;}}
 class Caminhao extends Carro{static CORES_CAMINHAO=["Azul Escuro","Laranja","Verde Musgo","Marrom","Branco Gelo"];constructor(m,c,id,cap,idC){super(m,c,id);this.tipoVeiculo='Caminhao';this.maxVelocidade=120;this.capacidadeCarga=cap>0?cap:10000;this.cargaAtual=0;this.idCargaAtualElement=idC||`carga-atual-${id}`;this.cores=[...Caminhao.CORES_CAMINHAO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}carregar(inputId){const cI=document.getElementById(inputId);if(!cI){console.error(`Input #${inputId} não encontrado!`);alert("Erro: Campo carga não encontrado.");return;}const cV=cI.value;const cN=Number(cV);if(isNaN(cN)||cN<=0){alert("Insira carga válida.");return;}if(this.cargaAtual+cN<=this.capacidadeCarga){this.cargaAtual+=cN;console.log(`Caminhão ${this.idVeiculo} carregado: ${cN.toFixed(0)}kg. Total: ${this.cargaAtual.toFixed(0)}kg`);alert(`Carregado ${cN.toFixed(0)}kg. Total: ${this.cargaAtual.toFixed(0)}kg.`);cI.value='';this.atualizarTela();salvarGaragem();}else{const eL=this.capacidadeCarga-this.cargaAtual;alert(`Carga excessiva! Espaço: ${eL.toFixed(0)} kg.`);}}_executarAceleracao(){const fC=this.capacidadeCarga>0?Math.max(0.4,1-(this.cargaAtual/(this.capacidadeCarga*1.5))):1;const iB=8;const i=Math.round(iB*fC);const vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar();this.atualizarTela();salvarGaragem();}}else{alert(`O ${this.modelo} atingiu vel. máx!`);}}getFreioIncremento(){const fC=this.capacidadeCarga>0?1+(this.cargaAtual/this.capacidadeCarga)*0.5:1;const fB=10;return Math.max(4,Math.round(fB/fC));}buzinar(){tocarBuzina();alert(`${this.modelo}: PÓÓÓÓÓÓM!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Caminhao)`);}atualizarTelaCarga(c){if(!c)return;const cE=c.querySelector(`#${this.idCargaAtualElement}`);if(cE)cE.textContent=`Carga: ${this.cargaAtual.toFixed(0)} kg / ${this.capacidadeCarga.toFixed(0)} kg`;}toPlainObject(){const p=super.toPlainObject();p.capacidadeCarga=this.capacidadeCarga;p.cargaAtual=this.cargaAtual;p.idCargaAtual=this.idCargaAtualElement;return p;}}
 class Moto extends Veiculo{static CORES_MOTO=["Preta","Vermelha","Azul Royal","Branca Pérola","Verde Kawasaki"];constructor(m,c,id){super(m,c,'Moto',id);this.maxVelocidade=200;this.cores=[...Moto.CORES_MOTO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}_executarAceleracao(){const i=18,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar();this.atualizarTela();salvarGaragem();}}else{alert("Moto vel. máxima!");}}getFreioIncremento(){return 15;}buzinar(){tocarBuzina();alert(`${this.modelo}: Bip Bip!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Moto)`);}toPlainObject(){return super.toPlainObject();}}
 class Bicicleta extends Veiculo{static CORES_BICICLETA=["Verde","Azul Claro","Vermelha","Preta","Amarela"];constructor(m,c,id){super(m,c,'Bicicleta',id);this.maxVelocidade=40;this.ligado=true;this.cores=[...Bicicleta.CORES_BICICLETA];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}ligar(){alert("Bike não liga!");}desligar(){alert("Bike não desliga!");}_executarAceleracao(){const i=5,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){this.atualizarTela();salvarGaragem();}}else{alert("Bike vel. máxima!");}}frear(){if(this.velocidade>0){const vA=this.velocidade;this.velocidade=Math.max(0,this.velocidade-this.getFreioIncremento());if(this.velocidade!==vA){this.atualizarTela();salvarGaragem();}}else{alert(`${this.modelo} parada!`);}}getFreioIncremento(){return 6;}buzinar(){console.log(`${this.modelo}: Trim Trim!`);alert("Trim Trim!");}toPlainObject(){return super.toPlainObject();}}
@@ -106,7 +106,7 @@ function renderApp() {
     setupDynamicEventListeners(); 
 }
 
-// ▼▼▼ FUNÇÃO MODIFICADA PARA ALTERAR A IMAGEM DE 'Jackson Storm' ▼▼▼
+// ▼▼▼ FUNÇÃO renderGarageView MODIFICADA PARA SELEÇÃO DE IMAGEM ▼▼▼
 function renderGarageView() {
     mainContentElement.innerHTML = '<h2>Minha Garagem</h2>';
     const container = document.createElement('div');
@@ -123,20 +123,30 @@ function renderGarageView() {
             card.setAttribute('role', 'button');
             card.tabIndex = 0;
 
-            let img = 'carrodomal.png'; // Default
+            // --- Lógica de seleção de imagem (Alterada aqui) ---
+            let img = 'carrodomal.png'; // Imagem padrão/fallback
+
             if (v.modelo === 'Jackson Storm') {
-                img = 'carrobranco.webp'; // ALTERADO AQUI
+                img = 'JacksonStormCars3Artwork.webp'; // Imagem específica para Jackson Storm
+            } else if (v.modelo === 'Ferrari') {
+                img = 'ferrari.png'; // Imagem específica para Ferrari
+            } else if (v.modelo === 'Scania') {
+                img = 'scania.png'; // Imagem específica para Scania
+            } else if (v.modelo === 'Mountain Bike') { // Assumindo que 'bilecerta.webp' é para a Mountain Bike
+                img = 'bilecerta.webp'; // Imagem específica para Mountain Bike (verificar nome do arquivo)
             } else if (v.tipoVeiculo === 'CarroEsportivo') {
-                img = 'carroesportivo.png';
+                img = 'carroesportivo.png'; // Genérica para outros Esportivos
             } else if (v.tipoVeiculo === 'Caminhao') {
-                img = 'caminhao.png';
+                img = 'caminhao.png'; // Genérica para outros Caminhões
             } else if (v.tipoVeiculo === 'Moto') {
-                img = 'moto.png';
+                img = 'moto.png'; // Genérica para todas as Motos (já era 'moto.png')
             } else if (v.tipoVeiculo === 'Bicicleta') {
-                img = 'bicicleta.png';
+                img = 'bicicleta.png'; // Genérica para outras Bicicletas
             } else if (v.tipoVeiculo === 'Carro') { 
-                img = 'carro.png';
+                img = 'carro.png'; // Genérica para outros Carros
             }
+             // --- Fim da lógica de seleção de imagem ---
+
 
             card.innerHTML = `<img src="imagens/${img}" alt="${v.tipoVeiculo} ${v.modelo}"><h3>${v.modelo}</h3><p>Tipo: ${v.tipoVeiculo}</p><p class="info-cor">Cor: ${v.cor}</p>`;
             container.appendChild(card);
@@ -144,29 +154,38 @@ function renderGarageView() {
     }
     mainContentElement.appendChild(container);
 }
-// ▲▲▲ FUNÇÃO MODIFICADA ▲▲▲
+// ▲▲▲ FIM da função renderGarageView MODIFICADA ▲▲▲
 
-// ▼▼▼ FUNÇÃO MODIFICADA PARA ALTERAR A IMAGEM DE 'Jackson Storm' ▼▼▼
+// ▼▼▼ FUNÇÃO renderVehicleDetailView MODIFICADA PARA SELEÇÃO DE IMAGEM ▼▼▼
 function renderVehicleDetailView(veiculo) {
     if (!veiculo) return;
     const container = document.createElement('div');
     container.className = 'vehicle vehicle-detail-view';
     container.id = `vehicle-detail-${veiculo.idVeiculo}`;
 
-    let img = 'carrodomal.png'; 
-    if (veiculo.modelo === 'carro') { // Atenção: na renderGarageView é 'Jackson Storm', aqui 'carro'. Consistência é importante.
-        img = 'carrobranco.webp'; 
+    // --- Lógica de seleção de imagem (Alterada aqui - igual à renderGarageView para consistência) ---
+    let img = 'carrodomal.png'; // Imagem padrão/fallback
+
+     if (veiculo.modelo === 'Jackson Storm') {
+        img = 'JacksonStormCars3Artwork.webp'; // Imagem específica para Jackson Storm
+    } else if (veiculo.modelo === 'Ferrari') {
+        img = 'ferrari.png'; // Imagem específica para Ferrari
+    } else if (veiculo.modelo === 'Scania') {
+        img = 'scania.png'; // Imagem específica para Scania
+    } else if (veiculo.modelo === 'Mountain Bike') { // Assumindo que 'bilecerta.webp' é para a Mountain Bike
+        img = 'bilecerta.webp'; // Imagem específica para Mountain Bike (verificar nome do arquivo)
     } else if (veiculo.tipoVeiculo === 'CarroEsportivo') {
-        img = 'carroesportivo.png';
+        img = 'carroesportivo.png'; // Genérica para outros Esportivos
     } else if (veiculo.tipoVeiculo === 'Caminhao') {
-        img = 'caminhao.png';
+        img = 'caminhao.png'; // Genérica para outros Caminhões
     } else if (veiculo.tipoVeiculo === 'Moto') {
-        img = 'moto.png';
+        img = 'moto.png'; // Genérica para todas as Motos (já era 'moto.png')
     } else if (veiculo.tipoVeiculo === 'Bicicleta') {
-        img = 'bicicleta.png';
+        img = 'bicicleta.png'; // Genérica para outras Bicicletas
     } else if (veiculo.tipoVeiculo === 'Carro') { 
-        img = 'carro.png';
+        img = 'carro.png'; // Genérica para outros Carros
     }
+    // --- Fim da lógica de seleção de imagem ---
 
     let header = `<h2>${veiculo.modelo} <span style="font-weight:normal; font-size: 0.8em; color: #555;">(${veiculo.tipoVeiculo})</span></h2><img src="imagens/${img}" id="imagem-${veiculo.idVeiculo}" alt="${veiculo.tipoVeiculo} ${veiculo.modelo}">`;
     let info = `<div class="info"><p>Modelo: ${veiculo.modelo}</p><p class="info-cor">Cor: ${veiculo.cor}</p>${(veiculo instanceof Caminhao)?`<p>Capacidade: ${veiculo.capacidadeCarga.toFixed(0)} kg</p>`:''}</div>`;
@@ -202,7 +221,7 @@ function renderVehicleDetailView(veiculo) {
     mainContentElement.appendChild(container);
     veiculo.atualizarTela();
 }
-// ▲▲▲ FUNÇÃO MODIFICADA ▲▲▲
+// ▲▲▲ FIM da função renderVehicleDetailView MODIFICADA ▲▲▲
 
 
 function renderAgendarView() { const container = document.createElement('div'); container.className = 'agendar-view'; container.innerHTML = '<h2>Agendar Nova Manutenção</h2>'; const selectorDiv = document.createElement('div'); selectorDiv.className = 'vehicle-selector'; let selectorHTML = `<label for="vehicle-select-schedule">Selecione o Veículo:</label><select id="vehicle-select-schedule" name="vehicleId"><option value="">-- Selecione --</option>`; const vehicleIds = Object.keys(veiculos); if (vehicleIds.length > 0) { vehicleIds.forEach(id => { selectorHTML += `<option value="${id}">${veiculos[id].modelo} (${veiculos[id].tipoVeiculo})</option>`; }); } else { selectorHTML += `<option value="" disabled>Nenhum veículo</option>`; } selectorHTML += `</select>`; selectorDiv.innerHTML = selectorHTML; container.appendChild(selectorDiv); const formContainer = document.createElement('div'); formContainer.id = 'agendar-maintenance-form-container'; formContainer.className = 'hidden'; formContainer.innerHTML = `<p id="select-vehicle-message">Selecione um veículo.</p>`; container.appendChild(formContainer); mainContentElement.innerHTML = ''; mainContentElement.appendChild(container); const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } else { console.error("Erro: Select #vehicle-select-schedule não encontrado."); } }
