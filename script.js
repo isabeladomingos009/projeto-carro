@@ -1,3 +1,4 @@
+
 // === VARIÁVEIS GLOBAIS E CONSTANTES ===
 let veiculos = {};
 const STORAGE_KEY = 'garagemInteligenteData_v2';
@@ -6,12 +7,17 @@ let currentVehicleId = null;
 let dadosPrevisaoAtual = null;
 
 // A CHAVE DA API FOI MOVIDA PARA O BACKEND (server.js e .env)
-// const OPENWEATHER_API_KEY = "SUA_CHAVE_AQUI_FOI_REMOVIDA"; 
+// const OPENWEATHER_API_KEY = "SUA_CHAVE_AQUI_FOI_REMOVIDA";
+
+// Definindo a URL base do backend. Por enquanto, LOCALHOST.
+// VAMOS MUDAR ISSO NA FASE 3 DA ATIVIDADE PARA A URL DO RENDER.COM!
+const backendUrl = 'http://localhost:3001';
+
 
 // --- FUNÇÕES DE SOM ---
 function tocarSom(nomeArquivo) { try { new Audio(`${nomeArquivo}`).play(); } catch (e) { console.warn(`Erro ao tocar o som '${nomeArquivo}':`, e); } }
 function tocarBuzina() { tocarSom('buzina.mp3'); }
-function tocarAcelerar() { tocarSom('acelerar.mp3'); }
+function tocarAcelerar() { tocarSom('acelerar.mp3'); } // <-- Função correta
 function tocarFrear() { tocarSom('frear.mp3'); }
 function tocarLigar() { tocarSom('ligar.mp3'); }
 function tocarDesligar() { tocarSom('desligar.mp3'); }
@@ -61,7 +67,10 @@ class Veiculo {
     toPlainObject(){return{idVeiculo:this.idVeiculo,tipoVeiculo:this.tipoVeiculo,modelo:this.modelo,cor:this.cor,ligado:this.ligado,velocidade:this.velocidade,cores:this.cores,indiceCorAtual:this.indiceCorAtual,maxVelocidade:this.maxVelocidade,historicoManutencao:this.historicoManutencao.map(m=>m.toPlainObject())};}
 }
 class Carro extends Veiculo{static CORES_CARRO=["Prata","Branco","Preto","Cinza","Vermelho","Azul"];constructor(m,c,id){super(m,c,'Carro',id);this.maxVelocidade=180;this.cores=[...Carro.CORES_CARRO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}_executarAceleracao(){const i=10,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar();this.atualizarTela();salvarGaragem();}}else{alert(`O ${this.modelo} atingiu vel. máx (${this.maxVelocidade} km/h)!`);}}buzinar(){tocarBuzina();alert(`${this.modelo}: Fom Fom!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Carro)`);}toPlainObject(){return super.toPlainObject();}}
-class CarroEsportivo extends Carro{static CORES_ESPORTIVO=["Vermelha","Amarela","Azul Esportivo","Verde Limão","Preto Fosco"];constructor(m,c,id,idTS){super(m,c,id);this.tipoVeiculo='CarroEsportivo';this.maxVelocidadeNormal=250;this.maxVelocidadeTurbo=320;this.maxVelocidade=this.maxVelocidadeNormal;this.turboAtivado=false;this.idTurboStatusElement=idTS||`turbo-status-${id}`;this.cores=[...CarroEsportivo.CORES_ESPORTIVO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}ativarTurbo(){if(!this.ligado){alert("Ligue o carro!");return;}if(!this.turboAtivado){this.turboAtivado=true;this.maxVelocidade=this.maxVelocidadeTurbo;console.log("Turbo Ativado!");alert("Turbo Ativado!");this.atualizarTela();salvarGaragem();}else{alert("Turbo já ativado!");}}desativarTurbo(a=true){if(this.turboAtivado){this.turboAtivado=false;this.maxVelocidade=this.maxVelocidadeNormal;if(this.velocidade>this.maxVelocidade)this.velocidade=this.maxVelocidade;console.log("Turbo Desativado!");if(a)alert("Turbo Desativado!");this.atualizarTela();salvarGaragem();}else if(a){alert("Turbo já desativado!");}}_executarAceleracao(){const i=this.turboAtivado?25:15,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelererar();this.atualizarTela();salvarGaragem();}}else{alert(`O ${this.modelo} na vel. máx (${this.maxVelocidade} km/h)!`);}}desligar(){super.desligar();}buzinar(){tocarBuzina();alert(`${this.modelo}: VRUUUUUM!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Esportivo)`);}atualizarTelaTurbo(c){if(!c)return;const tE=c.querySelector(`#${this.idTurboStatusElement}`);if(tE)tE.textContent=`Turbo: ${this.turboAtivado?"Ativado":"Desativado"}`;const pB=c.querySelector('.velocidade-progress-bar');if(pB)pB.style.backgroundColor=this.turboAtivado?'#e74c3c':'#3498db';}toPlainObject(){const p=super.toPlainObject();p.turboAtivado=this.turboAtivado;p.maxVelocidadeNormal=this.maxVelocidadeNormal;p.maxVelocidadeTurbo=this.maxVelocidadeTurbo;p.idTurboStatus=this.idTurboStatusElement;return p;}}
+class CarroEsportivo extends Carro{static CORES_ESPORTIVO=["Vermelha","Amarela","Azul Esportivo","Verde Limão","Preto Fosco"];constructor(m,c,id,idTS){super(m,c,id);this.tipoVeiculo='CarroEsportivo';this.maxVelocidadeNormal=250;this.maxVelocidadeTurbo=320;this.maxVelocidade=this.maxVelocidadeNormal;this.turboAtivado=false;this.idTurboStatusElement=idTS||`turbo-status-${id}`;this.cores=[...CarroEsportivo.CORES_ESPORTIVO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}ativarTurbo(){if(!this.ligado){alert("Ligue o carro!");return;}if(!this.turboAtivado){this.turboAtivado=true;this.maxVelocidade=this.maxVelocidadeTurbo;console.log("Turbo Ativado!");alert("Turbo Ativado!");this.atualizarTela();salvarGaragem();}else{alert("Turbo já ativado!");}}desativarTurbo(a=true){if(this.turboAtivado){this.turboAtivado=false;this.maxVelocidade=this.maxVelocidadeNormal;if(this.velocidade>this.maxVelocidade)this.velocidade=this.maxVelocidade;console.log("Turbo Desativado!");if(a)alert("Turbo Desativado!");this.atualizarTela();salvarGaragem();}else if(a){alert("Turbo já desativado!");}}_executarAceleracao(){const i=this.turboAtivado?25:15,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar(); // CORRIGIDO AQUI
+            this.atualizarTela();
+            salvarGaragem();
+        }}else{alert(`O ${this.modelo} na vel. máx (${this.maxVelocidade} km/h)!`);}}desligar(){super.desligar();}buzinar(){tocarBuzina();alert(`${this.modelo}: VRUUUUUM!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Esportivo)`);}atualizarTelaTurbo(c){if(!c)return;const tE=c.querySelector(`#${this.idTurboStatusElement}`);if(tE)tE.textContent=`Turbo: ${this.turboAtivado?"Ativado":"Desativado"}`;const pB=c.querySelector('.velocidade-progress-bar');if(pB)pB.style.backgroundColor=this.turboAtivado?'#e74c3c':'#3498db';}toPlainObject(){const p=super.toPlainObject();p.turboAtivado=this.turboAtivado;p.maxVelocidadeNormal=this.maxVelocidadeNormal;p.maxVelocidadeTurbo=this.maxVelocidadeTurbo;p.idTurboStatus=this.idTurboStatusElement;return p;}}
 class Caminhao extends Carro{static CORES_CAMINHAO=["Azul Escuro","Laranja","Verde Musgo","Marrom","Branco Gelo"];constructor(m,c,id,cap,idC){super(m,c,id);this.tipoVeiculo='Caminhao';this.maxVelocidade=120;this.capacidadeCarga=cap>0?cap:10000;this.cargaAtual=0;this.idCargaAtualElement=idC||`carga-atual-${id}`;this.cores=[...Caminhao.CORES_CAMINHAO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}carregar(inputId){const cI=document.getElementById(inputId);if(!cI){console.error(`Input #${inputId} não encontrado!`);alert("Erro: Campo carga não encontrado.");return;}const cV=cI.value;const cN=Number(cV);if(isNaN(cN)||cN<=0){alert("Insira carga válida.");return;}if(this.cargaAtual+cN<=this.capacidadeCarga){this.cargaAtual+=cN;console.log(`Caminhão ${this.idVeiculo} carregado: ${cN.toFixed(0)}kg. Total: ${this.cargaAtual.toFixed(0)}kg`);alert(`Carregado ${cN.toFixed(0)}kg. Total: ${this.cargaAtual.toFixed(0)}kg.`);cI.value='';this.atualizarTela();salvarGaragem();}else{const eL=this.capacidadeCarga-this.cargaAtual;alert(`Carga excessiva! Espaço: ${eL.toFixed(0)} kg.`);}}_executarAceleracao(){const fC=this.capacidadeCarga>0?Math.max(0.4,1-(this.cargaAtual/(this.capacidadeCarga*1.5))):1;const iB=8;const i=Math.round(iB*fC);const vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar();this.atualizarTela();salvarGaragem();}}else{alert(`O ${this.modelo} atingiu vel. máx!`);}}getFreioIncremento(){const fC=this.capacidadeCarga>0?1+(this.cargaAtual/this.capacidadeCarga)*0.5:1;const fB=10;return Math.max(4,Math.round(fB/fC));}buzinar(){tocarBuzina();alert(`${this.modelo}: PÓÓÓÓÓÓM!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Caminhao)`);}atualizarTelaCarga(c){if(!c)return;const cE=c.querySelector(`#${this.idCargaAtualElement}`);if(cE)cE.textContent=`Carga: ${this.cargaAtual.toFixed(0)} kg / ${this.capacidadeCarga.toFixed(0)} kg`;}toPlainObject(){const p=super.toPlainObject();p.capacidadeCarga=this.capacidadeCarga;p.cargaAtual=this.cargaAtual;p.idCargaAtual=this.idCargaAtualElement;return p;}}
 class Moto extends Veiculo{static CORES_MOTO=["Preta","Vermelha","Azul Royal","Branca Pérola","Verde Kawasaki"];constructor(m,c,id){super(m,c,'Moto',id);this.maxVelocidade=200;this.cores=[...Moto.CORES_MOTO];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}_executarAceleracao(){const i=18,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){tocarAcelerar();this.atualizarTela();salvarGaragem();}}else{alert("Moto vel. máxima!");}}getFreioIncremento(){return 15;}buzinar(){tocarBuzina();alert(`${this.modelo}: Bip Bip!`);console.log(`${this.modelo}(${this.idVeiculo}): Buzina(Moto)`);}toPlainObject(){return super.toPlainObject();}}
 class Bicicleta extends Veiculo{static CORES_BICICLETA=["Verde","Azul Claro","Vermelha","Preta","Amarela"];constructor(m,c,id){super(m,c,'Bicicleta',id);this.maxVelocidade=40;this.ligado=true;this.cores=[...Bicicleta.CORES_BICICLETA];this.indiceCorAtual=this.cores.indexOf(this.cor);if(this.indiceCorAtual===-1){this.indiceCorAtual=0;this.cor=this.cores[0];}}ligar(){alert("Bike não liga!");}desligar(){alert("Bike não desliga!");}_executarAceleracao(){const i=5,vA=this.velocidade;if(this.velocidade<this.maxVelocidade){this.velocidade=Math.min(this.velocidade+i,this.maxVelocidade);if(this.velocidade!==vA){this.atualizarTela();salvarGaragem();}}else{alert("Bike vel. máxima!");}}frear(){if(this.velocidade>0){const vA=this.velocidade;this.velocidade=Math.max(0,this.velocidade-this.getFreioIncremento());if(this.velocidade!==vA){this.atualizarTela();salvarGaragem();}}else{alert(`${this.modelo} parada!`);}}getFreioIncremento(){return 6;}buzinar(){console.log(`${this.modelo}: Trim Trim!`);alert("Trim Trim!");}toPlainObject(){return super.toPlainObject();}}
@@ -86,6 +95,7 @@ function renderApp() {
     } else {
          planejadorContainerElement.style.display = 'none'; 
          mainContentElement.style.display = 'block'; 
+        // Limpa o conteúdo principal antes de renderizar a nova view
         mainContentElement.innerHTML = '<p>Carregando...</p>'; 
     }
 
@@ -106,11 +116,12 @@ function renderApp() {
     setupDynamicEventListeners(); 
 }
 
-// ▼▼▼ FUNÇÃO renderGarageView MODIFICADA PARA SELEÇÃO DE IMAGEM ▼▼▼
+// ▼▼▼ FUNÇÃO renderGarageView MODIFICADA PARA SELEÇÃO DE IMAGEM E CHAMADA DE DADOS DE DESTAQUE ▼▼▼
 function renderGarageView() {
+    // Renderiza a lista principal de veículos primeiro
     mainContentElement.innerHTML = '<h2>Minha Garagem</h2>';
     const container = document.createElement('div');
-    container.className = 'garage-view';
+    container.className = 'garage-view'; // Container para os cards de veículos da garagem
     const ids = Object.keys(veiculos);
     if (ids.length === 0) {
         container.innerHTML = '<p>Sua garagem está vazia.</p>';
@@ -123,15 +134,15 @@ function renderGarageView() {
             card.setAttribute('role', 'button');
             card.tabIndex = 0;
 
-            // --- Lógica de seleção de imagem (Alterada aqui) ---
+            // --- Lógica de seleção de imagem ---
             let img = 'carrodomal.png'; // Imagem padrão/fallback
 
             if (v.modelo === 'Jackson Storm') {
-                img = 'JacksonStormCars3Artwork.webp'; // Imagem específica para Jackson Storm
+                img = 'JacksonStormCars3Artwork.webp';
             } else if (v.modelo === 'Ferrari') {
-                img = 'ferrari.png'; // Imagem específica para Ferrari
+                img = 'ferrari.png';
             } else if (v.modelo === 'Scania') {
-                img = 'scania.png'; // Imagem específica para Scania
+                img = 'scania.png';
             } else if (v.modelo === 'Mountain Bike') { // Assumindo que 'bilecerta.webp' é para a Mountain Bike
                 img = 'bilecerta.webp'; // Imagem específica para Mountain Bike (verificar nome do arquivo)
             } else if (v.tipoVeiculo === 'CarroEsportivo') {
@@ -139,22 +150,33 @@ function renderGarageView() {
             } else if (v.tipoVeiculo === 'Caminhao') {
                 img = 'caminhao.png'; // Genérica para outros Caminhões
             } else if (v.tipoVeiculo === 'Moto') {
-                img = 'moto.png'; // Genérica para todas as Motos (já era 'moto.png')
+                img = 'moto.png'; // Genérica para todas as Motos
             } else if (v.tipoVeiculo === 'Bicicleta') {
                 img = 'bicicleta.png'; // Genérica para outras Bicicletas
-            } else if (v.tipoVeiculo === 'Carro') { 
+            } else if (v.tipoVeiculo === 'Carro') {
                 img = 'carro.png'; // Genérica para outros Carros
             }
              // --- Fim da lógica de seleção de imagem ---
-
 
             card.innerHTML = `<img src="imagens/${img}" alt="${v.tipoVeiculo} ${v.modelo}"><h3>${v.modelo}</h3><p>Tipo: ${v.tipoVeiculo}</p><p class="info-cor">Cor: ${v.cor}</p>`;
             container.appendChild(card);
         });
     }
+    // Adiciona o container principal da garagem ao main content
     mainContentElement.appendChild(container);
+
+    // --- CHAMADA PARA CARREGAR DADOS DE DESTAQUE APÓS RENDERIZAR A GARAGEM ---
+    // Cria uma nova seção/div especificamente para os veículos em destaque
+    const destaqueSection = document.createElement('section');
+    destaqueSection.id = 'veiculos-destaque-section'; // Adiciona um ID para estilizar a seção toda
+    destaqueSection.innerHTML = '<h3>Veículos em Destaque</h3><p class="loading-message">Carregando destaques...</p>';
+    mainContentElement.appendChild(destaqueSection); // Adiciona a seção de destaques ao main content
+
+    carregarVeiculosDestaque(); // Chama a função para buscar e exibir os destaques
+    // --- FIM DA CHAMADA ---
 }
 // ▲▲▲ FIM da função renderGarageView MODIFICADA ▲▲▲
+
 
 // ▼▼▼ FUNÇÃO renderVehicleDetailView MODIFICADA PARA SELEÇÃO DE IMAGEM ▼▼▼
 function renderVehicleDetailView(veiculo) {
@@ -167,11 +189,11 @@ function renderVehicleDetailView(veiculo) {
     let img = 'carrodomal.png'; // Imagem padrão/fallback
 
      if (veiculo.modelo === 'Jackson Storm') {
-        img = 'JacksonStormCars3Artwork.webp'; // Imagem específica para Jackson Storm
+        img = 'JacksonStormCars3Artwork.webp';
     } else if (veiculo.modelo === 'Ferrari') {
-        img = 'ferrari.png'; // Imagem específica para Ferrari
+        img = 'ferrari.png';
     } else if (veiculo.modelo === 'Scania') {
-        img = 'scania.png'; // Imagem específica para Scania
+        img = 'scania.png';
     } else if (veiculo.modelo === 'Mountain Bike') { // Assumindo que 'bilecerta.webp' é para a Mountain Bike
         img = 'bilecerta.webp'; // Imagem específica para Mountain Bike (verificar nome do arquivo)
     } else if (veiculo.tipoVeiculo === 'CarroEsportivo') {
@@ -179,10 +201,10 @@ function renderVehicleDetailView(veiculo) {
     } else if (veiculo.tipoVeiculo === 'Caminhao') {
         img = 'caminhao.png'; // Genérica para outros Caminhões
     } else if (veiculo.tipoVeiculo === 'Moto') {
-        img = 'moto.png'; // Genérica para todas as Motos (já era 'moto.png')
+        img = 'moto.png'; // Genérica para todas as Motos
     } else if (veiculo.tipoVeiculo === 'Bicicleta') {
         img = 'bicicleta.png'; // Genérica para outras Bicicletas
-    } else if (veiculo.tipoVeiculo === 'Carro') { 
+    } else if (veiculo.tipoVeiculo === 'Carro') {
         img = 'carro.png'; // Genérica para outros Carros
     }
     // --- Fim da lógica de seleção de imagem ---
@@ -235,7 +257,8 @@ async function exibirDetalhesVeiculoAPI(vehicleId) { const resultadoDiv = docume
 async function buscarPrevisaoDetalhada(nomeCidade) {
     // A URL agora aponta para o seu servidor backend
     // Atenção à porta! Deve ser a porta do seu server.js (padrão 3001)
-    const apiUrl = `http://localhost:3001/api/previsao/${encodeURIComponent(nomeCidade)}`;
+    const apiUrl = `${backendUrl}/api/previsao/${encodeURIComponent(nomeCidade)}`; // Usa a variável backendUrl
+
     
     console.log(`[Frontend] Buscando previsão para: ${nomeCidade} via backend (${apiUrl})`);
 
@@ -243,26 +266,41 @@ async function buscarPrevisaoDetalhada(nomeCidade) {
         const response = await fetch(apiUrl);
 
         // Tenta pegar a mensagem de erro do JSON retornado pelo backend, mesmo que !response.ok
-        const errorData = await response.json().catch(() => ({ message: `Erro ${response.status} ao contatar o servidor.` })); 
+        // Usa text() em vez de json() para tentar ler a resposta mesmo se não for JSON válido
+        const responseBody = await response.text();
+        let errorData = { message: `Erro ${response.status} ao contatar o servidor.` };
+         try {
+             // Tenta parsear como JSON se a resposta não foi ok, mas o corpo existe
+             errorData = JSON.parse(responseBody);
+         } catch (parseError) {
+             // Se não for JSON, usa o texto como mensagem de erro ou uma padrão
+             errorData.message = responseBody || `Erro ${response.status} ao contatar o servidor. Resposta não-JSON.`;
+         }
+
 
         if (!response.ok) {
             const errorMessage = errorData.error || errorData.message || `Erro ${response.status} ao buscar previsão no servidor.`;
             console.error(`[Frontend] Erro ${response.status} ao buscar previsão:`, errorMessage, errorData);
+            // Lança o erro para ser capturado no catch
             throw new Error(errorMessage);
         }
 
-        // 'errorData' aqui seria o 'data' da OpenWeatherMap se response.ok for true
-        const data = errorData; 
+        // Se a resposta foi ok, então os dados são o corpo parseado como JSON
+        const data = JSON.parse(responseBody); // Parseia como JSON se response.ok
+
         console.log("[Frontend] Dados da previsão recebidos do backend:", data);
 
         // Verifica se a resposta do backend, que é o 'data' da OpenWeatherMap,
         // contém um 'cod' que não seja '200', indicando erro da OpenWeatherMap.
+        // Nota: A OpenWeatherMap *pode* retornar status 200 mesmo com 'cod' != 200 para alguns erros.
+        // Nosso backend já tenta tratar isso, mas este é um fallback.
         if (data.cod && String(data.cod) !== "200" && data.message) {
-            console.error(`[Frontend] Erro da API OpenWeatherMap (via backend): ${data.message} (cod: ${data.cod})`);
-            // Retorna um objeto de erro para ser tratado pelo handleVerificarClimaClick
-            return { error: true, message: data.message };
-        }
-        
+             console.warn(`[Frontend] API OpenWeatherMap (via backend) retornou cod != 200: ${data.message} (cod: ${data.cod})`);
+             // Retorna um objeto de erro para ser tratado pelo handleVerificarClimaClick
+             return { error: true, message: data.message, cod: data.cod };
+         }
+
+
         return data; // Retorna os dados da previsão (o objeto JSON completo da OpenWeatherMap)
     } catch (error) {
         console.error("[Frontend] Falha na requisição ou processamento da previsão:", error);
@@ -270,6 +308,7 @@ async function buscarPrevisaoDetalhada(nomeCidade) {
         return { error: true, message: error.message || "Não foi possível buscar a previsão detalhada." };
     }
 }
+
 
 function processarDadosForecast(dataApi) {
     // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
@@ -292,7 +331,8 @@ function processarDadosForecast(dataApi) {
             umidade: item.main.humidity,
             vento_velocidade: item.wind.speed,
         });
-    });
+    }
+    );
     const resultadoFinal = [];
     for (const diaKey in previsoesAgrupadasPorDia) {
         const diaData = previsoesAgrupadasPorDia[diaKey];
@@ -335,7 +375,7 @@ function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
         console.error("Div #previsao-tempo-resultado não encontrada.");
         return;
     }
-    resultadoDiv.innerHTML = ''; 
+    resultadoDiv.innerHTML = '';
 
     const tituloEl = document.createElement('h3');
     tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
@@ -363,7 +403,7 @@ function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
             <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
             <p class="descricao-tempo">${descricaoCapitalizada}</p>
             <p class="temperaturas">
-                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> / 
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> /
                 <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
             </p>
             <div class="detalhes-dia-info">
@@ -383,8 +423,8 @@ function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
 }
 
 function handleCardDiaClick(event) {
-    const botaoClicado = event.currentTarget; 
-    const cardClicado = botaoClicado.closest('.previsao-dia-card'); 
+    const botaoClicado = event.currentTarget;
+    const cardClicado = botaoClicado.closest('.previsao-dia-card');
 
     if (!cardClicado) {
         console.error("Card pai não encontrado para o botão clicado.");
@@ -402,7 +442,7 @@ function handleCardDiaClick(event) {
         }
 
         const isVisible = detalhesDiv.style.display === 'block';
-        
+
         const todosCards = cardClicado.closest('.previsao-dias-container').querySelectorAll('.previsao-dia-card');
         todosCards.forEach(outroCard => {
             if (outroCard !== cardClicado) {
@@ -413,15 +453,15 @@ function handleCardDiaClick(event) {
                     outroDetalheDiv.innerHTML = '';
                 }
                 if (outroBotao) {
-                    outroBotao.textContent = 'Mais Informações'; 
+                    outroBotao.textContent = 'Mais Informações';
                 }
             }
         });
 
         if (isVisible) {
             detalhesDiv.style.display = 'none';
-            detalhesDiv.innerHTML = ''; 
-            botaoClicado.textContent = 'Mais Informações'; 
+            detalhesDiv.innerHTML = '';
+            botaoClicado.textContent = 'Mais Informações';
         } else {
             detalhesDiv.style.display = 'block';
             let htmlDetalhes = '<h5>Previsão Horária:</h5><ul>';
@@ -441,7 +481,7 @@ function handleCardDiaClick(event) {
             });
             htmlDetalhes += '</ul>';
             detalhesDiv.innerHTML = htmlDetalhes;
-            botaoClicado.textContent = 'Ocultar Detalhes'; 
+            botaoClicado.textContent = 'Ocultar Detalhes';
         }
     } else {
         console.error("Não foi possível encontrar os dados para o dia clicado.", diaIndex, dadosPrevisaoAtual);
@@ -461,26 +501,26 @@ async function handleVerificarClimaClick() {
     const destinoInput = document.getElementById('destino-viagem');
     const resultadoDiv = document.getElementById('previsao-tempo-resultado');
     if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
-    
+
     const nomeCidade = destinoInput.value.trim();
-    if (!nomeCidade) { 
-        alert("Por favor, digite o nome da cidade."); 
-        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>'; 
-        destinoInput.focus(); 
-        return; 
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>';
+        destinoInput.focus();
+        return;
     }
-    
+
     resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
-    
+
     // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
-    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade); 
-    
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade);
+
     if (dadosApi && !dadosApi.error) {
         // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
         // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
         // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
         // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
-        
+
         const previsaoProcessada = processarDadosForecast(dadosApi);
         if (previsaoProcessada && previsaoProcessada.length > 0) {
             exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
@@ -495,20 +535,2073 @@ async function handleVerificarClimaClick() {
     }
 }
 
-// --- FUNÇÕES DE FORMULÁRIO DE MANUTENÇÃO ---
-function handleVehicleSelectionChange(event) { const selectedVehicleId = event.target.value; const formContainer = document.getElementById('agendar-maintenance-form-container'); if (!formContainer) { console.error("Container do formulário não encontrado!"); return; } if (selectedVehicleId && veiculos[selectedVehicleId]) { console.log(`Veículo selecionado: ${selectedVehicleId}`); formContainer.innerHTML = getMaintenanceFormHTML(selectedVehicleId); formContainer.classList.remove('hidden'); formContainer.style.display = 'block'; const formElement = formContainer.querySelector('form.form-agendamento'); if (formElement) { setupFormSubmitListener(formElement); } else { console.error("Erro: Formulário não encontrado."); } } else { console.log("Nenhum veículo selecionado."); formContainer.innerHTML = `<p id="select-vehicle-message">Selecione um veículo.</p>`; formContainer.classList.add('hidden'); formContainer.style.display = 'none'; } }
-function getMaintenanceFormHTML(vehicleId) { const formId = `form-agendamento-agendarview-${vehicleId}`; return `<form id="${formId}" class="form-agendamento"><h4>Agendar para: ${veiculos[vehicleId].modelo} (${veiculos[vehicleId].tipoVeiculo})</h4><label for="data-man-${formId}">Data:*</label><input type="date" id="data-man-${formId}" name="data" required><label for="hora-man-${formId}">Hora:</label><input type="time" id="hora-man-${formId}" name="hora"><label for="tipo-man-${formId}">Tipo Serviço:*</label><input type="text" id="tipo-man-${formId}" name="tipo" required placeholder="Ex: Troca de Óleo..."><label for="custo-man-${formId}">Custo (R$):</label><input type="number" id="custo-man-${formId}" name="custo" min="0" step="0.01" placeholder="0.00"><label for="desc-man-${formId}">Descrição:</label><textarea id="desc-man-${formId}" name="descricao" rows="2" placeholder="Detalhes..."></textarea><div><button type="submit" data-action="salvar-agendamento" data-vehicle-id-target="${vehicleId}">Salvar</button><button type="button" class="btn-cancelar-form" data-action="cancelar-form">Cancelar</button></div></form>`; }
-function setupFormSubmitListener(formElement) { if (formElement) { formElement.removeEventListener('submit', handleFormSubmit); formElement.addEventListener('submit', handleFormSubmit); console.log(`Listener submit adicionado: #${formElement.id}`); } else { console.error("setupFormSubmitListener: formElement inválido."); } }
-function handleFormSubmit(event) { event.preventDefault(); event.stopPropagation(); const form = event.target; console.log("Form submetido:", form.id); const submitButton = form.querySelector('button[type="submit"]'); let veiculoId = submitButton?.dataset.vehicleIdTarget; if (!veiculoId) { const selectElement = document.getElementById('vehicle-select-schedule'); if (selectElement) { veiculoId = selectElement.value; } } if (!veiculoId || !veiculos[veiculoId]) { console.error(`handleFormSubmit: ID veículo inválido ('${veiculoId}')`); alert("Erro: Selecione veículo."); return; } const veiculo = veiculos[veiculoId]; console.log(`Agendando para: ${veiculo.modelo}`); const formData = new FormData(form); const dataStr = formData.get('data'); const horaStr = formData.get('hora') || '00:00'; const tipo = formData.get('tipo')?.trim(); const custoStr = formData.get('custo'); const descricao = formData.get('descricao')?.trim(); if (!dataStr || !tipo) { alert("Erro: Data e Tipo obrigatórios!"); return; } const custo = parseFloat(custoStr) || 0; if (isNaN(custo) || custo < 0) { alert("Erro: Custo inválido."); return; } let dataCompleta; try { const dataIsoString = `${dataStr}T${horaStr}`; dataCompleta = new Date(dataIsoString); if (isNaN(dataCompleta.getTime())) throw new Error("Formato data/hora inválido."); const [year, month, day] = dataStr.split('-').map(Number); if (dataCompleta.getFullYear() !== year || dataCompleta.getMonth() !== month - 1 || dataCompleta.getDate() !== day) { throw new Error("Data inválida p/ mês."); } console.log("Data/Hora criada:", dataCompleta); } catch (e) { alert(`Erro Data/Hora: ${e.message}`); console.error("Erro criando Date:", e); return; } const novaManutencao = new Manutencao(null, dataCompleta, tipo, custo, descricao, 'Agendada'); console.log("Manutencao criada:", novaManutencao); const success = veiculo.adicionarManutencao(novaManutencao); if (success) { alert(`Manutenção "${tipo}" agendada p/ ${veiculo.modelo} em ${novaManutencao.getFormattedDate()}!`); form.reset(); const formContainer = document.getElementById('agendar-maintenance-form-container'); if(formContainer) { formContainer.innerHTML = `<p style="color: green; text-align: center; font-weight: bold;">Salvo!</p><p id="select-vehicle-message">Selecione outro veículo.</p>`; } console.log(`Manutenção ${novaManutencao.id} adicionada a ${veiculoId}.`); } else { console.error(`Falha ao adicionar manutenção a ${veiculoId}.`); } }
-function handleCancelForm(button) { const form = button.closest('form.form-agendamento'); const formContainer = document.getElementById('agendar-maintenance-form-container'); const selectElement = document.getElementById('vehicle-select-schedule'); if (form) form.reset(); if(formContainer) { formContainer.innerHTML = `<p id="select-vehicle-message">Selecione um veículo.</p>`; formContainer.classList.add('hidden'); formContainer.style.display = 'none'; } if(selectElement) selectElement.value = ""; }
-function verificarAgendamentosProximos(diasLimite = 3) {if(diasLimite<=0)return;const agora=new Date();agora.setHours(0,0,0,0);const umDia=24*60*60*1000;const dtLimite=new Date(agora.getTime()+umDia*(diasLimite+1));let alertas=[];for(const id in veiculos){if(veiculos.hasOwnProperty(id)){const v=veiculos[id];const ag=v.getHistoricoManutencao(true,true);ag.forEach(m=>{if(m.data&&m.data<dtLimite){alertas.push(`- ${v.modelo}(${v.tipoVeiculo}): ${m.tipo} em ${m.getFormattedDate()}`);}});}}if(alertas.length>0){setTimeout(()=>{alert(`🔔 LEMBRETE MANUT. PRÓXIMA (${diasLimite} dias) 🔔\n\n${alertas.join("\n")}\n\nAcesse detalhes p/ mais info.`);},500);}else{console.log(`Nenhum agendamento ativo nos próximos ${diasLimite} dias.`);}}
+function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+    const previsoesAgrupadasPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = { data: diaStr, entradas: [] };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5),
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon,
+            umidade: item.main.humidity,
+            vento_velocidade: item.wind.speed,
+        });
+    }
+    );
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const umidades = diaData.entradas.map(e => e.umidade);
+        const velocidades_vento = diaData.entradas.map(e => e.vento_velocidade);
+        let previsaoRepresentativa = diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00") || diaData.entradas.find(e => e.hora === "12:00") || diaData.entradas.find(e => e.hora === "09:00") || diaData.entradas[0];
+        resultadoFinal.push({
+            data: diaData.data,
+            temp_min: parseFloat(Math.min(...temperaturas).toFixed(1)),
+            temp_max: parseFloat(Math.max(...temperaturas).toFixed(1)),
+            descricao: previsaoRepresentativa.descricao,
+            icone: previsaoRepresentativa.icone,
+            umidade_media: parseFloat((umidades.reduce((a, b) => a + b, 0) / umidades.length).toFixed(1)),
+            vento_velocidade_media: parseFloat((velocidades_vento.reduce((a, b) => a + b, 0) / velocidades_vento.length).toFixed(1)),
+            previsoes_horarias: diaData.entradas
+        });
+    }
+    resultadoFinal.sort((a, b) => new Date(a.data) - new Date(b.data));
+    console.log("[Processamento Forecast] Dados processados por dia:", resultadoFinal);
+    return resultadoFinal;
+}
 
-// --- INICIALIZAÇÃO DA APLICAÇÃO ---
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM carregado. Inicializando Garagem v2.0 com APIs...");
-    carregarGaragem();
-    renderApp(); 
-    setupEventListeners(); 
-    console.log("Aplicação inicializada.");
-});
-// FIM DO SCRIPT
+function formatarDataParaExibicao(dataStr) {
+    if (!dataStr || typeof dataStr !== 'string') return "Data inválida";
+    try {
+        const [year, month, day] = dataStr.split('-');
+        const dataObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (isNaN(dataObj.getTime())) { throw new Error("Data inválida após parse."); }
+        return dataObj.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+    } catch (e) { console.error("Erro ao formatar data:", dataStr, e); return "Data inválida"; }
+}
+
+function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+    dadosPrevisaoAtual = previsaoDiariaProcessada; // Armazena para o clique nos detalhes
+
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!resultadoDiv) {
+        console.error("Div #previsao-tempo-resultado não encontrada.");
+        return;
+    }
+    resultadoDiv.innerHTML = '';
+
+    const tituloEl = document.createElement('h3');
+    tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
+    resultadoDiv.appendChild(tituloEl);
+
+    const previsaoContainer = document.createElement('div');
+    previsaoContainer.className = 'previsao-dias-container';
+    resultadoDiv.appendChild(previsaoContainer);
+
+    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
+        previsaoContainer.innerHTML = '<p>Nenhuma previsão disponível ou erro ao processar.</p>';
+        return;
+    }
+
+    previsaoDiariaProcessada.forEach((dia, index) => {
+        const diaCard = document.createElement('div');
+        diaCard.className = 'previsao-dia-card';
+
+        const dataFormatada = formatarDataParaExibicao(dia.data);
+        const descricaoCapitalizada = dia.descricao.charAt(0).toUpperCase() + dia.descricao.slice(1);
+        const ventoKmH = (dia.vento_velocidade_media * 3.6).toFixed(1);
+
+        diaCard.innerHTML = `
+            <h4>${dataFormatada}</h4>
+            <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
+            <p class="descricao-tempo">${descricaoCapitalizada}</p>
+            <p class="temperaturas">
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> /
+                <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
+            </p>
+            <div class="detalhes-dia-info">
+                <p title="Velocidade média do vento">Vento: ${ventoKmH} km/h</p>
+                <p title="Umidade média do ar">Umidade: ${dia.umidade_media.toFixed(0)}%</p>
+            </div>
+            <button class="btn-ver-detalhes-dia" data-dia-index="${index}">Mais Informações</button>
+            <div class="previsao-dia-detalhes-expansivel" style="display: none;"></div>
+        `;
+        previsaoContainer.appendChild(diaCard);
+
+        const detalhesButton = diaCard.querySelector('.btn-ver-detalhes-dia');
+        if (detalhesButton) {
+            detalhesButton.addEventListener('click', handleCardDiaClick);
+        }
+    });
+}
+
+function handleCardDiaClick(event) {
+    const botaoClicado = event.currentTarget;
+    const cardClicado = botaoClicado.closest('.previsao-dia-card');
+
+    if (!cardClicado) {
+        console.error("Card pai não encontrado para o botão clicado.");
+        return;
+    }
+    const diaIndex = parseInt(botaoClicado.dataset.diaIndex);
+
+    if (dadosPrevisaoAtual && dadosPrevisaoAtual[diaIndex]) {
+        const dadosDoDia = dadosPrevisaoAtual[diaIndex];
+        const detalhesDiv = cardClicado.querySelector('.previsao-dia-detalhes-expansivel');
+
+        if (!detalhesDiv) {
+            console.error("Div de detalhes expansível não encontrada no card.");
+            return;
+        }
+
+        const isVisible = detalhesDiv.style.display === 'block';
+
+        const todosCards = cardClicado.closest('.previsao-dias-container').querySelectorAll('.previsao-dia-card');
+        todosCards.forEach(outroCard => {
+            if (outroCard !== cardClicado) {
+                const outroDetalheDiv = outroCard.querySelector('.previsao-dia-detalhes-expansivel');
+                const outroBotao = outroCard.querySelector('.btn-ver-detalhes-dia');
+                if (outroDetalheDiv) {
+                    outroDetalheDiv.style.display = 'none';
+                    outroDetalheDiv.innerHTML = '';
+                }
+                if (outroBotao) {
+                    outroBotao.textContent = 'Mais Informações';
+                }
+            }
+        });
+
+        if (isVisible) {
+            detalhesDiv.style.display = 'none';
+            detalhesDiv.innerHTML = '';
+            botaoClicado.textContent = 'Mais Informações';
+        } else {
+            detalhesDiv.style.display = 'block';
+            let htmlDetalhes = '<h5>Previsão Horária:</h5><ul>';
+            dadosDoDia.previsoes_horarias.forEach(ph => {
+                const descricaoHorariaCapitalizada = ph.descricao.charAt(0).toUpperCase() + ph.descricao.slice(1);
+                const ventoHorarioKmH = (ph.vento_velocidade * 3.6).toFixed(1);
+                htmlDetalhes += `<li>
+                    <div class="hora-icone">
+                        <strong>${ph.hora}</strong>
+                        <img src="https://openweathermap.org/img/wn/${ph.icone}.png" alt="${descricaoHorariaCapitalizada}" title="${descricaoHorariaCapitalizada}">
+                    </div>
+                    <div class="info-horaria">
+                        <span>${ph.temp.toFixed(0)}°C, ${descricaoHorariaCapitalizada}</span>
+                        <span>Vento: ${ventoHorarioKmH} km/h, Umidade: ${ph.umidade}%</span>
+                    </div>
+                </li>`;
+            });
+            htmlDetalhes += '</ul>';
+            detalhesDiv.innerHTML = htmlDetalhes;
+            botaoClicado.textContent = 'Ocultar Detalhes';
+        }
+    } else {
+        console.error("Não foi possível encontrar os dados para o dia clicado.", diaIndex, dadosPrevisaoAtual);
+    }
+}
+
+// --- NAVEGAÇÃO E EVENTOS ---
+function updateNavButtons() { const b=document.querySelectorAll('.sidebar-nav .nav-button'); b.forEach(btn=>{ if(btn.dataset.view===currentView)btn.classList.add('active'); else btn.classList.remove('active'); }); }
+function navigateToDetails(vId){if(vId&&veiculos[vId]){console.log(`Nav detalhes: ${vId}`);currentVehicleId=vId;currentView='detalhes';renderApp();}else{console.error(`Erro nav detalhes: ID inválido ${vId}`);alert("Erro: Veículo não encontrado.");}}
+function navigateToView(vName){ const vV=['garagem','detalhes','agendar', 'planejar']; if(!vV.includes(vName)){console.warn(`Nav view inválida: ${vName}`);return;} console.log(`Nav view: ${vName}`); currentView=vName; if(currentView!=='detalhes') currentVehicleId=null; renderApp(); }
+function setupEventListeners() { console.log("Configurando listeners globais..."); mainContentElement.removeEventListener('click', handleMainContentClick); mainContentElement.addEventListener('click', handleMainContentClick); mainContentElement.removeEventListener('keydown', handleMainContentKeydown); mainContentElement.addEventListener('keydown', handleMainContentKeydown); const navButtons = document.querySelectorAll('.sidebar-nav .nav-button'); navButtons.forEach(button => { const viewName = button.dataset.view; if (viewName) { const newButton = button.cloneNode(true); button.parentNode.replaceChild(newButton, button); newButton.addEventListener('click', () => navigateToView(viewName)); } }); const verificarClimaBtn = document.getElementById('verificar-clima-btn'); if (verificarClimaBtn) { const newClimaBtn = verificarClimaBtn.cloneNode(true); verificarClimaBtn.parentNode.replaceChild(newClimaBtn, verificarClimaBtn); newClimaBtn.addEventListener('click', handleVerificarClimaClick); } else { console.warn("Botão #verificar-clima-btn não encontrado."); } console.log("Listeners configurados."); }
+function setupDynamicEventListeners() { if (currentView === 'agendar') { const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.removeEventListener('change', handleVehicleSelectionChange); vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } } }
+function handleMainContentClick(event) { const target = event.target; const vehicleCard = target.closest('.vehicle-card'); if (vehicleCard && vehicleCard.dataset.vehicleId) { event.preventDefault(); navigateToDetails(vehicleCard.dataset.vehicleId); return; } const button = target.closest('button[data-action]'); if (button) { const action = button.dataset.action; const vehicleId = button.dataset.vehicleId || target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); const manutencaoId = button.dataset.manutencaoId; console.log(`Click Action: ${action}`, { vehicleId, manutencaoId }); if (vehicleId && veiculos[vehicleId]) { const v = veiculos[vehicleId]; try{ switch(action){ case 'ligar': v.ligar(); break; case 'desligar': v.desligar(); break; case 'acelerar': v.acelerar(); break; case 'frear': v.frear(); break; case 'mudarCor': v.mudarCor(); break; case 'ativarTurbo': if(v.ativarTurbo)v.ativarTurbo(); else alert("Sem turbo."); break; case 'desativarTurbo': if(v.desativarTurbo)v.desativarTurbo(); else alert("Sem turbo."); break; case 'carregar': if(v.carregar&&button.dataset.inputId)v.carregar(button.dataset.inputId); else if(v.carregar)console.error("Botão carregar s/ data-input-id."); else alert("Não carrega."); break; case 'buzinar': v.buzinar(); break; case 'buscar-detalhes-api': exibirDetalhesVeiculoAPI(vehicleId); break; default: console.warn(`Ação de botão desconhecida: ${action}`); } }catch(e){console.error(`Erro ação '${action}' veículo ${vehicleId}:`,e);alert(`Erro ação '${action}'.`);} } else if (action === 'marcar-status' && manutencaoId) { const nS = button.dataset.novoStatus; const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext] && nS) { const v=veiculos[vIdContext];const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`Marcar "${m.tipo}" como "${nS}"?`))v.marcarManutencaoComo(manutencaoId,nS); } else console.error("Dados incompletos marcar status:",{vIdContext,manutencaoId,nS}); } else if (action === 'remover-manutencao' && manutencaoId) { const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext]) { const v=veiculos[vIdContext]; const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`REMOVER registro "${m.tipo}" de ${m.getFormattedDate()}?`))v.removerManutencao(manutencaoId); } else console.error("Dados incompletos remover manut:",{vIdContext,manutencaoId}); } else if (action === 'cancelar-form') { handleCancelForm(button); } } const formAgendamento = target.closest('form.form-agendamento'); if (formAgendamento && event.type === 'submit') { handleFormSubmit(event); } }
+function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('vehicle-card')){ const vId=event.target.dataset.vehicleId; if(vId){event.preventDefault();navigateToDetails(vId);} } }
+
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
+
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>';
+        destinoInput.focus();
+        return;
+    }
+
+    resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
+
+    // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade);
+
+    if (dadosApi && !dadosApi.error) {
+        // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
+        // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
+        // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
+        // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
+
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada && previsaoProcessada.length > 0) {
+            exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
+        } else {
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console.</p>';
+            console.warn("[Frontend] processarDadosForecast retornou nulo/vazio. API Response:", dadosApi);
+        }
+    } else {
+        // Trata erros de rede, erros retornados pelo nosso backend (ex: chave API não configurada no servidor),
+        // ou erros da API OpenWeatherMap já formatados por buscarPrevisaoDetalhada.
+        resultadoDiv.innerHTML = `<p class="error-message">Falha: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
+    }
+}
+
+// --- FUNÇÃO processarDadosForecast CORRIGIDA ---
+function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+    const previsoesAgrupadasPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = { data: diaStr, entradas: [] };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5),
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon,
+            umidade: item.main.humidity,
+            vento_velocidade: item.wind.speed,
+        });
+    }); // <-- FECHA O FOR EACH AQUI!
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const umidades = diaData.entradas.map(e => e.umidade);
+        const velocidades_vento = diaData.entradas.map(e => e.vento_velocidade); // CORRIGIDO AQUI - usa dados do dia
+        // Lógica para encontrar uma previsão representativa para o dia (12:00, 15:00, 09:00 ou a primeira)
+        let previsaoRepresentativa = diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00" || e.hora === "09:00") || diaData.entradas[0];
+
+         // Verifica se encontrou uma previsão representativa antes de usar seus dados
+         if (!previsaoRepresentativa) {
+             console.warn(`[Processamento Forecast] Nenhuma previsão horária encontrada para o dia ${diaKey}. Pulando este dia.`);
+             continue; // Pula para o próximo dia no loop for...in
+         }
+
+
+        resultadoFinal.push({
+            data: diaData.data,
+            temp_min: parseFloat(Math.min(...temperaturas).toFixed(1)),
+            temp_max: parseFloat(Math.max(...temperaturas).toFixed(1)),
+            descricao: previsaoRepresentativa.descricao,
+            icone: previsaoRepresentativa.icone,
+            umidade_media: parseFloat((umidades.reduce((a, b) => a + b, 0) / umidades.length).toFixed(1)),
+            vento_velocidade_media: parseFloat((velocidades_vento.reduce((a, b) => a + b, 0) / velocidades_vento.length).toFixed(1)),
+            previsoes_horarias: diaData.entradas // Inclui todas as previsões horárias do dia
+        });
+    } // <-- FECHA O LOOP FOR...IN AQUI!
+    resultadoFinal.sort((a, b) => new Date(a.data) - new Date(b.data)); // Garante que os dias estão em ordem
+    console.log("[Processamento Forecast] Dados processados por dia:", resultadoFinal);
+    return resultadoFinal; // <-- RETORNA O RESULTADO FINAL
+}
+// --- FIM DA FUNÇÃO processarDadosForecast CORRIGIDA ---
+
+
+function formatarDataParaExibicao(dataStr) {
+    if (!dataStr || typeof dataStr !== 'string') return "Data inválida";
+    try {
+        const [year, month, day] = dataStr.split('-');
+        const dataObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (isNaN(dataObj.getTime())) { throw new Error("Data inválida após parse."); }
+        return dataObj.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+    } catch (e) { console.error("Erro ao formatar data:", dataStr, e); return "Data inválida"; }
+}
+
+function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+    dadosPrevisaoAtual = previsaoDiariaProcessada; // Armazena para o clique nos detalhes
+
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!resultadoDiv) {
+        console.error("Div #previsao-tempo-resultado não encontrada.");
+        return;
+    }
+    resultadoDiv.innerHTML = '';
+
+    const tituloEl = document.createElement('h3');
+    tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
+    resultadoDiv.appendChild(tituloEl);
+
+    const previsaoContainer = document.createElement('div');
+    previsaoContainer.className = 'previsao-dias-container';
+    resultadoDiv.appendChild(previsaoContainer);
+
+    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
+        previsaoContainer.innerHTML = '<p>Nenhuma previsão disponível ou erro ao processar.</p>';
+        return;
+    }
+
+    previsaoDiariaProcessada.forEach((dia, index) => {
+        const diaCard = document.createElement('div');
+        diaCard.className = 'previsao-dia-card';
+
+        const dataFormatada = formatarDataParaExibicao(dia.data);
+        const descricaoCapitalizada = dia.descricao.charAt(0).toUpperCase() + dia.descricao.slice(1);
+        const ventoKmH = (dia.vento_velocidade_media * 3.6).toFixed(1);
+
+        diaCard.innerHTML = `
+            <h4>${dataFormatada}</h4>
+            <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
+            <p class="descricao-tempo">${descricaoCapitalizada}</p>
+            <p class="temperaturas">
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> /
+                <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
+            </p>
+            <div class="detalhes-dia-info">
+                <p title="Velocidade média do vento">Vento: ${ventoKmH} km/h</p>
+                <p title="Umidade média do ar">Umidade: ${dia.umidade_media.toFixed(0)}%</p>
+            </div>
+            <button class="btn-ver-detalhes-dia" data-dia-index="${index}">Mais Informações</button>
+            <div class="previsao-dia-detalhes-expansivel" style="display: none;"></div>
+        `;
+        previsaoContainer.appendChild(diaCard);
+
+        const detalhesButton = diaCard.querySelector('.btn-ver-detalhes-dia');
+        if (detalhesButton) {
+            detalhesButton.addEventListener('click', handleCardDiaClick);
+        }
+    });
+}
+
+function handleCardDiaClick(event) {
+    const botaoClicado = event.currentTarget;
+    const cardClicado = botaoClicado.closest('.previsao-dia-card');
+
+    if (!cardClicado) {
+        console.error("Card pai não encontrado para o botão clicado.");
+        return;
+    }
+    const diaIndex = parseInt(botaoClicado.dataset.diaIndex);
+
+    if (dadosPrevisaoAtual && dadosPrevisaoAtual[diaIndex]) {
+        const dadosDoDia = dadosPrevisaoAtual[diaIndex];
+        const detalhesDiv = cardClicado.querySelector('.previsao-dia-detalhes-expansivel');
+
+        if (!detalhesDiv) {
+            console.error("Div de detalhes expansível não encontrada no card.");
+            return;
+        }
+
+        const isVisible = detalhesDiv.style.display === 'block';
+
+        const todosCards = cardClicado.closest('.previsao-dias-container').querySelectorAll('.previsao-dia-card');
+        todosCards.forEach(outroCard => {
+            if (outroCard !== cardClicado) {
+                const outroDetalheDiv = outroCard.querySelector('.previsao-dia-detalhes-expansivel');
+                const outroBotao = outroCard.querySelector('.btn-ver-detalhes-dia');
+                if (outroDetalheDiv) {
+                    outroDetalheDiv.style.display = 'none';
+                    outroDetalheDiv.innerHTML = '';
+                }
+                if (outroBotao) {
+                    outroBotao.textContent = 'Mais Informações';
+                }
+            }
+        });
+
+        if (isVisible) {
+            detalhesDiv.style.display = 'none';
+            detalhesDiv.innerHTML = '';
+            botaoClicado.textContent = 'Mais Informações';
+        } else {
+            detalhesDiv.style.display = 'block';
+            let htmlDetalhes = '<h5>Previsão Horária:</h5><ul>';
+            dadosDoDia.previsoes_horarias.forEach(ph => {
+                const descricaoHorariaCapitalizada = ph.descricao.charAt(0).toUpperCase() + ph.descricao.slice(1);
+                const ventoHorarioKmH = (ph.vento_velocidade * 3.6).toFixed(1);
+                htmlDetalhes += `<li>
+                    <div class="hora-icone">
+                        <strong>${ph.hora}</strong>
+                        <img src="https://openweathermap.org/img/wn/${ph.icone}.png" alt="${descricaoHorariaCapitalizada}" title="${descricaoHorariaCapitalizada}">
+                    </div>
+                    <div class="info-horaria">
+                        <span>${ph.temp.toFixed(0)}°C, ${descricaoHorariaCapitalizada}</span>
+                        <span>Vento: ${ventoHorarioKmH} km/h, Umidade: ${ph.umidade}%</span>
+                    </div>
+                </li>`;
+            });
+            htmlDetalhes += '</ul>';
+            detalhesDiv.innerHTML = htmlDetalhes;
+            botaoClicado.textContent = 'Ocultar Detalhes';
+        }
+    } else {
+        console.error("Não foi possível encontrar os dados para o dia clicado.", diaIndex, dadosPrevisaoAtual);
+    }
+}
+
+// --- NAVEGAÇÃO E EVENTOS ---
+function updateNavButtons() { const b=document.querySelectorAll('.sidebar-nav .nav-button'); b.forEach(btn=>{ if(btn.dataset.view===currentView)btn.classList.add('active'); else btn.classList.remove('active'); }); }
+function navigateToDetails(vId){if(vId&&veiculos[vId]){console.log(`Nav detalhes: ${vId}`);currentVehicleId=vId;currentView='detalhes';renderApp();}else{console.error(`Erro nav detalhes: ID inválido ${vId}`);alert("Erro: Veículo não encontrado.");}}
+function navigateToView(vName){ const vV=['garagem','detalhes','agendar', 'planejar']; if(!vV.includes(vName)){console.warn(`Nav view inválida: ${vName}`);return;} console.log(`Nav view: ${vName}`); currentView=vName; if(currentView!=='detalhes') currentVehicleId=null; renderApp(); }
+function setupEventListeners() { console.log("Configurando listeners globais..."); mainContentElement.removeEventListener('click', handleMainContentClick); mainContentElement.addEventListener('click', handleMainContentClick); mainContentElement.removeEventListener('keydown', handleMainContentKeydown); mainContentElement.addEventListener('keydown', handleMainContentKeydown); const navButtons = document.querySelectorAll('.sidebar-nav .nav-button'); navButtons.forEach(button => { const viewName = button.dataset.view; if (viewName) { const newButton = button.cloneNode(true); button.parentNode.replaceChild(newButton, button); newButton.addEventListener('click', () => navigateToView(viewName)); } }); const verificarClimaBtn = document.getElementById('verificar-clima-btn'); if (verificarClimaBtn) { const newClimaBtn = verificarClimaBtn.cloneNode(true); verificarClimaBtn.parentNode.replaceChild(newClimaBtn, verificarClimaBtn); newClimaBtn.addEventListener('click', handleVerificarClimaClick); } else { console.warn("Botão #verificar-clima-btn não encontrado."); } console.log("Listeners configurados."); }
+function setupDynamicEventListeners() { if (currentView === 'agendar') { const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.removeEventListener('change', handleVehicleSelectionChange); vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } } }
+function handleMainContentClick(event) { const target = event.target; const vehicleCard = target.closest('.vehicle-card'); if (vehicleCard && vehicleCard.dataset.vehicleId) { event.preventDefault(); navigateToDetails(vehicleCard.dataset.vehicleId); return; } const button = target.closest('button[data-action]'); if (button) { const action = button.dataset.action; const vehicleId = button.dataset.vehicleId || target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); const manutencaoId = button.dataset.manutencaoId; console.log(`Click Action: ${action}`, { vehicleId, manutencaoId }); if (vehicleId && veiculos[vehicleId]) { const v = veiculos[vehicleId]; try{ switch(action){ case 'ligar': v.ligar(); break; case 'desligar': v.desligar(); break; case 'acelerar': v.acelerar(); break; case 'frear': v.frear(); break; case 'mudarCor': v.mudarCor(); break; case 'ativarTurbo': if(v.ativarTurbo)v.ativarTurbo(); else alert("Sem turbo."); break; case 'desativarTurbo': if(v.desativarTurbo)v.desativarTurbo(); else alert("Sem turbo."); break; case 'carregar': if(v.carregar&&button.dataset.inputId)v.carregar(button.dataset.inputId); else if(v.carregar)console.error("Botão carregar s/ data-input-id."); else alert("Não carrega."); break; case 'buzinar': v.buzinar(); break; case 'buscar-detalhes-api': exibirDetalhesVeiculoAPI(vehicleId); break; default: console.warn(`Ação de botão desconhecida: ${action}`); } }catch(e){console.error(`Erro ação '${action}' veículo ${vehicleId}:`,e);alert(`Erro ação '${action}'.`);} } else if (action === 'marcar-status' && manutencaoId) { const nS = button.dataset.novoStatus; const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext] && nS) { const v=veiculos[vIdContext];const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`Marcar "${m.tipo}" como "${nS}"?`))v.marcarManutencaoComo(manutencaoId,nS); } else console.error("Dados incompletos marcar status:",{vIdContext,manutencaoId,nS}); } else if (action === 'remover-manutencao' && manutencaoId) { const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext]) { const v=veiculos[vIdContext]; const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`REMOVER registro "${m.tipo}" de ${m.getFormattedDate()}?`))v.removerManutencao(manutencaoId); } else console.error("Dados incompletos remover manut:",{vIdContext,manutencaoId}); } else if (action === 'cancelar-form') { handleCancelForm(button); } } const formAgendamento = target.closest('form.form-agendamento'); if (formAgendamento && event.type === 'submit') { handleFormSubmit(event); } }
+function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('vehicle-card')){ const vId=event.target.dataset.vehicleId; if(vId){event.preventDefault();navigateToDetails(vId);} } }
+
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
+
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>';
+        destinoInput.focus();
+        return;
+    }
+
+    resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
+
+    // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade);
+
+    if (dadosApi && !dadosApi.error) {
+        // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
+        // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
+        // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
+        // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
+
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada && previsaoProcessada.length > 0) {
+            exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
+        } else {
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console.</p>';
+            console.warn("[Frontend] processarDadosForecast retornou nulo/vazio. API Response:", dadosApi);
+        }
+    } else {
+        // Trata erros de rede, erros retornados pelo nosso backend (ex: chave API não configurada no servidor),
+        // ou erros da API OpenWeatherMap já formatados por buscarPrevisaoDetalhada.
+        resultadoDiv.innerHTML = `<p class="error-message">Falha: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
+    }
+}
+
+function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+    const previsoesAgrupadasPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = { data: diaStr, entradas: [] };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5),
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon,
+            umidade: item.main.humidity,
+            vento_velocidade: item.wind.speed,
+        });
+    }
+    );
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const umidades = diaData.entradas.map(e => e.umidade);
+        const velocidades_vento = diaData.entradas.map(e => e.vento_velocidade);
+        let previsaoRepresentativa = diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00") || diaData.entradas.find(e => e.hora === "12:00") || diaData.entradas.find(e => e.hora === "09:00") || diaData.entradas[0];
+        resultadoFinal.push({
+            data: diaData.data,
+            temp_min: parseFloat(Math.min(...temperaturas).toFixed(1)),
+            temp_max: parseFloat(Math.max(...temperaturas).toFixed(1)),
+            descricao: previsaoRepresentativa.descricao,
+            icone: previsaoRepresentativa.icone,
+            umidade_media: parseFloat((umidades.reduce((a, b) => a + b, 0) / umidades.length).toFixed(1)),
+            vento_velocidade_media: parseFloat((velocidades_vento.reduce((a, b) => a + b, 0) / velocidades_vento.length).toFixed(1)),
+            previsoes_horarias: diaData.entradas
+        });
+    }
+    resultadoFinal.sort((a, b) => new Date(a.data) - new Date(b.data));
+    console.log("[Processamento Forecast] Dados processados por dia:", resultadoFinal);
+    return resultadoFinal;
+}
+
+function formatarDataParaExibicao(dataStr) {
+    if (!dataStr || typeof dataStr !== 'string') return "Data inválida";
+    try {
+        const [year, month, day] = dataStr.split('-');
+        const dataObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (isNaN(dataObj.getTime())) { throw new Error("Data inválida após parse."); }
+        return dataObj.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+    } catch (e) { console.error("Erro ao formatar data:", dataStr, e); return "Data inválida"; }
+}
+
+function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+    dadosPrevisaoAtual = previsaoDiariaProcessada; // Armazena para o clique nos detalhes
+
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!resultadoDiv) {
+        console.error("Div #previsao-tempo-resultado não encontrada.");
+        return;
+    }
+    resultadoDiv.innerHTML = '';
+
+    const tituloEl = document.createElement('h3');
+    tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
+    resultadoDiv.appendChild(tituloEl);
+
+    const previsaoContainer = document.createElement('div');
+    previsaoContainer.className = 'previsao-dias-container';
+    resultadoDiv.appendChild(previsaoContainer);
+
+    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
+        previsaoContainer.innerHTML = '<p>Nenhuma previsão disponível ou erro ao processar.</p>';
+        return;
+    }
+
+    previsaoDiariaProcessada.forEach((dia, index) => {
+        const diaCard = document.createElement('div');
+        diaCard.className = 'previsao-dia-card';
+
+        const dataFormatada = formatarDataParaExibicao(dia.data);
+        const descricaoCapitalizada = dia.descricao.charAt(0).toUpperCase() + dia.descricao.slice(1);
+        const ventoKmH = (dia.vento_velocidade_media * 3.6).toFixed(1);
+
+        diaCard.innerHTML = `
+            <h4>${dataFormatada}</h4>
+            <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
+            <p class="descricao-tempo">${descricaoCapitalizada}</p>
+            <p class="temperaturas">
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> /
+                <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
+            </p>
+            <div class="detalhes-dia-info">
+                <p title="Velocidade média do vento">Vento: ${ventoKmH} km/h</p>
+                <p title="Umidade média do ar">Umidade: ${dia.umidade_media.toFixed(0)}%</p>
+            </div>
+            <button class="btn-ver-detalhes-dia" data-dia-index="${index}">Mais Informações</button>
+            <div class="previsao-dia-detalhes-expansivel" style="display: none;"></div>
+        `;
+        previsaoContainer.appendChild(diaCard);
+
+        const detalhesButton = diaCard.querySelector('.btn-ver-detalhes-dia');
+        if (detalhesButton) {
+            detalhesButton.addEventListener('click', handleCardDiaClick);
+        }
+    });
+}
+
+function handleCardDiaClick(event) {
+    const botaoClicado = event.currentTarget;
+    const cardClicado = botaoClicado.closest('.previsao-dia-card');
+
+    if (!cardClicado) {
+        console.error("Card pai não encontrado para o botão clicado.");
+        return;
+    }
+    const diaIndex = parseInt(botaoClicado.dataset.diaIndex);
+
+    if (dadosPrevisaoAtual && dadosPrevisaoAtual[diaIndex]) {
+        const dadosDoDia = dadosPrevisaoAtual[diaIndex];
+        const detalhesDiv = cardClicado.querySelector('.previsao-dia-detalhes-expansivel');
+
+        if (!detalhesDiv) {
+            console.error("Div de detalhes expansível não encontrada no card.");
+            return;
+        }
+
+        const isVisible = detalhesDiv.style.display === 'block';
+
+        const todosCards = cardClicado.closest('.previsao-dias-container').querySelectorAll('.previsao-dia-card');
+        todosCards.forEach(outroCard => {
+            if (outroCard !== cardClicado) {
+                const outroDetalheDiv = outroCard.querySelector('.previsao-dia-detalhes-expansivel');
+                const outroBotao = outroCard.querySelector('.btn-ver-detalhes-dia');
+                if (outroDetalheDiv) {
+                    outroDetalheDiv.style.display = 'none';
+                    outroDetalheDiv.innerHTML = '';
+                }
+                if (outroBotao) {
+                    outroBotao.textContent = 'Mais Informações';
+                }
+            }
+        });
+
+        if (isVisible) {
+            detalhesDiv.style.display = 'none';
+            detalhesDiv.innerHTML = '';
+            botaoClicado.textContent = 'Mais Informações';
+        } else {
+            detalhesDiv.style.display = 'block';
+            let htmlDetalhes = '<h5>Previsão Horária:</h5><ul>';
+            dadosDoDia.previsoes_horarias.forEach(ph => {
+                const descricaoHorariaCapitalizada = ph.descricao.charAt(0).toUpperCase() + ph.descricao.slice(1);
+                const ventoHorarioKmH = (ph.vento_velocidade * 3.6).toFixed(1);
+                htmlDetalhes += `<li>
+                    <div class="hora-icone">
+                        <strong>${ph.hora}</strong>
+                        <img src="https://openweathermap.org/img/wn/${ph.icone}.png" alt="${descricaoHorariaCapitalizada}" title="${descricaoHorariaCapitalizada}">
+                    </div>
+                    <div class="info-horaria">
+                        <span>${ph.temp.toFixed(0)}°C, ${descricaoHorariaCapitalizada}</span>
+                        <span>Vento: ${ventoHorarioKmH} km/h, Umidade: ${ph.umidade}%</span>
+                    </div>
+                </li>`;
+            });
+            htmlDetalhes += '</ul>';
+            detalhesDiv.innerHTML = htmlDetalhes;
+            botaoClicado.textContent = 'Ocultar Detalhes';
+        }
+    } else {
+        console.error("Não foi possível encontrar os dados para o dia clicado.", diaIndex, dadosPrevisaoAtual);
+    }
+}
+
+// --- NAVEGAÇÃO E EVENTOS ---
+function updateNavButtons() { const b=document.querySelectorAll('.sidebar-nav .nav-button'); b.forEach(btn=>{ if(btn.dataset.view===currentView)btn.classList.add('active'); else btn.classList.remove('active'); }); }
+function navigateToDetails(vId){if(vId&&veiculos[vId]){console.log(`Nav detalhes: ${vId}`);currentVehicleId=vId;currentView='detalhes';renderApp();}else{console.error(`Erro nav detalhes: ID inválido ${vId}`);alert("Erro: Veículo não encontrado.");}}
+function navigateToView(vName){ const vV=['garagem','detalhes','agendar', 'planejar']; if(!vV.includes(vName)){console.warn(`Nav view inválida: ${vName}`);return;} console.log(`Nav view: ${vName}`); currentView=vName; if(currentView!=='detalhes') currentVehicleId=null; renderApp(); }
+function setupEventListeners() { console.log("Configurando listeners globais..."); mainContentElement.removeEventListener('click', handleMainContentClick); mainContentElement.addEventListener('click', handleMainContentClick); mainContentElement.removeEventListener('keydown', handleMainContentKeydown); mainContentElement.addEventListener('keydown', handleMainContentKeydown); const navButtons = document.querySelectorAll('.sidebar-nav .nav-button'); navButtons.forEach(button => { const viewName = button.dataset.view; if (viewName) { const newButton = button.cloneNode(true); button.parentNode.replaceChild(newButton, button); newButton.addEventListener('click', () => navigateToView(viewName)); } }); const verificarClimaBtn = document.getElementById('verificar-clima-btn'); if (verificarClimaBtn) { const newClimaBtn = verificarClimaBtn.cloneNode(true); verificarClimaBtn.parentNode.replaceChild(newClimaBtn, verificarClimaBtn); newClimaBtn.addEventListener('click', handleVerificarClimaClick); } else { console.warn("Botão #verificar-clima-btn não encontrado."); } console.log("Listeners configurados."); }
+function setupDynamicEventListeners() { if (currentView === 'agendar') { const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.removeEventListener('change', handleVehicleSelectionChange); vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } } }
+function handleMainContentClick(event) { const target = event.target; const vehicleCard = target.closest('.vehicle-card'); if (vehicleCard && vehicleCard.dataset.vehicleId) { event.preventDefault(); navigateToDetails(vehicleCard.dataset.vehicleId); return; } const button = target.closest('button[data-action]'); if (button) { const action = button.dataset.action; const vehicleId = button.dataset.vehicleId || target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); const manutencaoId = button.dataset.manutencaoId; console.log(`Click Action: ${action}`, { vehicleId, manutencaoId }); if (vehicleId && veiculos[vehicleId]) { const v = veiculos[vehicleId]; try{ switch(action){ case 'ligar': v.ligar(); break; case 'desligar': v.desligar(); break; case 'acelerar': v.acelerar(); break; case 'frear': v.frear(); break; case 'mudarCor': v.mudarCor(); break; case 'ativarTurbo': if(v.ativarTurbo)v.ativarTurbo(); else alert("Sem turbo."); break; case 'desativarTurbo': if(v.desativarTurbo)v.desativarTurbo(); else alert("Sem turbo."); break; case 'carregar': if(v.carregar&&button.dataset.inputId)v.carregar(button.dataset.inputId); else if(v.carregar)console.error("Botão carregar s/ data-input-id."); else alert("Não carrega."); break; case 'buzinar': v.buzinar(); break; case 'buscar-detalhes-api': exibirDetalhesVeiculoAPI(vehicleId); break; default: console.warn(`Ação de botão desconhecida: ${action}`); } }catch(e){console.error(`Erro ação '${action}' veículo ${vehicleId}:`,e);alert(`Erro ação '${action}'.`);} } else if (action === 'marcar-status' && manutencaoId) { const nS = button.dataset.novoStatus; const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext] && nS) { const v=veiculos[vIdContext];const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`Marcar "${m.tipo}" como "${nS}"?`))v.marcarManutencaoComo(manutencaoId,nS); } else console.error("Dados incompletos marcar status:",{vIdContext,manutencaoId,nS}); } else if (action === 'remover-manutencao' && manutencaoId) { const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext]) { const v=veiculos[vIdContext]; const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`REMOVER registro "${m.tipo}" de ${m.getFormattedDate()}?`))v.removerManutencao(manutencaoId); } else console.error("Dados incompletos remover manut:",{vIdContext,manutencaoId}); } else if (action === 'cancelar-form') { handleCancelForm(button); } } const formAgendamento = target.closest('form.form-agendamento'); if (formAgendamento && event.type === 'submit') { handleFormSubmit(event); } }
+function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('vehicle-card')){ const vId=event.target.dataset.vehicleId; if(vId){event.preventDefault();navigateToDetails(vId);} } }
+
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
+
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>';
+        destinoInput.focus();
+        return;
+    }
+
+    resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
+
+    // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade);
+
+    if (dadosApi && !dadosApi.error) {
+        // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
+        // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
+        // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
+        // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
+
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada && previsaoProcessada.length > 0) {
+            exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
+        } else {
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console.</p>';
+            console.warn("[Frontend] processarDadosForecast retornou nulo/vazio. API Response:", dadosApi);
+        }
+    } else {
+        // Trata erros de rede, erros retornados pelo nosso backend (ex: chave API não configurada no servidor),
+        // ou erros da API OpenWeatherMap já formatados por buscarPrevisaoDetalhada.
+        resultadoDiv.innerHTML = `<p class="error-message">Falha: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
+    }
+}
+
+function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+    const previsoesAgrupadasPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = { data: diaStr, entradas: [] };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5),
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon,
+            umidade: item.main.humidity,
+            vento_velocidade: item.wind.speed,
+        });
+    }
+    );
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const umidades = diaData.entradas.map(e => e.umidade);
+        const velocidades_vento = diaData.entradas.map(e => e.vento_velocidade);
+        let previsaoRepresentativa = diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00") || diaData.entradas.find(e => e.hora === "12:00") || diaData.entradas.find(e => e.hora === "09:00") || diaData.entradas[0];
+        resultadoFinal.push({
+            data: diaData.data,
+            temp_min: parseFloat(Math.min(...temperaturas).toFixed(1)),
+            temp_max: parseFloat(Math.max(...temperaturas).toFixed(1)),
+            descricao: previsaoRepresentativa.descricao,
+            icone: previsaoRepresentativa.icone,
+            umidade_media: parseFloat((umidades.reduce((a, b) => a + b, 0) / umidades.length).toFixed(1)),
+            vento_velocidade_media: parseFloat((velocidades_vento.reduce((a, b) => a + b, 0) / velocidades_vento.length).toFixed(1)),
+            previsoes_horarias: diaData.entradas
+        });
+    }
+    resultadoFinal.sort((a, b) => new Date(a.data) - new Date(b.data));
+    console.log("[Processamento Forecast] Dados processados por dia:", resultadoFinal);
+    return resultadoFinal;
+}
+
+function formatarDataParaExibicao(dataStr) {
+    if (!dataStr || typeof dataStr !== 'string') return "Data inválida";
+    try {
+        const [year, month, day] = dataStr.split('-');
+        const dataObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (isNaN(dataObj.getTime())) { throw new Error("Data inválida após parse."); }
+        return dataObj.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+    } catch (e) { console.error("Erro ao formatar data:", dataStr, e); return "Data inválida"; }
+}
+
+function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+    dadosPrevisaoAtual = previsaoDiariaProcessada; // Armazena para o clique nos detalhes
+
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!resultadoDiv) {
+        console.error("Div #previsao-tempo-resultado não encontrada.");
+        return;
+    }
+    resultadoDiv.innerHTML = '';
+
+    const tituloEl = document.createElement('h3');
+    tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
+    resultadoDiv.appendChild(tituloEl);
+
+    const previsaoContainer = document.createElement('div');
+    previsaoContainer.className = 'previsao-dias-container';
+    resultadoDiv.appendChild(previsaoContainer);
+
+    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
+        previsaoContainer.innerHTML = '<p>Nenhuma previsão disponível ou erro ao processar.</p>';
+        return;
+    }
+
+    previsaoDiariaProcessada.forEach((dia, index) => {
+        const diaCard = document.createElement('div');
+        diaCard.className = 'previsao-dia-card';
+
+        const dataFormatada = formatarDataParaExibicao(dia.data);
+        const descricaoCapitalizada = dia.descricao.charAt(0).toUpperCase() + dia.descricao.slice(1);
+        const ventoKmH = (dia.vento_velocidade_media * 3.6).toFixed(1);
+
+        diaCard.innerHTML = `
+            <h4>${dataFormatada}</h4>
+            <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
+            <p class="descricao-tempo">${descricaoCapitalizada}</p>
+            <p class="temperaturas">
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> /
+                <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
+            </p>
+            <div class="detalhes-dia-info">
+                <p title="Velocidade média do vento">Vento: ${ventoKmH} km/h</p>
+                <p title="Umidade média do ar">Umidade: ${dia.umidade_media.toFixed(0)}%</p>
+            </div>
+            <button class="btn-ver-detalhes-dia" data-dia-index="${index}">Mais Informações</button>
+            <div class="previsao-dia-detalhes-expansivel" style="display: none;"></div>
+        `;
+        previsaoContainer.appendChild(diaCard);
+
+        const detalhesButton = diaCard.querySelector('.btn-ver-detalhes-dia');
+        if (detalhesButton) {
+            detalhesButton.addEventListener('click', handleCardDiaClick);
+        }
+    });
+}
+
+function handleCardDiaClick(event) {
+    const botaoClicado = event.currentTarget;
+    const cardClicado = botaoClicado.closest('.previsao-dia-card');
+
+    if (!cardClicado) {
+        console.error("Card pai não encontrado para o botão clicado.");
+        return;
+    }
+    const diaIndex = parseInt(botaoClicado.dataset.diaIndex);
+
+    if (dadosPrevisaoAtual && dadosPrevisaoAtual[diaIndex]) {
+        const dadosDoDia = dadosPrevisaoAtual[diaIndex];
+        const detalhesDiv = cardClicado.querySelector('.previsao-dia-detalhes-expansivel');
+
+        if (!detalhesDiv) {
+            console.error("Div de detalhes expansível não encontrada no card.");
+            return;
+        }
+
+        const isVisible = detalhesDiv.style.display === 'block';
+
+        const todosCards = cardClicado.closest('.previsao-dias-container').querySelectorAll('.previsao-dia-card');
+        todosCards.forEach(outroCard => {
+            if (outroCard !== cardClicado) {
+                const outroDetalheDiv = outroCard.querySelector('.previsao-dia-detalhes-expansivel');
+                const outroBotao = outroCard.querySelector('.btn-ver-detalhes-dia');
+                if (outroDetalheDiv) {
+                    outroDetalheDiv.style.display = 'none';
+                    outroDetalheDiv.innerHTML = '';
+                }
+                if (outroBotao) {
+                    outroBotao.textContent = 'Mais Informações';
+                }
+            }
+        });
+
+        if (isVisible) {
+            detalhesDiv.style.display = 'none';
+            detalhesDiv.innerHTML = '';
+            botaoClicado.textContent = 'Mais Informações';
+        } else {
+            detalhesDiv.style.display = 'block';
+            let htmlDetalhes = '<h5>Previsão Horária:</h5><ul>';
+            dadosDoDia.previsoes_horarias.forEach(ph => {
+                const descricaoHorariaCapitalizada = ph.descricao.charAt(0).toUpperCase() + ph.descricao.slice(1);
+                const ventoHorarioKmH = (ph.vento_velocidade * 3.6).toFixed(1);
+                htmlDetalhes += `<li>
+                    <div class="hora-icone">
+                        <strong>${ph.hora}</strong>
+                        <img src="https://openweathermap.org/img/wn/${ph.icone}.png" alt="${descricaoHorariaCapitalizada}" title="${descricaoHorariaCapitalizada}">
+                    </div>
+                    <div class="info-horaria">
+                        <span>${ph.temp.toFixed(0)}°C, ${descricaoHorariaCapitalizada}</span>
+                        <span>Vento: ${ventoHorarioKmH} km/h, Umidade: ${ph.umidade}%</span>
+                    </div>
+                </li>`;
+            });
+            htmlDetalhes += '</ul>';
+            detalhesDiv.innerHTML = htmlDetalhes;
+            botaoClicado.textContent = 'Ocultar Detalhes';
+        }
+    } else {
+        console.error("Não foi possível encontrar os dados para o dia clicado.", diaIndex, dadosPrevisaoAtual);
+    }
+}
+
+// --- NAVEGAÇÃO E EVENTOS ---
+function updateNavButtons() { const b=document.querySelectorAll('.sidebar-nav .nav-button'); b.forEach(btn=>{ if(btn.dataset.view===currentView)btn.classList.add('active'); else btn.classList.remove('active'); }); }
+function navigateToDetails(vId){if(vId&&veiculos[vId]){console.log(`Nav detalhes: ${vId}`);currentVehicleId=vId;currentView='detalhes';renderApp();}else{console.error(`Erro nav detalhes: ID inválido ${vId}`);alert("Erro: Veículo não encontrado.");}}
+function navigateToView(vName){ const vV=['garagem','detalhes','agendar', 'planejar']; if(!vV.includes(vName)){console.warn(`Nav view inválida: ${vName}`);return;} console.log(`Nav view: ${vName}`); currentView=vName; if(currentView!=='detalhes') currentVehicleId=null; renderApp(); }
+function setupEventListeners() { console.log("Configurando listeners globals..."); mainContentElement.removeEventListener('click', handleMainContentClick); mainContentElement.addEventListener('click', handleMainContentClick); mainContentElement.removeEventListener('keydown', handleMainContentKeydown); mainContentElement.addEventListener('keydown', handleMainContentKeydown); const navButtons = document.querySelectorAll('.sidebar-nav .nav-button'); navButtons.forEach(button => { const viewName = button.dataset.view; if (viewName) { const newButton = button.cloneNode(true); button.parentNode.replaceChild(newButton, button); newButton.addEventListener('click', () => navigateToView(viewName)); } }); const verificarClimaBtn = document.getElementById('verificar-clima-btn'); if (verificarClimaBtn) { const newClimaBtn = verificarClimaBtn.cloneNode(true); verificarClimaBtn.parentNode.replaceChild(newClimaBtn, verificarClimaBtn); newClimaBtn.addEventListener('click', handleVerificarClimaClick); } else { console.warn("Botão #verificar-clima-btn não encontrado."); } console.log("Listeners configurados."); }
+function setupDynamicEventListeners() { if (currentView === 'agendar') { const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.removeEventListener('change', handleVehicleSelectionChange); vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } } }
+function handleMainContentClick(event) { const target = event.target; const vehicleCard = target.closest('.vehicle-card'); if (vehicleCard && vehicleCard.dataset.vehicleId) { event.preventDefault(); navigateToDetails(vehicleCard.dataset.vehicleId); return; } const button = target.closest('button[data-action]'); if (button) { const action = button.dataset.action; const vehicleId = button.dataset.vehicleId || target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); const manutencaoId = button.dataset.manutencaoId; console.log(`Click Action: ${action}`, { vehicleId, manutencaoId }); if (vehicleId && veiculos[vehicleId]) { const v = veiculos[vehicleId]; try{ switch(action){ case 'ligar': v.ligar(); break; case 'desligar': v.desligar(); break; case 'acelerar': v.acelerar(); break; case 'frear': v.frear(); break; case 'mudarCor': v.mudarCor(); break; case 'ativarTurbo': if(v.ativarTurbo)v.ativarTurbo(); else alert("Sem turbo."); break; case 'desativarTurbo': if(v.desativarTurbo)v.desativarTurbo(); else alert("Sem turbo."); break; case 'carregar': if(v.carregar&&button.dataset.inputId)v.carregar(button.dataset.inputId); else if(v.carregar)console.error("Botão carregar s/ data-input-id."); else alert("Não carrega."); break; case 'buzinar': v.buzinar(); break; case 'buscar-detalhes-api': exibirDetalhesVeiculoAPI(vehicleId); break; default: console.warn(`Ação de botão desconhecida: ${action}`); } }catch(e){console.error(`Erro ação '${action}' veículo ${vehicleId}:`,e);alert(`Erro ação '${action}'.`);} } else if (action === 'marcar-status' && manutencaoId) { const nS = button.dataset.novoStatus; const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext] && nS) { const v=veiculos[vIdContext];const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`Marcar "${m.tipo}" como "${nS}"?`))v.marcarManutencaoComo(manutencaoId,nS); } else console.error("Dados incompletos marcar status:",{vIdContext,manutencaoId,nS}); } else if (action === 'remover-manutencao' && manutencaoId) { const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext]) { const v=veiculos[vIdContext]; const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`REMOVER registro "${m.tipo}" de ${m.getFormattedDate()}?`))v.removerManutencao(manutencaoId); } else console.error("Dados incompletos remover manut:",{vIdContext,manutencaoId}); } else if (action === 'cancelar-form') { handleCancelForm(button); } } const formAgendamento = target.closest('form.form-agendamento'); if (formAgendamento && event.type === 'submit') { handleFormSubmit(event); } }
+function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('vehicle-card')){ const vId=event.target.dataset.vehicleId; if(vId){event.preventDefault();navigateToDetails(vId);} } }
+
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
+
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>';
+        destinoInput.focus();
+        return;
+    }
+
+    resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
+
+    // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade);
+
+    if (dadosApi && !dadosApi.error) {
+        // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
+        // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
+        // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
+        // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
+
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada && previsaoProcessada.length > 0) {
+            exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
+        } else {
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console.</p>';
+            console.warn("[Frontend] processarDadosForecast retornou nulo/vazio. API Response:", dadosApi);
+        }
+    } else {
+        // Trata erros de rede, erros retornados pelo nosso backend (ex: chave API não configurada no servidor),
+        // ou erros da API OpenWeatherMap já formatados por buscarPrevisaoDetalhada.
+        resultadoDiv.innerHTML = `<p class="error-message">Falha: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
+    }
+}
+
+function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+    const previsoesAgrupadasPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = { data: diaStr, entradas: [] };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5),
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon,
+            umidade: item.main.humidity,
+            vento_velocidade: item.wind.speed,
+        });
+    }
+    );
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const umidades = diaData.entradas.map(e => e.umidade);
+        const velocidades_vento = diaData.entradas.map(e => e.vento_velocidade);
+        let previsaoRepresentativa = diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00") || diaData.entradas.find(e => e.hora === "12:00") || diaData.entradas.find(e => e.hora === "09:00") || diaData.entradas[0];
+        resultadoFinal.push({
+            data: diaData.data,
+            temp_min: parseFloat(Math.min(...temperaturas).toFixed(1)),
+            temp_max: parseFloat(Math.max(...temperaturas).toFixed(1)),
+            descricao: previsaoRepresentativa.descricao,
+            icone: previsaoRepresentativa.icone,
+            umidade_media: parseFloat((umidades.reduce((a, b) => a + b, 0) / umidades.length).toFixed(1)),
+            vento_velocidade_media: parseFloat((velocidades_vento.reduce((a, b) => a + b, 0) / velocidades_vento.length).toFixed(1)),
+            previsoes_horarias: diaData.entradas
+        });
+    }
+    resultadoFinal.sort((a, b) => new Date(a.data) - new Date(b.data));
+    console.log("[Processamento Forecast] Dados processados por dia:", resultadoFinal);
+    return resultadoFinal;
+}
+
+function formatarDataParaExibicao(dataStr) {
+    if (!dataStr || typeof dataStr !== 'string') return "Data inválida";
+    try {
+        const [year, month, day] = dataStr.split('-');
+        const dataObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (isNaN(dataObj.getTime())) { throw new Error("Data inválida após parse."); }
+        return dataObj.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+    } catch (e) { console.error("Erro ao formatar data:", dataStr, e); return "Data inválida"; }
+}
+
+function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+    dadosPrevisaoAtual = previsaoDiariaProcessada; // Armazena para o clique nos detalhes
+
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!resultadoDiv) {
+        console.error("Div #previsao-tempo-resultado não encontrada.");
+        return;
+    }
+    resultadoDiv.innerHTML = '';
+
+    const tituloEl = document.createElement('h3');
+    tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
+    resultadoDiv.appendChild(tituloEl);
+
+    const previsaoContainer = document.createElement('div');
+    previsaoContainer.className = 'previsao-dias-container';
+    resultadoDiv.appendChild(previsaoContainer);
+
+    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
+        previsaoContainer.innerHTML = '<p>Nenhuma previsão disponível ou erro ao processar.</p>';
+        return;
+    }
+
+    previsaoDiariaProcessada.forEach((dia, index) => {
+        const diaCard = document.createElement('div');
+        diaCard.className = 'previsao-dia-card';
+
+        const dataFormatada = formatarDataParaExibicao(dia.data);
+        const descricaoCapitalizada = dia.descricao.charAt(0).toUpperCase() + dia.descricao.slice(1);
+        const ventoKmH = (dia.vento_velocidade_media * 3.6).toFixed(1);
+
+        diaCard.innerHTML = `
+            <h4>${dataFormatada}</h4>
+            <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
+            <p class="descricao-tempo">${descricaoCapitalizada}</p>
+            <p class="temperaturas">
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> /
+                <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
+            </p>
+            <div class="detalhes-dia-info">
+                <p title="Velocidade média do vento">Vento: ${ventoKmH} km/h</p>
+                <p title="Umidade média do ar">Umidade: ${dia.umidade_media.toFixed(0)}%</p>
+            </div>
+            <button class="btn-ver-detalhes-dia" data-dia-index="${index}">Mais Informações</button>
+            <div class="previsao-dia-detalhes-expansivel" style="display: none;"></div>
+        `;
+        previsaoContainer.appendChild(diaCard);
+
+        const detalhesButton = diaCard.querySelector('.btn-ver-detalhes-dia');
+        if (detalhesButton) {
+            detalhesButton.addEventListener('click', handleCardDiaClick);
+        }
+    });
+}
+
+function handleCardDiaClick(event) {
+    const botaoClicado = event.currentTarget;
+    const cardClicado = botaoClicado.closest('.previsao-dia-card');
+
+    if (!cardClicado) {
+        console.error("Card pai não encontrado para o botão clicado.");
+        return;
+    }
+    const diaIndex = parseInt(botaoClicado.dataset.diaIndex);
+
+    if (dadosPrevisaoAtual && dadosPrevisaoAtual[diaIndex]) {
+        const dadosDoDia = dadosPrevisaoAtual[diaIndex];
+        const detalhesDiv = cardClicado.querySelector('.previsao-dia-detalhes-expansivel');
+
+        if (!detalhesDiv) {
+            console.error("Div de detalhes expansível não encontrada no card.");
+            return;
+        }
+
+        const isVisible = detalhesDiv.style.display === 'block';
+
+        const todosCards = cardClicado.closest('.previsao-dias-container').querySelectorAll('.previsao-dia-card');
+        todosCards.forEach(outroCard => {
+            if (outroCard !== cardClicado) {
+                const outroDetalheDiv = outroCard.querySelector('.previsao-dia-detalhes-expansivel');
+                const outroBotao = outroCard.querySelector('.btn-ver-detalhes-dia');
+                if (outroDetalheDiv) {
+                    outroDetalheDiv.style.display = 'none';
+                    outroDetalheDiv.innerHTML = '';
+                }
+                if (outroBotao) {
+                    outroBotao.textContent = 'Mais Informações';
+                }
+            }
+        });
+
+        if (isVisible) {
+            detalhesDiv.style.display = 'none';
+            detalhesDiv.innerHTML = '';
+            botaoClicado.textContent = 'Mais Informações';
+        } else {
+            detalhesDiv.style.display = 'block';
+            let htmlDetalhes = '<h5>Previsão Horária:</h5><ul>';
+            dadosDoDia.previsoes_horarias.forEach(ph => {
+                const descricaoHorariaCapitalizada = ph.descricao.charAt(0).toUpperCase() + ph.descricao.slice(1);
+                const ventoHorarioKmH = (ph.vento_velocidade * 3.6).toFixed(1);
+                htmlDetalhes += `<li>
+                    <div class="hora-icone">
+                        <strong>${ph.hora}</strong>
+                        <img src="https://openweathermap.org/img/wn/${ph.icone}.png" alt="${descricaoHorariaCapitalizada}" title="${descricaoHorariaCapitalizada}">
+                    </div>
+                    <div class="info-horaria">
+                        <span>${ph.temp.toFixed(0)}°C, ${descricaoHorariaCapitalizada}</span>
+                        <span>Vento: ${ventoHorarioKmH} km/h, Umidade: ${ph.umidade}%</span>
+                    </div>
+                </li>`;
+            });
+            htmlDetalhes += '</ul>';
+            detalhesDiv.innerHTML = htmlDetalhes;
+            botaoClicado.textContent = 'Ocultar Detalhes';
+        }
+    } else {
+        console.error("Não foi possível encontrar os dados para o dia clicado.", diaIndex, dadosPrevisaoAtual);
+    }
+}
+
+// --- NAVEGAÇÃO E EVENTOS ---
+function updateNavButtons() { const b=document.querySelectorAll('.sidebar-nav .nav-button'); b.forEach(btn=>{ if(btn.dataset.view===currentView)btn.classList.add('active'); else btn.classList.remove('active'); }); }
+function navigateToDetails(vId){if(vId&&veiculos[vId]){console.log(`Nav detalhes: ${vId}`);currentVehicleId=vId;currentView='detalhes';renderApp();}else{console.error(`Erro nav detalhes: ID inválido ${vId}`);alert("Erro: Veículo não encontrado.");}}
+function navigateToView(vName){ const vV=['garagem','detalhes','agendar', 'planejar']; if(!vV.includes(vName)){console.warn(`Nav view inválida: ${vName}`);return;} console.log(`Nav view: ${vName}`); currentView=vName; if(currentView!=='detalhes') currentVehicleId=null; renderApp(); }
+function setupEventListeners() { console.log("Configurando listeners globals..."); mainContentElement.removeEventListener('click', handleMainContentClick); mainContentElement.addEventListener('click', handleMainContentClick); mainContentElement.removeEventListener('keydown', handleMainContentKeydown); mainContentElement.addEventListener('keydown', handleMainContentKeydown); const navButtons = document.querySelectorAll('.sidebar-nav .nav-button'); navButtons.forEach(button => { const viewName = button.dataset.view; if (viewName) { const newButton = button.cloneNode(true); button.parentNode.replaceChild(newButton, button); newButton.addEventListener('click', () => navigateToView(viewName)); } }); const verificarClimaBtn = document.getElementById('verificar-clima-btn'); if (verificarClimaBtn) { const newClimaBtn = verificarClimaBtn.cloneNode(true); verificarClimaBtn.parentNode.replaceChild(newClimaBtn, verificarClimaBtn); newClimaBtn.addEventListener('click', handleVerificarClimaClick); } else { console.warn("Botão #verificar-clima-btn não encontrado."); } console.log("Listeners configurados."); }
+function setupDynamicEventListeners() { if (currentView === 'agendar') { const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.removeEventListener('change', handleVehicleSelectionChange); vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } } }
+function handleMainContentClick(event) { const target = event.target; const vehicleCard = target.closest('.vehicle-card'); if (vehicleCard && vehicleCard.dataset.vehicleId) { event.preventDefault(); navigateToDetails(vehicleCard.dataset.vehicleId); return; } const button = target.closest('button[data-action]'); if (button) { const action = button.dataset.action; const vehicleId = button.dataset.vehicleId || target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); const manutencaoId = button.dataset.manutencaoId; console.log(`Click Action: ${action}`, { vehicleId, manutencaoId }); if (vehicleId && veiculos[vehicleId]) { const v = veiculos[vehicleId]; try{ switch(action){ case 'ligar': v.ligar(); break; case 'desligar': v.desligar(); break; case 'acelerar': v.acelerar(); break; case 'frear': v.frear(); break; case 'mudarCor': v.mudarCor(); break; case 'ativarTurbo': if(v.ativarTurbo)v.ativarTurbo(); else alert("Sem turbo."); break; case 'desativarTurbo': if(v.desativarTurbo)v.desativarTurbo(); else alert("Sem turbo."); break; case 'carregar': if(v.carregar&&button.dataset.inputId)v.carregar(button.dataset.inputId); else if(v.carregar)console.error("Botão carregar s/ data-input-id."); else alert("Não carrega."); break; case 'buzinar': v.buzinar(); break; case 'buscar-detalhes-api': exibirDetalhesVeiculoAPI(vehicleId); break; default: console.warn(`Ação de botão desconhecida: ${action}`); } }catch(e){console.error(`Erro ação '${action}' veículo ${vehicleId}:`,e);alert(`Erro ação '${action}'.`);} } else if (action === 'marcar-status' && manutencaoId) { const nS = button.dataset.novoStatus; const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext] && nS) { const v=veiculos[vIdContext];const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`Marcar "${m.tipo}" como "${nS}"?`))v.marcarManutencaoComo(manutencaoId,nS); } else console.error("Dados incompletos marcar status:",{vIdContext,manutencaoId,nS}); } else if (action === 'remover-manutencao' && manutencaoId) { const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext]) { const v=veiculos[vIdContext]; const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`REMOVER registro "${m.tipo}" de ${m.getFormattedDate()}?`))v.removerManutencao(manutencaoId); } else console.error("Dados incompletos remover manut:",{vIdContext,manutencaoId}); } else if (action === 'cancelar-form') { handleCancelForm(button); } } const formAgendamento = target.closest('form.form-agendamento'); if (formAgendamento && event.type === 'submit') { handleFormSubmit(event); } }
+function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('vehicle-card')){ const vId=event.target.dataset.vehicleId; if(vId){event.preventDefault();navigateToDetails(vId);} } }
+
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
+
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>';
+        destinoInput.focus();
+        return;
+    }
+
+    resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
+
+    // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade);
+
+    if (dadosApi && !dadosApi.error) {
+        // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
+        // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
+        // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
+        // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
+
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada && previsaoProcessada.length > 0) {
+            exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
+        } else {
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console.</p>';
+            console.warn("[Frontend] processarDadosForecast retornou nulo/vazio. API Response:", dadosApi);
+        }
+    } else {
+        // Trata erros de rede, erros retornados pelo nosso backend (ex: chave API não configurada no servidor),
+        // ou erros da API OpenWeatherMap já formatados por buscarPrevisaoDetalhada.
+        resultadoDiv.innerHTML = `<p class="error-message">Falha: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
+    }
+}
+
+function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+    const previsoesAgrupadasPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = { data: diaStr, entradas: [] };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5),
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon,
+            umidade: item.main.humidity,
+            vento_velocidade: item.wind.speed,
+        });
+    }
+    );
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const umidades = diaData.entradas.map(e => e.umidade);
+        const velocidades_vento = dataApi.list.map(e => e.wind.speed); // Corrigido: Usar dataApi.list diretamente para vento_velocidade aqui também, ou ajustar previsoesAgrupadasPorDia.entradas
+        let previsaoRepresentativa = diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00") || diaData.entradas.find(e => e.hora === "12:00") || diaData.entradas.find(e => e.hora === "09:00") || diaData.entradas[0];
+        resultadoFinal.push({
+            data: diaData.data,
+            temp_min: parseFloat(Math.min(...temperaturas).toFixed(1)),
+            temp_max: parseFloat(Math.max(...temperaturas).toFixed(1)),
+            descricao: previsaoRepresentativa.descricao,
+            icone: previsaoRepresentativa.icone,
+            umidade_media: parseFloat((umidades.reduce((a, b) => a + b, 0) / umidades.length).toFixed(1)),
+            // CORRIGIDO AQUI: vento_velocidade_media deve usar velocidades_vento do dia, não do dataApi.list
+            vento_velocidade_media: parseFloat((velocidades_vento.reduce((a, b) => a + b, 0) / velocidades_vento.length).toFixed(1)),
+            previsoes_horarias: diaData.entradas
+        });
+    }
+    resultadoFinal.sort((a, b) => new Date(a.data) - new Date(b.data));
+    console.log("[Processamento Forecast] Dados processados por dia:", resultadoFinal);
+    return resultadoFinal;
+}
+
+function formatarDataParaExibicao(dataStr) {
+    if (!dataStr || typeof dataStr !== 'string') return "Data inválida";
+    try {
+        const [year, month, day] = dataStr.split('-');
+        const dataObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (isNaN(dataObj.getTime())) { throw new Error("Data inválida após parse."); }
+        return dataObj.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+    } catch (e) { console.error("Erro ao formatar data:", dataStr, e); return "Data inválida"; }
+}
+
+function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+    dadosPrevisaoAtual = previsaoDiariaProcessada; // Armazena para o clique nos detalhes
+
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!resultadoDiv) {
+        console.error("Div #previsao-tempo-resultado não encontrada.");
+        return;
+    }
+    resultadoDiv.innerHTML = '';
+
+    const tituloEl = document.createElement('h3');
+    tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
+    resultadoDiv.appendChild(tituloEl);
+
+    const previsaoContainer = document.createElement('div');
+    previsaoContainer.className = 'previsao-dias-container';
+    resultadoDiv.appendChild(previsaoContainer);
+
+    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
+        previsaoContainer.innerHTML = '<p>Nenhuma previsão disponível ou erro ao processar.</p>';
+        return;
+    }
+
+    previsaoDiariaProcessada.forEach((dia, index) => {
+        const diaCard = document.createElement('div');
+        diaCard.className = 'previsao-dia-card';
+
+        const dataFormatada = formatarDataParaExibicao(dia.data);
+        const descricaoCapitalizada = dia.descricao.charAt(0).toUpperCase() + dia.descricao.slice(1);
+        const ventoKmH = (dia.vento_velocidade_media * 3.6).toFixed(1);
+
+        diaCard.innerHTML = `
+            <h4>${dataFormatada}</h4>
+            <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
+            <p class="descricao-tempo">${descricaoCapitalizada}</p>
+            <p class="temperaturas">
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> /
+                <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
+            </p>
+            <div class="detalhes-dia-info">
+                <p title="Velocidade média do vento">Vento: ${ventoKmH} km/h</p>
+                <p title="Umidade média do ar">Umidade: ${dia.umidade_media.toFixed(0)}%</p>
+            </div>
+            <button class="btn-ver-detalhes-dia" data-dia-index="${index}">Mais Informações</button>
+            <div class="previsao-dia-detalhes-expansivel" style="display: none;"></div>
+        `;
+        previsaoContainer.appendChild(diaCard);
+
+        const detalhesButton = diaCard.querySelector('.btn-ver-detalhes-dia');
+        if (detalhesButton) {
+            detalhesButton.addEventListener('click', handleCardDiaClick);
+        }
+    });
+}
+
+function handleCardDiaClick(event) {
+    const botaoClicado = event.currentTarget;
+    const cardClicado = botaoClicado.closest('.previsao-dia-card');
+
+    if (!cardClicado) {
+        console.error("Card pai não encontrado para o botão clicado.");
+        return;
+    }
+    const diaIndex = parseInt(botaoClicado.dataset.diaIndex);
+
+    if (dadosPrevisaoAtual && dadosPrevisaoAtual[diaIndex]) {
+        const dadosDoDia = dadosPrevisaoAtual[diaIndex];
+        const detalhesDiv = cardClicado.querySelector('.previsao-dia-detalhes-expansivel');
+
+        if (!detalhesDiv) {
+            console.error("Div de detalhes expansível não encontrada no card.");
+            return;
+        }
+
+        const isVisible = detalhesDiv.style.display === 'block';
+
+        const todosCards = cardClicado.closest('.previsao-dias-container').querySelectorAll('.previsao-dia-card');
+        todosCards.forEach(outroCard => {
+            if (outroCard !== cardClicado) {
+                const outroDetalheDiv = outroCard.querySelector('.previsao-dia-detalhes-expansivel');
+                const outroBotao = outroCard.querySelector('.btn-ver-detalhes-dia');
+                if (outroDetalheDiv) {
+                    outroDetalheDiv.style.display = 'none';
+                    outroDetalheDiv.innerHTML = '';
+                }
+                if (outroBotao) {
+                    outroBotao.textContent = 'Mais Informações';
+                }
+            }
+        });
+
+        if (isVisible) {
+            detalhesDiv.style.display = 'none';
+            detalhesDiv.innerHTML = '';
+            botaoClicado.textContent = 'Mais Informações';
+        } else {
+            detalhesDiv.style.display = 'block';
+            let htmlDetalhes = '<h5>Previsão Horária:</h5><ul>';
+            dadosDoDia.previsoes_horarias.forEach(ph => {
+                const descricaoHorariaCapitalizada = ph.descricao.charAt(0).toUpperCase() + ph.descricao.slice(1);
+                const ventoHorarioKmH = (ph.vento_velocidade * 3.6).toFixed(1);
+                htmlDetalhes += `<li>
+                    <div class="hora-icone">
+                        <strong>${ph.hora}</strong>
+                        <img src="https://openweathermap.org/img/wn/${ph.icone}.png" alt="${descricaoHorariaCapitalizada}" title="${descricaoHorariaCapitalizada}">
+                    </div>
+                    <div class="info-horaria">
+                        <span>${ph.temp.toFixed(0)}°C, ${descricaoHorariaCapitalizada}</span>
+                        <span>Vento: ${ventoHorarioKmH} km/h, Umidade: ${ph.umidade}%</span>
+                    </div>
+                </li>`;
+            });
+            htmlDetalhes += '</ul>';
+            detalhesDiv.innerHTML = htmlDetalhes;
+            botaoClicado.textContent = 'Ocultar Detalhes';
+        }
+    } else {
+        console.error("Não foi possível encontrar os dados para o dia clicado.", diaIndex, dadosPrevisaoAtual);
+    }
+}
+
+// --- NAVEGAÇÃO E EVENTOS ---
+function updateNavButtons() { const b=document.querySelectorAll('.sidebar-nav .nav-button'); b.forEach(btn=>{ if(btn.dataset.view===currentView)btn.classList.add('active'); else btn.classList.remove('active'); }); }
+function navigateToDetails(vId){if(vId&&veiculos[vId]){console.log(`Nav detalhes: ${vId}`);currentVehicleId=vId;currentView='detalhes';renderApp();}else{console.error(`Erro nav detalhes: ID inválido ${vId}`);alert("Erro: Veículo não encontrado.");}}
+function navigateToView(vName){ const vV=['garagem','detalhes','agendar', 'planejar']; if(!vV.includes(vName)){console.warn(`Nav view inválida: ${vName}`);return;} console.log(`Nav view: ${vName}`); currentView=vName; if(currentView!=='detalhes') currentVehicleId=null; renderApp(); }
+function setupEventListeners() { console.log("Configurando listeners globals..."); mainContentElement.removeEventListener('click', handleMainContentClick); mainContentElement.addEventListener('click', handleMainContentClick); mainContentElement.removeEventListener('keydown', handleMainContentKeydown); mainContentElement.addEventListener('keydown', handleMainContentKeydown); const navButtons = document.querySelectorAll('.sidebar-nav .nav-button'); navButtons.forEach(button => { const viewName = button.dataset.view; if (viewName) { const newButton = button.cloneNode(true); button.parentNode.replaceChild(newButton, button); newButton.addEventListener('click', () => navigateToView(viewName)); } }); const verificarClimaBtn = document.getElementById('verificar-clima-btn'); if (verificarClimaBtn) { const newClimaBtn = verificarClimaBtn.cloneNode(true); verificarClimaBtn.parentNode.replaceChild(newClimaBtn, verificarClimaBtn); newClimaBtn.addEventListener('click', handleVerificarClimaClick); } else { console.warn("Botão #verificar-clima-btn não encontrado."); } console.log("Listeners configurados."); }
+function setupDynamicEventListeners() { if (currentView === 'agendar') { const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.removeEventListener('change', handleVehicleSelectionChange); vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } } }
+function handleMainContentClick(event) { const target = event.target; const vehicleCard = target.closest('.vehicle-card'); if (vehicleCard && vehicleCard.dataset.vehicleId) { event.preventDefault(); navigateToDetails(vehicleCard.dataset.vehicleId); return; } const button = target.closest('button[data-action]'); if (button) { const action = button.dataset.action; const vehicleId = button.dataset.vehicleId || target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); const manutencaoId = button.dataset.manutencaoId; console.log(`Click Action: ${action}`, { vehicleId, manutencaoId }); if (vehicleId && veiculos[vehicleId]) { const v = veiculos[vehicleId]; try{ switch(action){ case 'ligar': v.ligar(); break; case 'desligar': v.desligar(); break; case 'acelerar': v.acelerar(); break; case 'frear': v.frear(); break; case 'mudarCor': v.mudarCor(); break; case 'ativarTurbo': if(v.ativarTurbo)v.ativarTurbo(); else alert("Sem turbo."); break; case 'desativarTurbo': if(v.desativarTurbo)v.desativarTurbo(); else alert("Sem turbo."); break; case 'carregar': if(v.carregar&&button.dataset.inputId)v.carregar(button.dataset.inputId); else if(v.carregar)console.error("Botão carregar s/ data-input-id."); else alert("Não carrega."); break; case 'buzinar': v.buzinar(); break; case 'buscar-detalhes-api': exibirDetalhesVeiculoAPI(vehicleId); break; default: console.warn(`Ação de botão desconhecida: ${action}`); } }catch(e){console.error(`Erro ação '${action}' veículo ${vehicleId}:`,e);alert(`Erro ação '${action}'.`);} } else if (action === 'marcar-status' && manutencaoId) { const nS = button.dataset.novoStatus; const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext] && nS) { const v=veiculos[vIdContext];const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`Marcar "${m.tipo}" como "${nS}"?`))v.marcarManutencaoComo(manutencaoId,nS); } else console.error("Dados incompletos marcar status:",{vIdContext,manutencaoId,nS}); } else if (action === 'remover-manutencao' && manutencaoId) { const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext]) { const v=veiculos[vIdContext]; const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`REMOVER registro "${m.tipo}" de ${m.getFormattedDate()}?`))v.removerManutencao(manutencaoId); } else console.error("Dados incompletos remover manut:",{vIdContext,manutencaoId}); } else if (action === 'cancelar-form') { handleCancelForm(button); } } const formAgendamento = target.closest('form.form-agendamento'); if (formAgendamento && event.type === 'submit') { handleFormSubmit(event); } }
+function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('vehicle-card')){ const vId=event.target.dataset.vehicleId; if(vId){event.preventDefault();navigateToDetails(vId);} } }
+
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
+
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>';
+        destinoInput.focus();
+        return;
+    }
+
+    resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
+
+    // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade);
+
+    if (dadosApi && !dadosApi.error) {
+        // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
+        // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
+        // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
+        // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
+
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada && previsaoProcessada.length > 0) {
+            exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
+        } else {
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console.</p>';
+            console.warn("[Frontend] processarDadosForecast retornou nulo/vazio. API Response:", dadosApi);
+        }
+    } else {
+        // Trata erros de rede, erros retornados pelo nosso backend (ex: chave API não configurada no servidor),
+        // ou erros da API OpenWeatherMap já formatados por buscarPrevisaoDetalhada.
+        resultadoDiv.innerHTML = `<p class="error-message">Falha: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
+    }
+}
+
+function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+    const previsoesAgrupadasPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = { data: diaStr, entradas: [] };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5),
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon,
+            umidade: item.main.humidity,
+            vento_velocidade: item.wind.speed,
+        });
+    }
+    );
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const umidades = diaData.entradas.map(e => e.umidade);
+        const velocidades_vento = diaData.entradas.map(e => e.vento_velocidade); // Corrigido aqui
+        let previsaoRepresentativa = diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00") || diaData.entradas.find(e => e.hora === "12:00") || diaData.entradas.find(e => e.hora === "09:00") || diaData.entradas[0];
+        resultadoFinal.push({
+            data: diaData.data,
+            temp_min: parseFloat(Math.min(...temperaturas).toFixed(1)),
+            temp_max: parseFloat(Math.max(...temperaturas).toFixed(1)),
+            descricao: previsaoRepresentativa.descricao,
+            icone: previsaoRepresentativa.icone,
+            umidade_media: parseFloat((umidades.reduce((a, b) => a + b, 0) / umidades.length).toFixed(1)),
+            vento_velocidade_media: parseFloat((velocidades_vento.reduce((a, b) => a + b, 0) / velocidades_vento.length).toFixed(1)),
+            previsoes_horarias: diaData.entradas
+        });
+    }
+    resultadoFinal.sort((a, b) => new Date(a.data) - new Date(b.data));
+    console.log("[Processamento Forecast] Dados processados por dia:", resultadoFinal);
+    return resultadoFinal;
+}
+
+function formatarDataParaExibicao(dataStr) {
+    if (!dataStr || typeof dataStr !== 'string') return "Data inválida";
+    try {
+        const [year, month, day] = dataStr.split('-');
+        const dataObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (isNaN(dataObj.getTime())) { throw new Error("Data inválida após parse."); }
+        return dataObj.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+    } catch (e) { console.error("Erro ao formatar data:", dataStr, e); return "Data inválida"; }
+}
+
+function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+    dadosPrevisaoAtual = previsaoDiariaProcessada; // Armazena para o clique nos detalhes
+
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!resultadoDiv) {
+        console.error("Div #previsao-tempo-resultado não encontrada.");
+        return;
+    }
+    resultadoDiv.innerHTML = '';
+
+    const tituloEl = document.createElement('h3');
+    tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
+    resultadoDiv.appendChild(tituloEl);
+
+    const previsaoContainer = document.createElement('div');
+    previsaoContainer.className = 'previsao-dias-container';
+    resultadoDiv.appendChild(previsaoContainer);
+
+    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
+        previsaoContainer.innerHTML = '<p>Nenhuma previsão disponível ou erro ao processar.</p>';
+        return;
+    }
+
+    previsaoDiariaProcessada.forEach((dia, index) => {
+        const diaCard = document.createElement('div');
+        diaCard.className = 'previsao-dia-card';
+
+        const dataFormatada = formatarDataParaExibicao(dia.data);
+        const descricaoCapitalizada = dia.descricao.charAt(0).toUpperCase() + dia.descricao.slice(1);
+        const ventoKmH = (dia.vento_velocidade_media * 3.6).toFixed(1);
+
+        diaCard.innerHTML = `
+            <h4>${dataFormatada}</h4>
+            <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
+            <p class="descricao-tempo">${descricaoCapitalizada}</p>
+            <p class="temperaturas">
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> /
+                <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
+            </p>
+            <div class="detalhes-dia-info">
+                <p title="Velocidade média do vento">Vento: ${ventoKmH} km/h</p>
+                <p title="Umidade média do ar">Umidade: ${dia.umidade_media.toFixed(0)}%</p>
+            </div>
+            <button class="btn-ver-detalhes-dia" data-dia-index="${index}">Mais Informações</button>
+            <div class="previsao-dia-detalhes-expansivel" style="display: none;"></div>
+        `;
+        previsaoContainer.appendChild(diaCard);
+
+        const detalhesButton = diaCard.querySelector('.btn-ver-detalhes-dia');
+        if (detalhesButton) {
+            detalhesButton.addEventListener('click', handleCardDiaClick);
+        }
+    });
+}
+
+function handleCardDiaClick(event) {
+    const botaoClicado = event.currentTarget;
+    const cardClicado = botaoClicado.closest('.previsao-dia-card');
+
+    if (!cardClicado) {
+        console.error("Card pai não encontrado para o botão clicado.");
+        return;
+    }
+    const diaIndex = parseInt(botaoClicado.dataset.diaIndex);
+
+    if (dadosPrevisaoAtual && dadosPrevisaoAtual[diaIndex]) {
+        const dadosDoDia = dadosPrevisaoAtual[diaIndex];
+        const detalhesDiv = cardClicado.querySelector('.previsao-dia-detalhes-expansivel');
+
+        if (!detalhesDiv) {
+            console.error("Div de detalhes expansível não encontrada no card.");
+            return;
+        }
+
+        const isVisible = detalhesDiv.style.display === 'block';
+
+        const todosCards = cardClicado.closest('.previsao-dias-container').querySelectorAll('.previsao-dia-card');
+        todosCards.forEach(outroCard => {
+            if (outroCard !== cardClicado) {
+                const outroDetalheDiv = outroCard.querySelector('.previsao-dia-detalhes-expansivel');
+                const outroBotao = outroCard.querySelector('.btn-ver-detalhes-dia');
+                if (outroDetalheDiv) {
+                    outroDetalheDiv.style.display = 'none';
+                    outroDetalheDiv.innerHTML = '';
+                }
+                if (outroBotao) {
+                    outroBotao.textContent = 'Mais Informações';
+                }
+            }
+        });
+
+        if (isVisible) {
+            detalhesDiv.style.display = 'none';
+            detalhesDiv.innerHTML = '';
+            botaoClicado.textContent = 'Mais Informações';
+        } else {
+            detalhesDiv.style.display = 'block';
+            let htmlDetalhes = '<h5>Previsão Horária:</h5><ul>';
+            dadosDoDia.previsoes_horarias.forEach(ph => {
+                const descricaoHorariaCapitalizada = ph.descricao.charAt(0).toUpperCase() + ph.descricao.slice(1);
+                const ventoHorarioKmH = (ph.vento_velocidade * 3.6).toFixed(1);
+                htmlDetalhes += `<li>
+                    <div class="hora-icone">
+                        <strong>${ph.hora}</strong>
+                        <img src="https://openweathermap.org/img/wn/${ph.icone}.png" alt="${descricaoHorariaCapitalizada}" title="${descricaoHorariaCapitalizada}">
+                    </div>
+                    <div class="info-horaria">
+                        <span>${ph.temp.toFixed(0)}°C, ${descricaoHorariaCapitalizada}</span>
+                        <span>Vento: ${ventoHorarioKmH} km/h, Umidade: ${ph.umidade}%</span>
+                    </div>
+                </li>`;
+            });
+            htmlDetalhes += '</ul>';
+            detalhesDiv.innerHTML = htmlDetalhes;
+            botaoClicado.textContent = 'Ocultar Detalhes';
+        }
+    } else {
+        console.error("Não foi possível encontrar os dados para o dia clicado.", diaIndex, dadosPrevisaoAtual);
+    }
+}
+
+// --- NAVEGAÇÃO E EVENTOS ---
+function updateNavButtons() { const b=document.querySelectorAll('.sidebar-nav .nav-button'); b.forEach(btn=>{ if(btn.dataset.view===currentView)btn.classList.add('active'); else btn.classList.remove('active'); }); }
+function navigateToDetails(vId){if(vId&&veiculos[vId]){console.log(`Nav detalhes: ${vId}`);currentVehicleId=vId;currentView='detalhes';renderApp();}else{console.error(`Erro nav detalhes: ID inválido ${vId}`);alert("Erro: Veículo não encontrado.");}}
+function navigateToView(vName){ const vV=['garagem','detalhes','agendar', 'planejar']; if(!vV.includes(vName)){console.warn(`Nav view inválida: ${vName}`);return;} console.log(`Nav view: ${vName}`); currentView=vName; if(currentView!=='detalhes') currentVehicleId=null; renderApp(); }
+function setupEventListeners() { console.log("Configurando listeners globals..."); mainContentElement.removeEventListener('click', handleMainContentClick); mainContentElement.addEventListener('click', handleMainContentClick); mainContentElement.removeEventListener('keydown', handleMainContentKeydown); mainContentElement.addEventListener('keydown', handleMainContentKeydown); const navButtons = document.querySelectorAll('.sidebar-nav .nav-button'); navButtons.forEach(button => { const viewName = button.dataset.view; if (viewName) { const newButton = button.cloneNode(true); button.parentNode.replaceChild(newButton, button); newButton.addEventListener('click', () => navigateToView(viewName)); } }); const verificarClimaBtn = document.getElementById('verificar-clima-btn'); if (verificarClimaBtn) { const newClimaBtn = verificarClimaBtn.cloneNode(true); verificarClimaBtn.parentNode.replaceChild(newClimaBtn, verificarClimaBtn); newClimaBtn.addEventListener('click', handleVerificarClimaClick); } else { console.warn("Botão #verificar-clima-btn não encontrado."); } console.log("Listeners configurados."); }
+function setupDynamicEventListeners() { if (currentView === 'agendar') { const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.removeEventListener('change', handleVehicleSelectionChange); vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } } }
+function handleMainContentClick(event) { const target = event.target; const vehicleCard = target.closest('.vehicle-card'); if (vehicleCard && vehicleCard.dataset.vehicleId) { event.preventDefault(); navigateToDetails(vehicleCard.dataset.vehicleId); return; } const button = target.closest('button[data-action]'); if (button) { const action = button.dataset.action; const vehicleId = button.dataset.vehicleId || target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); const manutencaoId = button.dataset.manutencaoId; console.log(`Click Action: ${action}`, { vehicleId, manutencaoId }); if (vehicleId && veiculos[vehicleId]) { const v = veiculos[vehicleId]; try{ switch(action){ case 'ligar': v.ligar(); break; case 'desligar': v.desligar(); break; case 'acelerar': v.acelerar(); break; case 'frear': v.frear(); break; case 'mudarCor': v.mudarCor(); break; case 'ativarTurbo': if(v.ativarTurbo)v.ativarTurbo(); else alert("Sem turbo."); break; case 'desativarTurbo': if(v.desativarTurbo)v.desativarTurbo(); else alert("Sem turbo."); break; case 'carregar': if(v.carregar&&button.dataset.inputId)v.carregar(button.dataset.inputId); else if(v.carregar)console.error("Botão carregar s/ data-input-id."); else alert("Não carrega."); break; case 'buzinar': v.buzinar(); break; case 'buscar-detalhes-api': exibirDetalhesVeiculoAPI(vehicleId); break; default: console.warn(`Ação de botão desconhecida: ${action}`); } }catch(e){console.error(`Erro ação '${action}' veículo ${vehicleId}:`,e);alert(`Erro ação '${action}'.`);} } else if (action === 'marcar-status' && manutencaoId) { const nS = button.dataset.novoStatus; const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext] && nS) { const v=veiculos[vIdContext];const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`Marcar "${m.tipo}" como "${nS}"?`))v.marcarManutencaoComo(manutencaoId,nS); } else console.error("Dados incompletos marcar status:",{vIdContext,manutencaoId,nS}); } else if (action === 'remover-manutencao' && manutencaoId) { const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext]) { const v=veiculos[vIdContext]; const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`REMOVER registro "${m.tipo}" de ${m.getFormattedDate()}?`))v.removerManutencao(manutencaoId); } else console.error("Dados incompletos remover manut:",{vIdContext,manutencaoId}); } else if (action === 'cancelar-form') { handleCancelForm(button); } } const formAgendamento = target.closest('form.form-agendamento'); if (formAgendamento && event.type === 'submit') { handleFormSubmit(event); } }
+function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('vehicle-card')){ const vId=event.target.dataset.vehicleId; if(vId){event.preventDefault();navigateToDetails(vId);} } }
+
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
+
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>';
+        destinoInput.focus();
+        return;
+    }
+
+    resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
+
+    // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade);
+
+    if (dadosApi && !dadosApi.error) {
+        // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
+        // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
+        // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
+        // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
+
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada && previsaoProcessada.length > 0) {
+            exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
+        } else {
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console.</p>';
+            console.warn("[Frontend] processarDadosForecast retornou nulo/vazio. API Response:", dadosApi);
+        }
+    } else {
+        // Trata erros de rede, erros retornados pelo nosso backend (ex: chave API não configurada no servidor),
+        // ou erros da API OpenWeatherMap já formatados por buscarPrevisaoDetalhada.
+        resultadoDiv.innerHTML = `<p class="error-message">Falha: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
+    }
+}
+
+function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+    const previsoesAgrupadasPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = { data: diaStr, entradas: [] };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5),
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon,
+            umidade: item.main.humidity,
+            vento_velocidade: item.wind.speed,
+        });
+    }
+    );
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const umidades = diaData.entradas.map(e => e.umidade);
+        const velocidades_vento = diaData.entradas.map(e => e.vento_velocidade); // Corrigido aqui
+        let previsaoRepresentativa = diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00") || diaData.entradas.find(e => e.hora === "12:00") || diaData.entradas.find(e => e.hora === "09:00") || diaData.entradas[0];
+        resultadoFinal.push({
+            data: diaData.data,
+            temp_min: parseFloat(Math.min(...temperaturas).toFixed(1)),
+            temp_max: parseFloat(Math.max(...temperaturas).toFixed(1)),
+            descricao: previsaoRepresentativa.descricao,
+            icone: previsaoRepresentativa.icone,
+            umidade_media: parseFloat((umidades.reduce((a, b) => a + b, 0) / umidades.length).toFixed(1)),
+            vento_velocidade_media: parseFloat((velocidades_vento.reduce((a, b) => a + b, 0) / velocidades_vento.length).toFixed(1)),
+            previsoes_horarias: diaData.entradas
+        });
+    }
+    resultadoFinal.sort((a, b) => new Date(a.data) - new Date(b.data));
+    console.log("[Processamento Forecast] Dados processados por dia:", resultadoFinal);
+    return resultadoFinal;
+}
+
+function formatarDataParaExibicao(dataStr) {
+    if (!dataStr || typeof dataStr !== 'string') return "Data inválida";
+    try {
+        const [year, month, day] = dataStr.split('-');
+        const dataObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (isNaN(dataObj.getTime())) { throw new Error("Data inválida após parse."); }
+        return dataObj.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+    } catch (e) { console.error("Erro ao formatar data:", dataStr, e); return "Data inválida"; }
+}
+
+function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+    dadosPrevisaoAtual = previsaoDiariaProcessada; // Armazena para o clique nos detalhes
+
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!resultadoDiv) {
+        console.error("Div #previsao-tempo-resultado não encontrada.");
+        return;
+    }
+    resultadoDiv.innerHTML = '';
+
+    const tituloEl = document.createElement('h3');
+    tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
+    resultadoDiv.appendChild(tituloEl);
+
+    const previsaoContainer = document.createElement('div');
+    previsaoContainer.className = 'previsao-dias-container';
+    resultadoDiv.appendChild(previsaoContainer);
+
+    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
+        previsaoContainer.innerHTML = '<p>Nenhuma previsão disponível ou erro ao processar.</p>';
+        return;
+    }
+
+    previsaoDiariaProcessada.forEach((dia, index) => {
+        const diaCard = document.createElement('div');
+        diaCard.className = 'previsao-dia-card';
+
+        const dataFormatada = formatarDataParaExibicao(dia.data);
+        const descricaoCapitalizada = dia.descricao.charAt(0).toUpperCase() + dia.descricao.slice(1);
+        const ventoKmH = (dia.vento_velocidade_media * 3.6).toFixed(1);
+
+        diaCard.innerHTML = `
+            <h4>${dataFormatada}</h4>
+            <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
+            <p class="descricao-tempo">${descricaoCapitalizada}</p>
+            <p class="temperaturas">
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> /
+                <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
+            </p>
+            <div class="detalhes-dia-info">
+                <p title="Velocidade média do vento">Vento: ${ventoKmH} km/h</p>
+                <p title="Umidade média do ar">Umidade: ${dia.umidade_media.toFixed(0)}%</p>
+            </div>
+            <button class="btn-ver-detalhes-dia" data-dia-index="${index}">Mais Informações</button>
+            <div class="previsao-dia-detalhes-expansivel" style="display: none;"></div>
+        `;
+        previsaoContainer.appendChild(diaCard);
+
+        const detalhesButton = diaCard.querySelector('.btn-ver-detalhes-dia');
+        if (detalhesButton) {
+            detalhesButton.addEventListener('click', handleCardDiaClick);
+        }
+    });
+}
+
+function handleCardDiaClick(event) {
+    const botaoClicado = event.currentTarget;
+    const cardClicado = botaoClicado.closest('.previsao-dia-card');
+
+    if (!cardClicado) {
+        console.error("Card pai não encontrado para o botão clicado.");
+        return;
+    }
+    const diaIndex = parseInt(botaoClicado.dataset.diaIndex);
+
+    if (dadosPrevisaoAtual && dadosPrevisaoAtual[diaIndex]) {
+        const dadosDoDia = dadosPrevisaoAtual[diaIndex];
+        const detalhesDiv = cardClicado.querySelector('.previsao-dia-detalhes-expansivel');
+
+        if (!detalhesDiv) {
+            console.error("Div de detalhes expansível não encontrada no card.");
+            return;
+        }
+
+        const isVisible = detalhesDiv.style.display === 'block';
+
+        const todosCards = cardClicado.closest('.previsao-dias-container').querySelectorAll('.previsao-dia-card');
+        todosCards.forEach(outroCard => {
+            if (outroCard !== cardClicado) {
+                const outroDetalheDiv = outroCard.querySelector('.previsao-dia-detalhes-expansivel');
+                const outroBotao = outroCard.querySelector('.btn-ver-detalhes-dia');
+                if (outroDetalheDiv) {
+                    outroDetalheDiv.style.display = 'none';
+                    outroDetalheDiv.innerHTML = '';
+                }
+                if (outroBotao) {
+                    outroBotao.textContent = 'Mais Informações';
+                }
+            }
+        });
+
+        if (isVisible) {
+            detalhesDiv.style.display = 'none';
+            detalhesDiv.innerHTML = '';
+            botaoClicado.textContent = 'Mais Informações';
+        } else {
+            detalhesDiv.style.display = 'block';
+            let htmlDetalhes = '<h5>Previsão Horária:</h5><ul>';
+            dadosDoDia.previsoes_horarias.forEach(ph => {
+                const descricaoHorariaCapitalizada = ph.descricao.charAt(0).toUpperCase() + ph.descricao.slice(1);
+                const ventoHorarioKmH = (ph.vento_velocidade * 3.6).toFixed(1);
+                htmlDetalhes += `<li>
+                    <div class="hora-icone">
+                        <strong>${ph.hora}</strong>
+                        <img src="https://openweathermap.org/img/wn/${ph.icone}.png" alt="${descricaoHorariaCapitalizada}" title="${descricaoHorariaCapitalizada}">
+                    </div>
+                    <div class="info-horaria">
+                        <span>${ph.temp.toFixed(0)}°C, ${descricaoHorariaCapitalizada}</span>
+                        <span>Vento: ${ventoHorarioKmH} km/h, Umidade: ${ph.umidade}%</span>
+                    </div>
+                </li>`;
+            });
+            htmlDetalhes += '</ul>';
+            detalhesDiv.innerHTML = htmlDetalhes;
+            botaoClicado.textContent = 'Ocultar Detalhes';
+        }
+    } else {
+        console.error("Não foi possível encontrar os dados para o dia clicado.", diaIndex, dadosPrevisaoAtual);
+    }
+}
+
+// --- NAVEGAÇÃO E EVENTOS ---
+function updateNavButtons() { const b=document.querySelectorAll('.sidebar-nav .nav-button'); b.forEach(btn=>{ if(btn.dataset.view===currentView)btn.classList.add('active'); else btn.classList.remove('active'); }); }
+function navigateToDetails(vId){if(vId&&veiculos[vId]){console.log(`Nav detalhes: ${vId}`);currentVehicleId=vId;currentView='detalhes';renderApp();}else{console.error(`Erro nav detalhes: ID inválido ${vId}`);alert("Erro: Veículo não encontrado.");}}
+function navigateToView(vName){ const vV=['garagem','detalhes','agendar', 'planejar']; if(!vV.includes(vName)){console.warn(`Nav view inválida: ${vName}`);return;} console.log(`Nav view: ${vName}`); currentView=vName; if(currentView!=='detalhes') currentVehicleId=null; renderApp(); }
+function setupEventListeners() { console.log("Configurando listeners globals..."); mainContentElement.removeEventListener('click', handleMainContentClick); mainContentElement.addEventListener('click', handleMainContentClick); mainContentElement.removeEventListener('keydown', handleMainContentKeydown); mainContentElement.addEventListener('keydown', handleMainContentKeydown); const navButtons = document.querySelectorAll('.sidebar-nav .nav-button'); navButtons.forEach(button => { const viewName = button.dataset.view; if (viewName) { const newButton = button.cloneNode(true); button.parentNode.replaceChild(newButton, button); newButton.addEventListener('click', () => navigateToView(viewName)); } }); const verificarClimaBtn = document.getElementById('verificar-clima-btn'); if (verificarClimaBtn) { const newClimaBtn = verificarClimaBtn.cloneNode(true); verificarClimaBtn.parentNode.replaceChild(newClimaBtn, verificarClimaBtn); newClimaBtn.addEventListener('click', handleVerificarClimaClick); } else { console.warn("Botão #verificar-clima-btn não encontrado."); } console.log("Listeners configurados."); }
+function setupDynamicEventListeners() { if (currentView === 'agendar') { const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.removeEventListener('change', handleVehicleSelectionChange); vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } } }
+function handleMainContentClick(event) { const target = event.target; const vehicleCard = target.closest('.vehicle-card'); if (vehicleCard && vehicleCard.dataset.vehicleId) { event.preventDefault(); navigateToDetails(vehicleCard.dataset.vehicleId); return; } const button = target.closest('button[data-action]'); if (button) { const action = button.dataset.action; const vehicleId = button.dataset.vehicleId || target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); const manutencaoId = button.dataset.manutencaoId; console.log(`Click Action: ${action}`, { vehicleId, manutencaoId }); if (vehicleId && veiculos[vehicleId]) { const v = veiculos[vehicleId]; try{ switch(action){ case 'ligar': v.ligar(); break; case 'desligar': v.desligar(); break; case 'acelerar': v.acelerar(); break; case 'frear': v.frear(); break; case 'mudarCor': v.mudarCor(); break; case 'ativarTurbo': if(v.ativarTurbo)v.ativarTurbo(); else alert("Sem turbo."); break; case 'desativarTurbo': if(v.desativarTurbo)v.desativarTurbo(); else alert("Sem turbo."); break; case 'carregar': if(v.carregar&&button.dataset.inputId)v.carregar(button.dataset.inputId); else if(v.carregar)console.error("Botão carregar s/ data-input-id."); else alert("Não carrega."); break; case 'buzinar': v.buzinar(); break; case 'buscar-detalhes-api': exibirDetalhesVeiculoAPI(vehicleId); break; default: console.warn(`Ação de botão desconhecida: ${action}`); } }catch(e){console.error(`Erro ação '${action}' veículo ${vehicleId}:`,e);alert(`Erro ação '${action}'.`);} } else if (action === 'marcar-status' && manutencaoId) { const nS = button.dataset.novoStatus; const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext] && nS) { const v=veiculos[vIdContext];const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`Marcar "${m.tipo}" como "${nS}"?`))v.marcarManutencaoComo(manutencaoId,nS); } else console.error("Dados incompletos marcar status:",{vIdContext,manutencaoId,nS}); } else if (action === 'remover-manutencao' && manutencaoId) { const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext]) { const v=veiculos[vIdContext]; const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`REMOVER registro "${m.tipo}" de ${m.getFormattedDate()}?`))v.removerManutencao(manutencaoId); } else console.error("Dados incompletos remover manut:",{vIdContext,manutencaoId}); } else if (action === 'cancelar-form') { handleCancelForm(button); } } const formAgendamento = target.closest('form.form-agendamento'); if (formAgendamento && event.type === 'submit') { handleFormSubmit(event); } }
+function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('vehicle-card')){ const vId=event.target.dataset.vehicleId; if(vId){event.preventDefault();navigateToDetails(vId);} } }
+
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
+
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>';
+        destinoInput.focus();
+        return;
+    }
+
+    resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
+
+    // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade);
+
+    if (dadosApi && !dadosApi.error) {
+        // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
+        // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
+        // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
+        // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
+
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada && previsaoProcessada.length > 0) {
+            exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
+        } else {
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console.</p>';
+            console.warn("[Frontend] processarDadosForecast retornou nulo/vazio. API Response:", dadosApi);
+        }
+    } else {
+        // Trata erros de rede, erros retornados pelo nosso backend (ex: chave API não configurada no servidor),
+        // ou erros da API OpenWeatherMap já formatados por buscarPrevisaoDetalhada.
+        resultadoDiv.innerHTML = `<p class="error-message">Falha: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
+    }
+}
+
+function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+    const previsoesAgrupadasPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = { data: diaStr, entradas: [] };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5),
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon,
+            umidade: item.main.humidity,
+            vento_velocidade: item.wind.speed,
+        });
+    }
+    );
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const umidades = diaData.entradas.map(e => e.umidade);
+        const velocidades_vento = diaData.entradas.map(e => e.vento_velocidade); // Corrigido aqui
+        let previsaoRepresentativa = diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00") || diaData.entradas.find(e => e.hora === "12:00") || diaData.entradas.find(e => e.hora === "09:00") || diaData.entradas[0];
+        resultadoFinal.push({
+            data: diaData.data,
+            temp_min: parseFloat(Math.min(...temperaturas).toFixed(1)),
+            temp_max: parseFloat(Math.max(...temperaturas).toFixed(1)),
+            descricao: previsaoRepresentativa.descricao,
+            icone: previsaoRepresentativa.icone,
+            umidade_media: parseFloat((umidades.reduce((a, b) => a + b, 0) / umidades.length).toFixed(1)),
+            vento_velocidade_media: parseFloat((velocidades_vento.reduce((a, b) => a + b, 0) / velocidades_vento.length).toFixed(1)),
+            previsoes_horarias: diaData.entradas
+        });
+    }
+    resultadoFinal.sort((a, b) => new Date(a.data) - new Date(b.data));
+    console.log("[Processamento Forecast] Dados processados por dia:", resultadoFinal);
+    return resultadoFinal;
+}
+
+function formatarDataParaExibicao(dataStr) {
+    if (!dataStr || typeof dataStr !== 'string') return "Data inválida";
+    try {
+        const [year, month, day] = dataStr.split('-');
+        const dataObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (isNaN(dataObj.getTime())) { throw new Error("Data inválida após parse."); }
+        return dataObj.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' });
+    } catch (e) { console.error("Erro ao formatar data:", dataStr, e); return "Data inválida"; }
+}
+
+function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+    dadosPrevisaoAtual = previsaoDiariaProcessada; // Armazena para o clique nos detalhes
+
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!resultadoDiv) {
+        console.error("Div #previsao-tempo-resultado não encontrada.");
+        return;
+    }
+    resultadoDiv.innerHTML = '';
+
+    const tituloEl = document.createElement('h3');
+    tituloEl.innerHTML = `Previsão para <strong>${nomeCidade}</strong> (Próximos Dias)`;
+    resultadoDiv.appendChild(tituloEl);
+
+    const previsaoContainer = document.createElement('div');
+    previsaoContainer.className = 'previsao-dias-container';
+    resultadoDiv.appendChild(previsaoContainer);
+
+    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
+        previsaoContainer.innerHTML = '<p>Nenhuma previsão disponível ou erro ao processar.</p>';
+        return;
+    }
+
+    previsaoDiariaProcessada.forEach((dia, index) => {
+        const diaCard = document.createElement('div');
+        diaCard.className = 'previsao-dia-card';
+
+        const dataFormatada = formatarDataParaExibicao(dia.data);
+        const descricaoCapitalizada = dia.descricao.charAt(0).toUpperCase() + dia.descricao.slice(1);
+        const ventoKmH = (dia.vento_velocidade_media * 3.6).toFixed(1);
+
+        diaCard.innerHTML = `
+            <h4>${dataFormatada}</h4>
+            <img src="https://openweathermap.org/img/wn/${dia.icone}@2x.png" alt="${descricaoCapitalizada}" title="${descricaoCapitalizada}">
+            <p class="descricao-tempo">${descricaoCapitalizada}</p>
+            <p class="temperaturas">
+                <span class="temp-max" title="Temperatura Máxima">${dia.temp_max.toFixed(0)}°C</span> /
+                <span class="temp-min" title="Temperatura Mínima">${dia.temp_min.toFixed(0)}°C</span>
+            </p>
+            <div class="detalhes-dia-info">
+                <p title="Velocidade média do vento">Vento: ${ventoKmH} km/h</p>
+                <p title="Umidade média do ar">Umidade: ${dia.umidade_media.toFixed(0)}%</p>
+            </div>
+            <button class="btn-ver-detalhes-dia" data-dia-index="${index}">Mais Informações</button>
+            <div class="previsao-dia-detalhes-expansivel" style="display: none;"></div>
+        `;
+        previsaoContainer.appendChild(diaCard);
+
+        const detalhesButton = diaCard.querySelector('.btn-ver-detalhes-dia');
+        if (detalhesButton) {
+            detalhesButton.addEventListener('click', handleCardDiaClick);
+        }
+    });
+}
+
+function handleCardDiaClick(event) {
+    const botaoClicado = event.currentTarget;
+    const cardClicado = botaoClicado.closest('.previsao-dia-card');
+
+    if (!cardClicado) {
+        console.error("Card pai não encontrado para o botão clicado.");
+        return;
+    }
+    const diaIndex = parseInt(botaoClicado.dataset.diaIndex);
+
+    if (dadosPrevisaoAtual && dadosPrevisaoAtual[diaIndex]) {
+        const dadosDoDia = dadosPrevisaoAtual[diaIndex];
+        const detalhesDiv = cardClicado.querySelector('.previsao-dia-detalhes-expansivel');
+
+        if (!detalhesDiv) {
+            console.error("Div de detalhes expansível não encontrada no card.");
+            return;
+        }
+
+        const isVisible = detalhesDiv.style.display === 'block';
+
+        const todosCards = cardClicado.closest('.previsao-dias-container').querySelectorAll('.previsao-dia-card');
+        todosCards.forEach(outroCard => {
+            if (outroCard !== cardClicado) {
+                const outroDetalheDiv = outroCard.querySelector('.previsao-dia-detalhes-expansivel');
+                const outroBotao = outroCard.querySelector('.btn-ver-detalhes-dia');
+                if (outroDetalheDiv) {
+                    outroDetalheDiv.style.display = 'none';
+                    outroDetalheDiv.innerHTML = '';
+                }
+                if (outroBotao) {
+                    outroBotao.textContent = 'Mais Informações';
+                }
+            }
+        });
+
+        if (isVisible) {
+            detalhesDiv.style.display = 'none';
+            detalhesDiv.innerHTML = '';
+            botaoClicado.textContent = 'Mais Informações';
+        } else {
+            detalhesDiv.style.display = 'block';
+            let htmlDetalhes = '<h5>Previsão Horária:</h5><ul>';
+            dadosDoDia.previsoes_horarias.forEach(ph => {
+                const descricaoHorariaCapitalizada = ph.descricao.charAt(0).toUpperCase() + ph.descricao.slice(1);
+                const ventoHorarioKmH = (ph.vento_velocidade * 3.6).toFixed(1);
+                htmlDetalhes += `<li>
+                    <div class="hora-icone">
+                        <strong>${ph.hora}</strong>
+                        <img src="https://openweathermap.org/img/wn/${ph.icone}.png" alt="${descricaoHorariaCapitalizada}" title="${descricaoHorariaCapitalizada}">
+                    </div>
+                    <div class="info-horaria">
+                        <span>${ph.temp.toFixed(0)}°C, ${descricaoHorariaCapitalizada}</span>
+                        <span>Vento: ${ventoHorarioKmH} km/h, Umidade: ${ph.umidade}%</span>
+                    </div>
+                </li>`;
+            });
+            htmlDetalhes += '</ul>';
+            detalhesDiv.innerHTML = htmlDetalhes;
+            botaoClicado.textContent = 'Ocultar Detalhes';
+        }
+    } else {
+        console.error("Não foi possível encontrar os dados para o dia clicado.", diaIndex, dadosPrevisaoAtual);
+    }
+}
+
+// --- NAVEGAÇÃO E EVENTOS ---
+function updateNavButtons() { const b=document.querySelectorAll('.sidebar-nav .nav-button'); b.forEach(btn=>{ if(btn.dataset.view===currentView)btn.classList.add('active'); else btn.classList.remove('active'); }); }
+function navigateToDetails(vId){if(vId&&veiculos[vId]){console.log(`Nav detalhes: ${vId}`);currentVehicleId=vId;currentView='detalhes';renderApp();}else{console.error(`Erro nav detalhes: ID inválido ${vId}`);alert("Erro: Veículo não encontrado.");}}
+function navigateToView(vName){ const vV=['garagem','detalhes','agendar', 'planejar']; if(!vV.includes(vName)){console.warn(`Nav view inválida: ${vName}`);return;} console.log(`Nav view: ${vName}`); currentView=vName; if(currentView!=='detalhes') currentVehicleId=null; renderApp(); }
+function setupEventListeners() { console.log("Configurando listeners globals..."); mainContentElement.removeEventListener('click', handleMainContentClick); mainContentElement.addEventListener('click', handleMainContentClick); mainContentElement.removeEventListener('keydown', handleMainContentKeydown); mainContentElement.addEventListener('keydown', handleMainContentKeydown); const navButtons = document.querySelectorAll('.sidebar-nav .nav-button'); navButtons.forEach(button => { const viewName = button.dataset.view; if (viewName) { const newButton = button.cloneNode(true); button.parentNode.replaceChild(newButton, button); newButton.addEventListener('click', () => navigateToView(viewName)); } }); const verificarClimaBtn = document.getElementById('verificar-clima-btn'); if (verificarClimaBtn) { const newClimaBtn = verificarClimaBtn.cloneNode(true); verificarClimaBtn.parentNode.replaceChild(newClimaBtn, verificarClimaBtn); newClimaBtn.addEventListener('click', handleVerificarClimaClick); } else { console.warn("Botão #verificar-clima-btn não encontrado."); } console.log("Listeners configurados."); }
+function setupDynamicEventListeners() { if (currentView === 'agendar') { const vehicleSelect = document.getElementById('vehicle-select-schedule'); if (vehicleSelect) { vehicleSelect.removeEventListener('change', handleVehicleSelectionChange); vehicleSelect.addEventListener('change', handleVehicleSelectionChange); } } }
+function handleMainContentClick(event) { const target = event.target; const vehicleCard = target.closest('.vehicle-card'); if (vehicleCard && vehicleCard.dataset.vehicleId) { event.preventDefault(); navigateToDetails(vehicleCard.dataset.vehicleId); return; } const button = target.closest('button[data-action]'); if (button) { const action = button.dataset.action; const vehicleId = button.dataset.vehicleId || target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); const manutencaoId = button.dataset.manutencaoId; console.log(`Click Action: ${action}`, { vehicleId, manutencaoId }); if (vehicleId && veiculos[vehicleId]) { const v = veiculos[vehicleId]; try{ switch(action){ case 'ligar': v.ligar(); break; case 'desligar': v.desligar(); break; case 'acelerar': v.acelerar(); break; case 'frear': v.frear(); break; case 'mudarCor': v.mudarCor(); break; case 'ativarTurbo': if(v.ativarTurbo)v.ativarTurbo(); else alert("Sem turbo."); break; case 'desativarTurbo': if(v.desativarTurbo)v.desativarTurbo(); else alert("Sem turbo."); break; case 'carregar': if(v.carregar&&button.dataset.inputId)v.carregar(button.dataset.inputId); else if(v.carregar)console.error("Botão carregar s/ data-input-id."); else alert("Não carrega."); break; case 'buzinar': v.buzinar(); break; case 'buscar-detalhes-api': exibirDetalhesVeiculoAPI(vehicleId); break; default: console.warn(`Ação de botão desconhecida: ${action}`); } }catch(e){console.error(`Erro ação '${action}' veículo ${vehicleId}:`,e);alert(`Erro ação '${action}'.`);} } else if (action === 'marcar-status' && manutencaoId) { const nS = button.dataset.novoStatus; const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext] && nS) { const v=veiculos[vIdContext];const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`Marcar "${m.tipo}" como "${nS}"?`))v.marcarManutencaoComo(manutencaoId,nS); } else console.error("Dados incompletos marcar status:",{vIdContext,manutencaoId,nS}); } else if (action === 'remover-manutencao' && manutencaoId) { const vIdContext = target.closest('.vehicle-detail-view')?.id.replace('vehicle-detail-',''); if (vIdContext && veiculos[vIdContext]) { const v=veiculos[vIdContext]; const m=v.historicoManutencao.find(m=>m.id===manutencaoId); if(m&&confirm(`REMOVER registro "${m.tipo}" de ${m.getFormattedDate()}?`))v.removerManutencao(manutencaoId); } else console.error("Dados incompletos remover manut:",{vIdContext,manutencaoId}); } else if (action === 'cancelar-form') { handleCancelForm(button); } } const formAgendamento = target.closest('form.form-agendamento'); if (formAgendamento && event.type === 'submit') { handleFormSubmit(event); } }
+function handleMainContentKeydown(event) { if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('vehicle-card')){ const vId=event.target.dataset.vehicleId; if(vId){event.preventDefault();navigateToDetails(vId);} } }
+
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const resultadoDiv = document.getElementById('previsao-tempo-resultado');
+    if (!destinoInput || !resultadoDiv) { console.error("Elementos do DOM para clima não encontrados."); alert("Erro interno na página (elementos clima)."); return; }
+
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        alert("Por favor, digite o nome da cidade.");
+        resultadoDiv.innerHTML = '<p class="error-message">Digite uma cidade.</p>';
+        destinoInput.focus();
+        return;
+    }
+
+    resultadoDiv.innerHTML = '<p class="loading-message">Buscando previsão...</p>';
+
+    // dadosApi será o objeto JSON da OpenWeatherMap ou um objeto de erro { error: true, message: "..." }
+    const dadosApi = await buscarPrevisaoDetalhada(nomeCidade);
+
+    if (dadosApi && !dadosApi.error) {
+        // 'dadosApi' aqui já é o objeto JSON da OpenWeatherMap.
+        // A verificação de erro da OpenWeatherMap (data.cod !== "200") já foi feita dentro de buscarPrevisaoDetalhada
+        // e, se houve erro lá, dadosApi já seria { error: true, message: "..." }.
+        // Então, se chegamos aqui sem dadosApi.error, significa que a OpenWeatherMap retornou dados válidos.
+
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada && previsaoProcessada.length > 0) {
+            exibirPrevisaoDetalhada(previsaoProcessada, nomeCidade);
+        } else {
+            resultadoDiv.innerHTML = '<p class="error-message">Não foi possível processar os dados da previsão. Verifique o console.</p>';
+            console.warn("[Frontend] processarDadosForecast retornou nulo/vazio. API Response:", dadosApi);
+        }
+    } else {
+        // Trata erros de rede, erros retornados pelo nosso backend (ex: chave API não configurada no servidor),
+        // ou erros da API OpenWeatherMap já formatados por buscarPrevisaoDetalhada.
+        resultadoDiv.innerHTML = `<p class="error-message">Falha: ${dadosApi?.message || 'Não foi possível obter a previsão.'}</p>`;
+    }
+}
+
+function processarDadosForecast(dataApi) {
+    // Esta função recebe diretamente os dados da OpenWeatherMap (repassados pelo backend)
+    // Não precisa de alterações, pois o formato dos dados não mudou.
+    if (!dataApi || !dataApi.list || !Array.isArray(dataApi.list) || dataApi.list.length === 0) {
+        console.error("[Processamento Forecast] Dados da API inválidos ou lista de previsão vazia.", dataApi);
+        return null;
+    }
+    const previsoesAgrupadasPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesAgrupadasPorDia[diaStr]) {
+            previsoesAgrupadasPorDia[diaStr] = { data: diaStr, entradas: [] };
+        }
+        previsoesAgrupadasPorDia[diaStr].entradas.push({
+            hora: item.dt_txt.split(' ')[1].substring(0, 5),
+            temp: item.main.temp,
+            descricao: item.weather[0].description,
+            icone: item.weather[0].icon,
+            umidade: item.main.humidity,
+            vento_velocidade: item.wind.speed,
+        });
+    }
+    );
+    const resultadoFinal = [];
+    for (const diaKey in previsoesAgrupadasPorDia) {
+        const diaData = previsoesAgrupadasPorDia[diaKey];
+        if (diaData.entradas.length === 0) continue;
+        const temperaturas = diaData.entradas.map(e => e.temp);
+        const umidades = diaData.entradas.map(e => e.umidade);
+        const velocidades_vento = diaData.entradas.map(e => e.vento_velocidade); // Corrigido aqui
+       let previsaoRepresentativa = diaData.entradas.find(e => e.hora === "12:00" || e.hora === "15:00" || e.hora === "09:00") || diaData.entradas[0];
+        }
+};
