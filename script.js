@@ -522,4 +522,4 @@ async function handleVerificarClimaClick() {
         return;
     }
 
-botoesAcao += `<button class="btn-manutencao-remover" data-action="remover-manutencao" data-manutencao-id="${m.id}" title="Remover Registro">🗑️</button`;
+botoesAcao += `<button class="btn-manutencao-remover" data-action="remover-manutencao" data-manutencao-id="${m.id}" title="Remover Registro">🗑️</button`};
