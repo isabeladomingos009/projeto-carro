@@ -1,477 +1,274 @@
-/* Estilos Globais e Reset Mínimo */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+/* --- Variáveis CSS (NOVA PALETA - TONS DE AZUL-ARDÓSIA) --- */
+:root {
+    --primary-color: #1E293B;      /* Azul-ardósia escuro (Fundo interno do site) */
+    --secondary-color: #0F172A;   /* Azul-ardósia muito escuro (Fundo do body) */
+    --accent-color: #38BDF8;       /* Azul "elétrico" para títulos e destaques */
+    --warm-accent-color: #F59E0B;  /* Âmbar/Laranja para botões de ação */
+    --card-bg-color: #2c3a50;      /* Tom de card um pouco mais claro */
+    --text-color: #E2E8F0;         /* Texto branco-acinzentado */
+    --text-muted-color: #94A3B8;   /* Cinza-azulado para detalhes */
+    --success-color: #4ADE80;
+    --error-color: #F87171;
+    --container-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
+/* --- Resets e Globais --- */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #dfe6e9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
     margin: 0;
-    padding: 15px;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
+    padding: 2rem 1rem; /* Adiciona espaço vertical e lateral no corpo */
+    background-color: var(--secondary-color);
+    color: var(--text-color);
 }
 
-h1 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+/* --- Container Principal Centralizado --- */
+.site-container {
+    max-width: 1400px; /* Largura máxima do seu site */
+    margin: 0 auto;    /* O segredo para centralizar horizontalmente */
+    background-color: var(--primary-color); /* Fundo interno do container */
+    border-radius: 12px;
+    box-shadow: var(--container-shadow);
+    overflow: hidden; /* Garante que os cantos arredondados sejam respeitados */
 }
 
-h2, h3, h4 {
-    color: #3498db;
-    margin-bottom: 10px;
-}
-
-button {
-    cursor: pointer;
-    font-family: inherit;
-    padding: 10px 15px;
-    border-radius: 5px;
-    border: none;
-    background-color: #3498db;
+/* --- Layout Principal --- */
+header, footer {
+    background-color: rgba(15, 23, 42, 0.5); /* Fundo semi-transparente para profundidade */
     color: white;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #2980b9;
-}
-
-button:active {
-    transform: translateY(1px);
-}
-
-input[type="text"],
-input[type="number"],
-input[type="date"],
-input[type="time"],
-textarea,
-select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1em;
-    font-family: inherit;
-    margin-bottom: 10px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-    font-size: 0.95em;
-}
-
-/* --- LAYOUT PRINCIPAL --- */
-.app-container {
-    display: flex;
-    width: 100%;
-    max-width: 1300px;
-    background-color: #ecf0f1;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-    overflow: hidden;
-    flex-grow: 1;
-}
-
-.sidebar-nav {
-    width: 220px;
-    background-color: #34495e;
-    padding: 20px;
-    color: #ecf0f1;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar-nav h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
     text-align: center;
-    color: #ecf0f1;
-    border-bottom: 1px solid #7f8c8d;
-    padding-bottom: 15px;
-    font-size: 1.4em;
+    padding: 1rem 0;
 }
 
-.sidebar-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    flex-grow: 1;
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--text-color);
 }
 
-.sidebar-nav li {
-    margin-bottom: 12px;
-}
-
-.sidebar-nav .nav-button {
-    background-color: transparent;
-    border: 1px solid #7f8c8d;
-    color: #ecf0f1;
-    padding: 12px 18px;
-    width: 100%;
-    text-align: left;
-    border-radius: 4px;
-    font-size: 1em;
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-}
-
-.sidebar-nav .nav-button:hover {
-    background-color: rgba(236, 240, 241, 0.1);
-    border-color: #95a5a6;
-    color: #fff;
-}
-
-.sidebar-nav .nav-button.active {
-    background-color: #3498db;
-    border-color: #3498db;
-    color: #fff;
-    font-weight: bold;
-}
-
-.nav-footer {
-    margin-top: auto;
-    padding-top: 20px;
-    border-top: 1px solid #7f8c8d;
-    font-size: 0.8em;
-    text-align: center;
-    color: #bdc3c7;
-}
-
-.content-wrapper {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    background-color: #f8f9fa;
-}
-
-.main-content {
-    flex-grow: 1;
-    padding: 25px;
-}
-
-/* --- VISUALIZAÇÃO DA GARAGEM (CARDS) --- */
-.garage-view {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 25px;
-}
-
-.vehicle-card {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid #eee;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.vehicle-card:hover,
-.vehicle-card:focus {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.12);
-}
-.vehicle-card:focus {
-    outline: 2px solid #3498db;
-    outline-offset: 2px;
-}
-
-.vehicle-card img {
-    max-width: 100%;
-    height: 120px;
-    object-fit: contain;
-    margin-bottom: 15px;
-    border-radius: 4px;
-}
-
-.vehicle-card h3 {
-    margin-top: 0;
-    margin-bottom: 8px;
-    color: #3498db;
-    font-size: 1.2em;
-}
-
-.vehicle-card p {
-    font-size: 0.9em;
-    color: #555;
-    margin: 4px 0;
-}
-
-/* --- VISUALIZAÇÃO DE DETALHES DO VEÍCULO --- */
-.vehicle-detail-view {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 25px;
-    margin: 0 auto 20px auto;
-    max-width: 800px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    border: 1px solid #eee;
-}
-
-.vehicle-detail-view h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 1.6em;
-}
-
-.vehicle-detail-view img {
-    display: block;
-    max-width: 300px;
-    height: auto;
-    margin: 0 auto 20px auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.vehicle-detail-view .info,
-.vehicle-detail-view .controls,
-.vehicle-detail-view .status,
-.manutencao-section,
-.detalhes-api-section {
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
-}
-.vehicle-detail-view > *:last-child {
-    border-bottom: none;
+section {
+    padding: 2rem 2.5rem; /* Adiciona espaçamento interno nas seções */
     margin-bottom: 0;
-    padding-bottom: 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.2); /* Linha sutil para separar seções */
 }
 
-.vehicle-detail-view .info {
+section:first-of-type {
+    border-top: none;
+}
+
+section h2 {
+    font-size: 1.8rem;
+    color: var(--accent-color);
     text-align: center;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
 }
 
-.vehicle-detail-view .info p {
-    font-size: 1.1em;
-    color: #555;
-    margin: 6px 0;
+main {
+    padding: 0;
+    margin: 0 auto;
 }
 
-.vehicle-detail-view .controls {
+/* --- Componentes (Cards, Botões, etc.) --- */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background-color: var(--card-bg-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.card__image-placeholder {
+    height: 180px;
+    background-color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted-color);
+    font-style: italic;
+}
+
+.card__content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.card__title {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+}
+
+.card__detail {
+    margin: 0.25rem 0;
+    color: var(--text-muted-color);
+}
+
+.card__detail strong {
+    color: var(--text-color);
+}
+
+.card__button {
+    background-color: var(--warm-accent-color);
+    color: #1E293B;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1.5rem;
+    transition: background-color 0.2s;
+}
+
+.card__button:hover {
+    background-color: #dd8c0a;
+}
+
+/* --- Formulários --- */
+#add-veiculo-section {
+    background-color: transparent;
+    border-top: none;
+}
+
+#form-add-veiculo {
+    background-color: transparent;
+    padding: 0;
+    box-shadow: none;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+    gap: 1rem;
 }
 
-.vehicle-detail-view .controls button {
-    flex-basis: calc(33.33% - 10px); 
-    min-width: 100px; 
-}
-.vehicle-detail-view .controls div { 
+.form-group {
+    flex: 1 1 200px;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%; 
-    justify-content: center;
-    margin-top: 10px;
-}
-.vehicle-detail-view .controls input[type="number"] {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 80px; 
-}
-
-.vehicle-detail-view .status {
-    font-size: 1.1em;
-    color: #666;
-    text-align: center;
-}
-
-.vehicle-detail-view .status p {
-    margin: 8px 0;
-}
-
-.status .ligado { color: #2ecc71; font-weight: bold; }
-.status .desligado { color: #e74c3c; font-weight: bold; }
-
-.velocidade-progress { width: 80%; height: 12px; background-color: #e0e0e0; border-radius: 6px; margin: 10px auto 0 auto; overflow: hidden; border: 1px solid #ccc; }
-.velocidade-progress-bar { height: 100%; background-color: #3498db; width: 0%; transition: width 0.4s ease, background-color 0.4s ease; border-radius: 5px; }
-
-/* --- SEÇÃO DE MANUTENÇÃO (Detalhes) --- */
-.manutencao-section h3 { text-align: center; font-size: 1.4em; }
-.manutencao-section h4 { margin-top: 20px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dashed #ccc; font-size: 1.2em; color: #555; }
-
-.manutencao-agendamentos ul,
-.manutencao-historico ul { list-style: none; padding-left: 0; }
-
-.manutencao-agendamentos li,
-.manutencao-historico li {
-    background-color: #f9f9f9; border: 1px solid #eee; border-radius: 4px;
-    padding: 12px 15px; margin-bottom: 10px; display: flex;
-    justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
-}
-
-.manutencao-info { flex-grow: 1; color: #333; font-size: 0.95em; }
-.manutencao-info span { font-style: italic; color: #777; }
-.manutencao-actions { display: flex; gap: 8px; flex-shrink: 0; }
-.manutencao-actions button { padding: 5px 8px; font-size: 0.9em; min-width: 30px; line-height: 1; }
-.manutencao-actions button[data-novo-status="Realizada"] { background-color: #2ecc71; }
-.manutencao-actions button[data-novo-status="Realizada"]:hover { background-color: #27ae60; }
-.manutencao-actions button[data-novo-status="Cancelada"] { background-color: #f39c12; }
-.manutencao-actions button[data-novo-status="Cancelada"]:hover { background-color: #e67e22; }
-.manutencao-actions .btn-manutencao-remover { background-color: #e74c3c; }
-.manutencao-actions .btn-manutencao-remover:hover { background-color: #c0392b; }
-
-/* --- SEÇÃO DETALHES EXTRAS API (Detalhes) --- */
-.detalhes-api-section { text-align: center; }
-.detalhes-api-section h4 { margin-bottom: 15px; color: #555; font-size: 1.2em; }
-.btn-buscar-api { background-color: #9b59b6; color: white; margin-bottom: 15px; padding: 10px 20px; }
-.btn-buscar-api:hover { background-color: #8e44ad; }
-.resultado-api { margin-top: 10px; padding: 15px; background-color: #f8f9fa; border: 1px dashed #ccc; border-radius: 4px; min-height: 50px; text-align: left; color: #333; font-size: 0.95em; line-height: 1.5; }
-.resultado-api p { margin-bottom: 8px; }
-.resultado-api strong { color: #34495e; } 
-
-/* --- VIEW AGENDAR MANUTENÇÃO --- */
-.agendar-view { padding: 20px; }
-.agendar-view h2 { text-align: center; margin-bottom: 25px; }
-.vehicle-selector { margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-.vehicle-selector label { margin-bottom: 0; }
-.vehicle-selector select { min-width: 250px; margin-bottom: 0; }
-
-.form-agendamento { background-color: #fdfdfd; border: 1px solid #ddd; border-radius: 6px; padding: 20px; margin-top: 10px; margin-bottom: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); max-width: 500px; margin-left: auto; margin-right: auto; }
-.form-agendamento h4 { text-align: center; margin-top: 0; margin-bottom: 15px; border-bottom: none; color: #3498db; }
-.form-agendamento label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 0.95em; }
-.form-agendamento input[type="date"],
-.form-agendamento input[type="time"],
-.form-agendamento input[type="text"],
-.form-agendamento input[type="number"],
-.form-agendamento textarea { width: 100%; margin-bottom: 15px; } 
-.form-agendamento textarea { resize: vertical; min-height: 60px; }
-.form-agendamento div { margin-top: 15px; text-align: right; }
-.form-agendamento button[type="submit"] { background-color: #3498db; margin-right: 10px; }
-.form-agendamento button[type="submit"]:hover { background-color: #2980b9; }
-.form-agendamento .btn-cancelar-form { background-color: #e74c3c; }
-.form-agendamento .btn-cancelar-form:hover { background-color: #c0392b; }
-
-/* --- SEÇÃO PLANEJADOR DE VIAGEM --- */
-#planejador-viagem-container { padding: 25px; background-color: #fff; border-top: 2px solid #3498db; }
-.planejador-viagem-section h2 { text-align: center; margin-bottom: 20px; color: #16a085; }
-.form-planejador { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-.form-planejador label { margin-bottom: 0; }
-.form-planejador input[type="text"] { min-width: 200px; flex-grow: 1; margin-bottom: 0; }
-#verificar-clima-btn { background-color: #1abc9c; padding: 10px 20px; }
-#verificar-clima-btn:hover { background-color: #16a085; }
-.resultado-previsao { margin-top: 15px; padding: 15px; background-color: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 4px; min-height: 60px; color: #34495e; font-size: 1em; line-height: 1.6; text-align: left; }
-.resultado-previsao p { margin-bottom: 8px; }
-.resultado-previsao strong { color: #2c3e50; }
-
-/* --- NOVOS ESTILOS PARA PREVISÃO DETALHADA (COM BOTÃO) --- */
-.resultado-previsao h3 { text-align: center; margin-bottom: 15px; color: #2c3e50; font-size: 1.3em; font-weight: 600; }
-.resultado-previsao h3 strong { color: #16a085; }
-
-.previsao-dias-container {
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 15px;       
-    justify-content: space-around; 
-    margin-top: 10px; 
-}
-
-/* ▼▼▼ CLASSE MODIFICADA (REMOÇÃO DE justify-content) ▼▼▼ */
-.previsao-dia-card {
-    background-color: #fff;
-    border: 1px solid #e0e0e0; 
-    border-radius: 8px;
-    padding: 15px;
-    text-align: center;
-    min-width: 140px;   
-    flex: 1 1 140px;    
-    max-width: 170px; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-    display: flex; 
     flex-direction: column;
-    /* justify-content: space-between; */ /* REMOVIDO/COMENTADO */
-}
-/* ▲▲▲ CLASSE MODIFICADA ▲▲▲ */
-
-.previsao-dia-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.12);
 }
 
-.previsao-dia-card h4 { margin-top: 0; margin-bottom: 8px; font-size: 1em; color: #34495e; font-weight: bold; }
-.previsao-dia-card img { width: 50px; height: 50px; margin-bottom: 5px; object-fit: contain; }
-.previsao-dia-card .descricao-tempo { font-size: 0.9em; color: #555; margin-bottom: 8px; min-height: 2.2em; line-height: 1.1em; }
-.previsao-dia-card .temperaturas { font-size: 1em; font-weight: 500; color: #333; }
-.previsao-dia-card .temperaturas .temp-max { color: #e74c3c; font-weight: bold; }
-.previsao-dia-card .temperaturas .temp-min { color: #3498db; font-weight: bold; }
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: var(--text-muted-color);
+}
 
-.previsao-dia-card .detalhes-dia-info { font-size: 0.8em; color: #555; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e0e0e0; }
-.previsao-dia-card .detalhes-dia-info p { margin: 3px 0; line-height: 1.2; }
-
-.btn-ver-detalhes-dia {
-    background-color: #6c757d; 
-    color: white;
-    border: none;
-    padding: 8px 10px; 
+.form-group input,
+.form-group select {
+    padding: 0.7rem;
+    border: 1px solid #475569;
     border-radius: 4px;
-    font-size: 0.8em; 
-    margin-top: auto; 
-    margin-bottom: 5px;
-    margin-left: 5px; 
-    margin-right: 5px;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.btn {
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
-    width: calc(100% - 10px); 
-    box-sizing: border-box;
-    line-height: 1.4; 
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    width: 100%;
+    margin-top: 1rem;
 }
 
-.btn-ver-detalhes-dia:hover { background-color: #5a6268; }
-.btn-ver-detalhes-dia:active { background-color: #545b62; }
-
-.previsao-dia-detalhes-expansivel {
-    margin-top: 10px; 
-    padding: 12px;
-    background-color: #f8f9fa; 
-    border-radius: 6px;
-    border: 1px solid #dee2e6;
-    text-align: left; 
-    font-size: 0.85em; 
-    max-height: 200px; 
-    overflow-y: auto; 
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-    width: 100%; 
-    box-sizing: border-box;
+.btn:hover {
+    background-color: #0ea5e9;
 }
 
-.previsao-dia-detalhes-expansivel h5 { margin-top: 0; margin-bottom: 10px; color: #343a40; font-size: 1.1em; padding-bottom: 5px; border-bottom: 1px solid #ced4da; }
-.previsao-dia-detalhes-expansivel ul { list-style: none; padding-left: 0; margin: 0; }
-.previsao-dia-detalhes-expansivel li { padding: 8px 5px; border-bottom: 1px dotted #e9ecef; display: flex; align-items: center; gap: 10px; }
-.previsao-dia-detalhes-expansivel li:last-child { border-bottom: none; }
-.previsao-dia-detalhes-expansivel .hora-icone { display: flex; flex-direction: column; align-items: center; min-width: 50px; }
-.previsao-dia-detalhes-expansivel .hora-icone strong { color: #007bff; font-size: 1.1em; }
-.previsao-dia-detalhes-expansivel .hora-icone img { width: 32px; height: 32px; margin-top: 2px; }
-.previsao-dia-detalhes-expansivel .info-horaria { display: flex; flex-direction: column; font-size: 0.95em; line-height: 1.4; }
-.previsao-dia-detalhes-expansivel .info-horaria span { display: block; }
-.previsao-dia-detalhes-expansivel .info-horaria span:first-child { font-weight: 500; }
+/* --- Indicadores (Spinner, Notificações) --- */
+.loader {
+    text-align: center;
+    padding: 2rem;
+    font-style: italic;
+    color: #666;
+}
 
-/* --- Estilos Comuns para Mensagens (Loading, Error) --- */
-.loading-message { font-style: italic; color: #777; }
-.error-message { color: #e74c3c; font-weight: bold; }
-.success-message { color: #2ecc71; font-weight: bold; }
+.notification-area {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
 
-/* --- Classes Utilitárias --- */
-.hidden { display: none; }
+.notification {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 5px;
+    color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.notification--success {
+    background-color: var(--success-color);
+}
+
+.notification--error {
+    background-color: var(--error-color);
+}
+
+/* --- Responsividade --- */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem 0.5rem; /* Menos padding em telas pequenas */
+    }
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+    header h1 {
+        font-size: 2rem;
+    }
+    section h2 {
+        font-size: 1.5rem;
+    }
+    section {
+        padding: 1.5rem 1rem;
+    }
+    /* ... (todo o código CSS anterior) ... */
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ▼▼▼ ADICIONE ESTA CLASSE SE ELA AINDA NÃO EXISTIR ▼▼▼ */
+.card__image {
+    height: 180px;
+    width: 100%;
+    object-fit: cover; /* Faz a imagem preencher o espaço sem distorcer */
+}
+
+.card__content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* ... (resto do código CSS) ... */
+}
