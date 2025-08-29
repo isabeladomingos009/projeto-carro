@@ -1,3 +1,4 @@
+<!-- index.html (arquivo completo) -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,7 +9,6 @@
 </head>
 <body>
 
-    <!-- ▼▼▼ INÍCIO DO CONTAINER PRINCIPAL DO SITE ▼▼▼ -->
     <div class="site-container">
 
         <header>
@@ -35,6 +35,8 @@
                         <select id="tipoVeiculo" name="tipoVeiculo" required>
                             <option value="Carro">Carro</option>
                             <option value="Moto">Moto</option>
+                            <option value="Caminhão">Caminhão</option>
+                            <option value="Bicicleta">Bicicleta</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -54,11 +56,40 @@
                 </div>
             </section>
 
-            <section id="servicos-section">
+            <section id="veiculos-destaque-section"> <!-- Nova seção de destaque -->
+                <h2>Veículos em Destaque</h2>
+                <div id="destaque-list" class="grid-container">
+                    <p class="loading-message">Carregando destaques...</p>
+                </div>
+            </section>
+
+            <section id="servicos-section"> <!-- Nova seção de serviços -->
                 <h2>Serviços Disponíveis</h2>
                 <div id="servicos-loader" class="loader">Carregando serviços...</div>
                 <div id="servicos-list" class="grid-container">
                     <!-- Os serviços do backend serão inseridos aqui -->
+                </div>
+            </section>
+
+            <section id="ferramentas-section"> <!-- Nova seção de ferramentas -->
+                <h2>Ferramentas Essenciais</h2>
+                <div id="ferramentas-loader" class="loader">Carregando ferramentas...</div>
+                <div id="ferramentas-list" class="grid-container">
+                    <!-- As ferramentas do backend serão inseridas aqui -->
+                </div>
+            </section>
+
+             <section id="planejador-viagem-container"> <!-- Seção de Planejar Viagem -->
+                 <div class="planejador-viagem-section">
+                    <h2>Planejar Viagem</h2>
+                    <div class="form-planejador">
+                        <label for="destino-viagem">Destino:</label>
+                        <input type="text" id="destino-viagem" placeholder="Digite a cidade de destino">
+                        <button id="verificar-clima-btn" class="btn">Verificar Clima</button>
+                    </div>
+                    <div id="previsao-tempo-resultado" class="resultado-previsao">
+                         <p>Digite uma cidade e clique em "Verificar Clima".</p>
+                    </div>
                 </div>
             </section>
 
@@ -68,10 +99,48 @@
             <p>&copy; 2025 Garagem Virtual</p>
         </footer>
 
-    <!-- ▲▲▲ FIM DO CONTAINER PRINCIPAL DO SITE ▲▲▲ -->
     </div>
 
-    <!-- O script continua fora do container, no final do body -->
+    <!-- O script principal do frontend, como um módulo. Caminho ajustado para a pasta js/. -->
     <script type="module" src="js/script.js"></script>
+
+    <!-- CÓDIGO INJETADO PELO LIVE-SERVER (DEVE FICAR AQUI, NÃO MOVA) -->
+    <script>
+        // <![CDATA[  <-- For SVG support
+        if ('WebSocket' in window) {
+            (function () {
+                function refreshCSS() {
+                    var sheets = [].slice.call(document.getElementsByTagName("link"));
+                    var head = document.getElementsByTagName("head")[0];
+                    for (var i = 0; i < sheets.length; ++i) {
+                        var elem = sheets[i];
+                        var parent = elem.parentElement || head;
+                        parent.removeChild(elem);
+                        var rel = elem.rel;
+                        if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+                            var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+                            elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+                        }
+                        parent.appendChild(elem);
+                    }
+                }
+                var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+                var address = protocol + window.location.host + window.location.pathname + '/ws';
+                var socket = new WebSocket(address);
+                socket.onmessage = function (msg) {
+                    if (msg.data == 'reload') window.location.reload();
+                    else if (msg.data == 'refreshcss') refreshCSS();
+                };
+                if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+                    console.log('Live reload enabled.');
+                    sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+                }
+            })();
+        }
+        else {
+            console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+        }
+        // ]]>
+    </script>
 </body>
 </html>
