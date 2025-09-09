@@ -1,0 +1,22 @@
+[
+    {
+      "nome": "Troca de Óleo e Filtro",
+      "descricao": "Serviço completo de troca de óleo do motor e filtro de óleo.",
+      "precoEstimado": 250.00
+    },
+    {
+      "nome": "Alinhamento e Balanceamento",
+      "descricao": "Ajuste da geometria da suspensão e balanceamento das rodas.",
+      "precoEstimado": 180.00
+    },
+    {
+      "nome": "Revisão Geral",
+      "descricao": "Verificação de 50 itens do veículo, incluindo freios, fluidos e suspensão.",
+      "precoEstimado": 450.00
+    },
+    {
+      "nome": "Troca de Pneus",
+      "descricao": "Substituição e instalação de pneus novos.",
+      "precoEstimado": 100.00
+    }
+]

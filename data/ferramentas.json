@@ -1,0 +1,22 @@
+[
+    {
+      "nome": "Chave de Roda Cruz",
+      "utilidade": "Indispensável para troca de pneus e verificação de aperto.",
+      "imageUrl": "chavederoda.png"
+    },
+    {
+      "nome": "Macaco Hidráulico",
+      "utilidade": "Para levantar o veículo com segurança em manutenções.",
+      "imageUrl": "macaco.png"
+    },
+    {
+      "nome": "Jogo de Chaves Combinadas",
+      "utilidade": "Conjunto versátil de chaves para diversas aplicações.",
+      "imageUrl": "chaves.png"
+    },
+    {
+      "nome": "Multímetro Digital",
+      "utilidade": "Para diagnóstico de problemas elétricos no veículo.",
+      "imageUrl": "multimetro.png"
+    }
+]

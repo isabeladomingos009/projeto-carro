@@ -1,0 +1,274 @@
+/* --- Variáveis CSS (NOVA PALETA - TONS DE AZUL-ARDÓSIA) --- */
+:root {
+    --primary-color: #1E293B;      /* Azul-ardósia escuro (Fundo interno do site) */
+    --secondary-color: #0F172A;   /* Azul-ardósia muito escuro (Fundo do body) */
+    --accent-color: #38BDF8;       /* Azul "elétrico" para títulos e destaques */
+    --warm-accent-color: #F59E0B;  /* Âmbar/Laranja para botões de ação */
+    --card-bg-color: #2c3a50;      /* Tom de card um pouco mais claro */
+    --text-color: #E2E8F0;         /* Texto branco-acinzentado */
+    --text-muted-color: #94A3B8;   /* Cinza-azulado para detalhes */
+    --success-color: #4ADE80;
+    --error-color: #F87171;
+    --container-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Resets e Globais --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 2rem 1rem; /* Adiciona espaço vertical e lateral no corpo */
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+/* --- Container Principal Centralizado --- */
+.site-container {
+    max-width: 1400px; /* Largura máxima do seu site */
+    margin: 0 auto;    /* O segredo para centralizar horizontalmente */
+    background-color: var(--primary-color); /* Fundo interno do container */
+    border-radius: 12px;
+    box-shadow: var(--container-shadow);
+    overflow: hidden; /* Garante que os cantos arredondados sejam respeitados */
+}
+
+/* --- Layout Principal --- */
+header, footer {
+    background-color: rgba(15, 23, 42, 0.5); /* Fundo semi-transparente para profundidade */
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+section {
+    padding: 2rem 2.5rem; /* Adiciona espaçamento interno nas seções */
+    margin-bottom: 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.2); /* Linha sutil para separar seções */
+}
+
+section:first-of-type {
+    border-top: none;
+}
+
+section h2 {
+    font-size: 1.8rem;
+    color: var(--accent-color);
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+main {
+    padding: 0;
+    margin: 0 auto;
+}
+
+/* --- Componentes (Cards, Botões, etc.) --- */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background-color: var(--card-bg-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.card__image-placeholder {
+    height: 180px;
+    background-color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted-color);
+    font-style: italic;
+}
+
+.card__content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.card__title {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+}
+
+.card__detail {
+    margin: 0.25rem 0;
+    color: var(--text-muted-color);
+}
+
+.card__detail strong {
+    color: var(--text-color);
+}
+
+.card__button {
+    background-color: var(--warm-accent-color);
+    color: #1E293B;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1.5rem;
+    transition: background-color 0.2s;
+}
+
+.card__button:hover {
+    background-color: #dd8c0a;
+}
+
+/* --- Formulários --- */
+#add-veiculo-section {
+    background-color: transparent;
+    border-top: none;
+}
+
+#form-add-veiculo {
+    background-color: transparent;
+    padding: 0;
+    box-shadow: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.form-group {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: var(--text-muted-color);
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.7rem;
+    border: 1px solid #475569;
+    border-radius: 4px;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.btn {
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.btn:hover {
+    background-color: #0ea5e9;
+}
+
+/* --- Indicadores (Spinner, Notificações) --- */
+.loader {
+    text-align: center;
+    padding: 2rem;
+    font-style: italic;
+    color: #666;
+}
+
+.notification-area {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.notification {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 5px;
+    color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.notification--success {
+    background-color: var(--success-color);
+}
+
+.notification--error {
+    background-color: var(--error-color);
+}
+
+/* --- Responsividade --- */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem 0.5rem; /* Menos padding em telas pequenas */
+    }
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+    header h1 {
+        font-size: 2rem;
+    }
+    section h2 {
+        font-size: 1.5rem;
+    }
+    section {
+        padding: 1.5rem 1rem;
+    }
+    /* ... (todo o código CSS anterior) ... */
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ▼▼▼ ADICIONE ESTA CLASSE SE ELA AINDA NÃO EXISTIR ▼▼▼ */
+.card__image {
+    height: 180px;
+    width: 100%;
+    object-fit: cover; /* Faz a imagem preencher o espaço sem distorcer */
+}
+
+.card__content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* ... (resto do código CSS) ... */
+}
