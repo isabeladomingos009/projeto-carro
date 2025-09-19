@@ -1,4 +1,3 @@
-<!-- index.html (arquivo completo) -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -13,73 +12,71 @@
 
         <header>
             <h1>Minha Garagem Virtual</h1>
+            <nav class="main-nav">
+                <ul>
+                    <li><button class="nav-button active" data-view="garagem">Garagem</button></li>
+                    <li><button class="nav-button" data-view="planejar">Planejar Viagem</button></li>
+                    <!-- A opção "Agendar Manutenções" será acessada pelos detalhes do veículo, se implementada -->
+                </ul>
+            </nav>
         </header>
 
         <main>
-            <!-- 2.1 - Feedback visual: Notificações -->
+            <!-- Área para notificações de sucesso/erro -->
             <div id="notification-area" class="notification-area"></div>
 
-            <section id="add-veiculo-section">
-                <h2>Adicionar Novo Veículo</h2>
-                <form id="form-add-veiculo">
-                    <div class="form-group">
-                        <label for="modelo">Modelo:</label>
-                        <input type="text" id="modelo" name="modelo" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="cor">Cor:</label>
-                        <input type="text" id="cor" name="cor" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tipoVeiculo">Tipo:</label>
-                        <select id="tipoVeiculo" name="tipoVeiculo" required>
-                            <option value="Carro">Carro</option>
-                            <option value="Moto">Moto</option>
-                            <option value="Caminhão">Caminhão</option>
-                            <option value="Bicicleta">Bicicleta</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="maxVelocidade">Velocidade Máxima (km/h):</label>
-                        <input type="number" id="maxVelocidade" name="maxVelocidade" required>
-                    </div>
-                    <button type="submit" class="btn">Adicionar Veículo</button>
-                </form>
-            </section>
+            <!-- Seção principal da Garagem -->
+            <section id="garagem-principal-section">
+                <!-- Formulário de Adicionar Veículo -->
+                <section id="add-veiculo-section">
+                    <h2>Adicionar Novo Veículo</h2>
+                    <form id="form-add-veiculo">
+                        <div class="form-group">
+                            <label for="modelo">Modelo:</label>
+                            <input type="text" id="modelo" name="modelo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cor">Cor:</label>
+                            <input type="text" id="cor" name="cor" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipoVeiculo">Tipo:</label>
+                            <select id="tipoVeiculo" name="tipoVeiculo" required>
+                                <option value="Carro">Carro</option>
+                                <option value="Moto">Moto</option>
+                                <option value="Caminhão">Caminhão</option>
+                                <option value="Bicicleta">Bicicleta</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxVelocidade">Velocidade Máxima (km/h):</label>
+                            <input type="number" id="maxVelocidade" name="maxVelocidade" required>
+                        </div>
+                        <button type="submit" class="btn">Adicionar Veículo</button>
+                    </form>
+                </section>
 
-            <section id="veiculos-section">
-                <h2>Meus Veículos</h2>
-                <!-- 2.1 - Feedback visual: Spinner de carregamento -->
-                <div id="veiculos-loader" class="loader">Carregando veículos...</div>
-                <div id="veiculos-list" class="grid-container">
-                    <!-- Os veículos do backend serão inseridos aqui pelo JavaScript -->
+                <!-- Lista de Meus Veículos -->
+                <section id="veiculos-section">
+                    <h2>Meus Veículos</h2>
+                    <button id="btn-reset-veiculos" class="btn btn-warn">Resetar Veículos</button>
+                    <div id="veiculos-loader" class="loader">Carregando veículos...</div>
+                    <div id="veiculos-list" class="grid-container">
+                        <!-- Os veículos do backend serão inseridos aqui pelo JavaScript -->
+                    </div>
+                </section>
+            </section> <!-- Fim da Seção principal da Garagem -->
+
+            <!-- Nova Seção para Detalhes do Veículo e Manutenções -->
+            <section id="detalhes-veiculo-section" style="display: none;">
+                <button id="btn-voltar-garagem" class="btn btn-secondary">Voltar para a Garagem</button>
+                <div id="detalhes-veiculo-container">
+                    <!-- Conteúdo dos detalhes do veículo e manutenções será renderizado aqui -->
                 </div>
             </section>
 
-            <section id="veiculos-destaque-section"> <!-- Nova seção de destaque -->
-                <h2>Veículos em Destaque</h2>
-                <div id="destaque-list" class="grid-container">
-                    <p class="loading-message">Carregando destaques...</p>
-                </div>
-            </section>
-
-            <section id="servicos-section"> <!-- Nova seção de serviços -->
-                <h2>Serviços Disponíveis</h2>
-                <div id="servicos-loader" class="loader">Carregando serviços...</div>
-                <div id="servicos-list" class="grid-container">
-                    <!-- Os serviços do backend serão inseridos aqui -->
-                </div>
-            </section>
-
-            <section id="ferramentas-section"> <!-- Nova seção de ferramentas -->
-                <h2>Ferramentas Essenciais</h2>
-                <div id="ferramentas-loader" class="loader">Carregando ferramentas...</div>
-                <div id="ferramentas-list" class="grid-container">
-                    <!-- As ferramentas do backend serão inseridas aqui -->
-                </div>
-            </section>
-
-             <section id="planejador-viagem-container"> <!-- Seção de Planejar Viagem -->
+            <!-- Seção de Planejar Viagem (Clima) -->
+             <section id="planejador-viagem-container" style="display: none;">
                  <div class="planejador-viagem-section">
                     <h2>Planejar Viagem</h2>
                     <div class="form-planejador">
@@ -92,6 +89,11 @@
                     </div>
                 </div>
             </section>
+
+            <!-- As seções de Destaque, Serviços e Ferramentas foram removidas conforme solicitado -->
+            <!-- <section id="veiculos-destaque-section" style="display: none;">...</section> -->
+            <!-- <section id="servicos-section" style="display: none;">...</section> -->
+            <!-- <section id="ferramentas-section" style="display: none;">...</section> -->
 
         </main>
 
@@ -106,7 +108,7 @@
 
     <!-- CÓDIGO INJETADO PELO LIVE-SERVER (DEVE FICAR AQUI, NÃO MOVA) -->
     <script>
-        // <![CDATA[  <-- For SVG support
+        // <![CDATA[
         if ('WebSocket' in window) {
             (function () {
                 function refreshCSS() {

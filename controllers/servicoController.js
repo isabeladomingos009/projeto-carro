@@ -1,15 +1,15 @@
 // controllers/servicoController.js (arquivo completo)
-import Servico from '../models/servicoModel.js'; // Importa o modelo Servico
+import Servico from '../models/servicoModel.js';
 
 // @desc    Obter todos os serviços
 // @route   GET /api/servicos
 // @access  Public
 export const getServicos = async (req, res, next) => {
     try {
-        const servicos = await Servico.find(); // Busca todos os serviços no MongoDB
+        const servicos = await Servico.find();
         res.status(200).json({ success: true, count: servicos.length, data: servicos });
     } catch (error) {
-        next(error); // Passa o erro para o middleware de tratamento de erros
+        next(error);
     }
 };
 

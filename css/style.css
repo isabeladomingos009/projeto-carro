@@ -1,10 +1,10 @@
-/* --- Variáveis CSS (NOVA PALETA - TONS DE AZUL-ARDÓSIA) --- */
+/* --- Variáveis CSS (NOVA PALETA - TONS DE AZUL) --- */
 :root {
-    --primary-color: #1E293B;      /* Azul-ardósia escuro (Fundo interno do site) */
-    --secondary-color: #0F172A;   /* Azul-ardósia muito escuro (Fundo do body) */
-    --accent-color: #38BDF8;       /* Azul "elétrico" para títulos e destaques */
-    --warm-accent-color: #F59E0B;  /* Âmbar/Laranja para botões de ação */
-    --card-bg-color: #2c3a50;      /* Tom de card um pouco mais claro */
+    --primary-color: #0F172A;      /* Azul muito escuro (quase preto), para fundo do body */
+    --secondary-color: #1E293B;   /* Azul escuro para fundo geral do site / seções */
+    --tertiary-color: #334155;    /* Azul médio-escuro para cards / elementos secundários */
+    --accent-color: #38BDF8;       /* Azul vibrante para títulos e destaques */
+    --warm-accent-color: #F59E0B;  /* Âmbar/Laranja para botões de ação (mantido para contraste) */
     --text-color: #E2E8F0;         /* Texto branco-acinzentado */
     --text-muted-color: #94A3B8;   /* Cinza-azulado para detalhes */
     --success-color: #4ADE80;
@@ -13,43 +13,88 @@
 }
 
 /* --- Resets e Globais --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     margin: 0;
-    padding: 2rem 1rem; /* Adiciona espaço vertical e lateral no corpo */
-    background-color: var(--secondary-color);
+    padding: 2rem 1rem;
+    background-color: var(--primary-color);
     color: var(--text-color);
 }
 
 /* --- Container Principal Centralizado --- */
 .site-container {
-    max-width: 1400px; /* Largura máxima do seu site */
-    margin: 0 auto;    /* O segredo para centralizar horizontalmente */
-    background-color: var(--primary-color); /* Fundo interno do container */
+    max-width: 1400px;
+    margin: 0 auto;
+    background-color: var(--secondary-color);
     border-radius: 12px;
     box-shadow: var(--container-shadow);
-    overflow: hidden; /* Garante que os cantos arredondados sejam respeitados */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 4rem);
 }
 
 /* --- Layout Principal --- */
-header, footer {
-    background-color: rgba(15, 23, 42, 0.5); /* Fundo semi-transparente para profundidade */
+header {
+    background-color: var(--tertiary-color);
     color: white;
     text-align: center;
     padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
 header h1 {
     font-size: 2.5rem;
     font-weight: 600;
+    color: var(--accent-color);
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+    margin: 0;
+}
+
+.main-nav .nav-button {
+    background-color: transparent;
+    border: 1px solid var(--text-muted-color);
     color: var(--text-color);
+    padding: 0.75rem 1.25rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.main-nav .nav-button:hover {
+    background-color: rgba(56, 189, 248, 0.1);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+.main-nav .nav-button.active {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--primary-color);
+    font-weight: bold;
 }
 
 section {
-    padding: 2rem 2.5rem; /* Adiciona espaçamento interno nas seções */
+    padding: 2rem 2.5rem;
     margin-bottom: 0;
-    border-top: 1px solid rgba(148, 163, 184, 0.2); /* Linha sutil para separar seções */
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 section:first-of-type {
@@ -67,23 +112,39 @@ section h2 {
 main {
     padding: 0;
     margin: 0 auto;
+    flex-grow: 1;
+    width: 100%;
+}
+
+footer {
+    background-color: var(--tertiary-color);
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: auto;
 }
 
 /* --- Componentes (Cards, Botões, etc.) --- */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 1.5rem;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 .card {
-    background-color: var(--card-bg-color);
+    background-color: var(--tertiary-color);
     border-radius: 8px;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     overflow: hidden;
+    width: 100%;
+    color: var(--text-color);
 }
 
 .card:hover {
@@ -91,18 +152,16 @@ main {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
-.card__image-placeholder {
-    height: 180px;
-    background-color: #475569;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted-color);
-    font-style: italic;
+.card__image {
+    height: 120px;
+    width: 180px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border-radius: 8px 0 0 8px;
 }
 
 .card__content {
-    padding: 1.5rem;
+    padding: 1rem 1.5rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -125,7 +184,7 @@ main {
 
 .card__button {
     background-color: var(--warm-accent-color);
-    color: #1E293B;
+    color: var(--primary-color);
     border: none;
     padding: 0.75rem;
     border-radius: 5px;
@@ -134,10 +193,48 @@ main {
     text-align: center;
     margin-top: 1.5rem;
     transition: background-color 0.2s;
+    width: auto;
+    align-self: flex-start;
 }
 
 .card__button:hover {
     background-color: #dd8c0a;
+}
+
+/* --- Botão geral (usado para adicionar veículo, verificar clima, etc.) --- */
+.btn {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.btn:hover {
+    background-color: #0ea5e9;
+}
+
+.btn-warn {
+    background-color: var(--error-color);
+    color: var(--primary-color);
+}
+
+.btn-warn:hover {
+    background-color: #d13a3a;
+}
+
+.btn-secondary {
+    background-color: var(--text-muted-color);
+    color: var(--primary-color);
+}
+.btn-secondary:hover {
+    background-color: #7c8a9f;
 }
 
 /* --- Formulários --- */
@@ -153,6 +250,8 @@ main {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .form-group {
@@ -170,9 +269,9 @@ main {
 .form-group input,
 .form-group select {
     padding: 0.7rem;
-    border: 1px solid #475569;
+    border: 1px solid var(--tertiary-color);
     border-radius: 4px;
-    background-color: var(--secondary-color);
+    background-color: var(--primary-color);
     color: var(--text-color);
     font-size: 1rem;
 }
@@ -183,30 +282,12 @@ main {
     border-color: var(--accent-color);
 }
 
-.btn {
-    background-color: var(--accent-color);
-    color: var(--secondary-color);
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    font-weight: bold;
-    transition: background-color 0.2s;
-    width: 100%;
-    margin-top: 1rem;
-}
-
-.btn:hover {
-    background-color: #0ea5e9;
-}
-
 /* --- Indicadores (Spinner, Notificações) --- */
 .loader {
     text-align: center;
     padding: 2rem;
     font-style: italic;
-    color: #666;
+    color: var(--text-muted-color);
 }
 
 .notification-area {
@@ -232,13 +313,275 @@ main {
     background-color: var(--error-color);
 }
 
+/* --- Estilos para as seções de detalhes do veículo e manutenções --- */
+#detalhes-veiculo-section {
+    padding: 2rem 2.5rem;
+}
+
+#btn-voltar-garagem {
+    margin-bottom: 1.5rem;
+    width: auto;
+    align-self: flex-start;
+}
+
+#detalhes-veiculo-container {
+    background-color: var(--tertiary-color);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: var(--container-shadow);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.veiculo-detalhes-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.veiculo-detalhes-card > img {
+    max-width: 300px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+    align-self: center;
+}
+
+.veiculo-detalhes-card .card__content p {
+    font-size: 1.1em;
+    margin-bottom: 0.5rem;
+}
+
+.veiculo-detalhes-card h3 {
+    color: var(--accent-color);
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    padding-bottom: 0.5rem;
+}
+
+/* Layout do formulário de manutenção dentro dos detalhes */
+#form-add-manutencao {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    padding-bottom: 1.5rem;
+}
+#form-add-manutencao .form-group {
+    flex: 1 1 calc(50% - 1rem);
+    min-width: unset;
+}
+#form-add-manutencao button {
+    flex: 1 1 100%;
+}
+
+.manutencao-card {
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem;
+}
+
+/* --- SEÇÃO PLANEJADOR DE VIAGEM --- */
+.planejador-viagem-section {
+    padding: 25px;
+    background-color: var(--tertiary-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+.planejador-viagem-section h2 {
+    color: var(--accent-color);
+}
+
+.form-planejador {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.form-planejador label { margin-bottom: 0; }
+.form-planejador input[type="text"] {
+    flex-grow: 1;
+    min-width: 180px;
+    margin-bottom: 0;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: 1px solid var(--tertiary-color);
+}
+#verificar-clima-btn {
+    background-color: var(--warm-accent-color);
+    color: var(--primary-color);
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+#verificar-clima-btn:hover { background-color: #dd8c0a; }
+
+.resultado-previsao {
+    margin-top: 1rem;
+    padding: 1.5rem;
+    background-color: var(--secondary-color);
+    border: 1px solid var(--tertiary-color);
+    border-radius: 8px;
+    min-height: 100px;
+    color: var(--text-color);
+}
+.resultado-previsao h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+.previsao-dias-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+.previsao-dia-card {
+    background-color: var(--primary-color);
+    border: 1px solid var(--tertiary-color);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    width: 160px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.previsao-dia-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+}
+.previsao-dia-card h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1em;
+    color: var(--accent-color);
+}
+.previsao-dia-card img {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 0.5rem auto;
+    object-fit: contain;
+}
+.previsao-dia-card .descricao-tempo {
+    font-size: 0.9em;
+    color: var(--text-muted-color);
+    margin-bottom: 0.5rem;
+    min-height: 2.2em;
+    line-height: 1.1em;
+}
+.previsao-dia-card .temperaturas {
+    font-size: 1em;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+.previsao-dia-card .temperaturas .temp-max { color: var(--error-color); font-weight: bold; }
+.previsao-dia-card .temperaturas .temp-min { color: var(--accent-color); font-weight: bold; }
+
+.detalhes-dia-info {
+    font-size: 0.8em;
+    color: var(--text-muted-color);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed rgba(148, 163, 184, 0.1);
+}
+.detalhes-dia-info p { margin: 3px 0; line-height: 1.2; }
+
+.btn-ver-detalhes-dia {
+    background-color: var(--warm-accent-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    margin-top: auto;
+    margin-bottom: 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%;
+}
+.btn-ver-detalhes-dia:hover { background-color: #dd8c0a; }
+
+.previsao-dia-detalhes-expansivel {
+    margin-top: 10px;
+    padding: 12px;
+    background-color: var(--secondary-color);
+    border-radius: 6px;
+    border: 1px solid var(--tertiary-color);
+    text-align: left;
+    font-size: 0.85em;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.previsao-dia-detalhes-expansivel h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--accent-color);
+    font-size: 1.1em;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--tertiary-color);
+}
+.previsao-dia-detalhes-expansivel ul { list-style: none; padding-left: 0; margin: 0; }
+.previsao-dia-detalhes-expansivel li {
+    padding: 8px 5px;
+    border-bottom: 1px dotted rgba(148, 163, 184, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.previsao-dia-detalhes-expansivel li:last-child { border-bottom: none; }
+.previsao-dia-detalhes-expansivel .hora-icone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50px;
+}
+.previsao-dia-detalhes-expansivel .hora-icone strong { color: var(--accent-color); font-size: 1.1em; }
+.previsao-dia-detalhes-expansivel .hora-icone img { width: 32px; height: 32px; margin-top: 2px; }
+.previsao-dia-detalhes-expansivel .info-horaria {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.95em;
+    line-height: 1.4;
+}
+.previsao-dia-detalhes-expansivel .info-horaria span { display: block; }
+.previsao-dia-detalhes-expansivel .info-horaria span:first-child { font-weight: 500; }
+
+
 /* --- Responsividade --- */
 @media (max-width: 768px) {
     body {
-        padding: 1rem 0.5rem; /* Menos padding em telas pequenas */
+        padding: 1rem 0.5rem;
     }
     .grid-container {
         grid-template-columns: 1fr;
+        max-width: 100%;
+    }
+    .card {
+        flex-direction: column;
+        text-align: center;
+    }
+    .card__image {
+        width: 100%;
+        border-radius: 8px 8px 0 0;
+    }
+    .card__content {
+        align-items: center;
+        text-align: center;
     }
     header h1 {
         font-size: 2rem;
@@ -249,26 +592,10 @@ main {
     section {
         padding: 1.5rem 1rem;
     }
-    /* ... (todo o código CSS anterior) ... */
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* ▼▼▼ ADICIONE ESTA CLASSE SE ELA AINDA NÃO EXISTIR ▼▼▼ */
-.card__image {
-    height: 180px;
-    width: 100%;
-    object-fit: cover; /* Faz a imagem preencher o espaço sem distorcer */
-}
-
-.card__content {
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-/* ... (resto do código CSS) ... */
+    .form-group {
+        flex: 1 1 100%;
+    }
+    .btn {
+        font-size: 1rem;
+    }
 }

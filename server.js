@@ -18,9 +18,9 @@ import errorHandler from './middleware/errorHandler.js'; // Tratamento de erros
 
 // Importação dos arquivos de rota
 import veiculosRoutes from './routes/veiculos.js';
-import servicosRoutes from './routes/servicos.js'; 
-// import ferramentasRoutes from './routes/ferramentas.js'; // <-- COMENTADO: Para pular a parte de ferramentas por enquanto
-// import climaRoutes from './routes/clima.js'; // <-- COMENTADO: Para pular a parte de clima por enquanto
+// import servicosRoutes from './routes/servicos.js'; // MANTIDO COMENTADO: Para focar no clima e reset
+// import ferramentasRoutes from './routes/ferramentas.js'; // MANTIDO COMENTADO
+import climaRoutes from './routes/clima.js'; // <-- DESCOMENTADO: Ativando a rota de clima
 
 // Conecta ao Banco de Dados MongoDB Atlas
 connectDB();
@@ -31,26 +31,27 @@ const app = express();
 app.use(cors()); // Permite requisições de diferentes origens (frontend)
 app.use(express.json()); // Habilita o parser de JSON para o corpo das requisições
 
-// Servir arquivos estáticos da pasta raiz do projeto (para Opção B)
-// Isso fará com que `index.html`, `css/`, `js/`, `imagens/` sejam acessíveis diretamente.
-app.use(express.static(__dirname)); 
-
-// Definição das Rotas da API
+// --- DEFINIÇÃO DAS ROTAS DA API (COLOCAR SEMPRE ANTES DE SERVIR ARQUIVOS ESTÁTICOS) ---
+// É CRÍTICO que todas as rotas da API venham ANTES de `express.static(__dirname)`
 app.use('/api/veiculos', veiculosRoutes);
-app.use('/api/servicos', servicosRoutes);
-// app.use('/api/ferramentas', ferramentasRoutes); // <-- COMENTADO: Para pular a parte de ferramentas por enquanto
-// app.use('/api/clima', climaRoutes); // <-- COMENTADO: Para pular a parte de clima por enquanto
+// app.use('/api/servicos', servicosRoutes); // MANTIDO COMENTADO
+// app.use('/api/ferramentas', ferramentasRoutes); // MANTIDO COMENTADO
+app.use('/api/clima', climaRoutes); // <-- USANDO A ROTA DE CLIMA AGORA
 
 // Rota padrão para testar se o backend está rodando
-app.get('/api', (req, res) => { // Mudei para /api para evitar conflito com index.html
+app.get('/api', (req, res) => {
     res.send('Servidor backend da Garagem Virtual API está online!');
 });
+
+// --- SERVIR ARQUIVOS ESTÁTICOS (COLOCAR SEMPRE DEPOIS DAS ROTAS DA API) ---
+// Isso fará com que `index.html`, `css/`, `js/`, `imagens/` sejam acessíveis diretamente da raiz.
+app.use(express.static(__dirname)); 
 
 // Middleware de Tratamento de Erros Centralizado
 // (Deve ser o último middleware a ser adicionado, antes de app.listen)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000; // Porta para o backend (5000 para evitar conflito com live-server 5500)
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`Servidor backend rodando na porta ${PORT}`);
