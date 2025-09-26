@@ -1,4 +1,4 @@
-// server.js (arquivo completo e ATUALIZADO)
+// server.js (arquivo completo e ATUALIZADO para Opção B - SEM PASTA 'public')
 
 // Importações de módulos ES (moderno)
 import 'dotenv/config'; // Carrega variáveis de ambiente do .env
@@ -18,8 +18,8 @@ import errorHandler from './middleware/errorHandler.js'; // Tratamento de erros
 
 // Importação dos arquivos de rota
 import veiculosRoutes from './routes/veiculos.js';
-// import servicosRoutes from './routes/servicos.js'; // MANTIDO COMENTADO: Para focar no clima e reset
-// import ferramentasRoutes from './routes/ferramentas.js'; // MANTIDO COMENTADO
+import servicosRoutes from './routes/servicos.js'; // <-- AGORA DESCOMENTADO
+// import ferramentasRoutes from './routes/ferramentas.js'; // Continua comentado
 import climaRoutes from './routes/clima.js'; // <-- DESCOMENTADO: Ativando a rota de clima
 
 // Conecta ao Banco de Dados MongoDB Atlas
@@ -32,10 +32,10 @@ app.use(cors()); // Permite requisições de diferentes origens (frontend)
 app.use(express.json()); // Habilita o parser de JSON para o corpo das requisições
 
 // --- DEFINIÇÃO DAS ROTAS DA API (COLOCAR SEMPRE ANTES DE SERVIR ARQUIVOS ESTÁTICOS) ---
-// É CRÍTICO que todas as rotas da API venham ANTES de `express.static(__dirname)`
+// É CRÍTICO que todas as rotas da API venham ANTES do Express servir arquivos estáticos.
 app.use('/api/veiculos', veiculosRoutes);
-// app.use('/api/servicos', servicosRoutes); // MANTIDO COMENTADO
-// app.use('/api/ferramentas', ferramentasRoutes); // MANTIDO COMENTADO
+app.use('/api/servicos', servicosRoutes); // <-- USANDO A ROTA DE SERVIÇOS AGORA
+// app.use('/api/ferramentas', ferramentasRoutes); // Continua comentado
 app.use('/api/clima', climaRoutes); // <-- USANDO A ROTA DE CLIMA AGORA
 
 // Rota padrão para testar se o backend está rodando
@@ -43,8 +43,9 @@ app.get('/api', (req, res) => {
     res.send('Servidor backend da Garagem Virtual API está online!');
 });
 
-// --- SERVIR ARQUIVOS ESTÁTICOS (COLOCAR SEMPRE DEPOIS DAS ROTAS DA API) ---
-// Isso fará com que `index.html`, `css/`, `js/`, `imagens/` sejam acessíveis diretamente da raiz.
+// --- SERVIR ARQUIVOS ESTÁTICOS (COLOCAR ISSO DEPOIS DE TODAS AS ROTAS DA API) ---
+// Em Opção B (tudo na raiz), isso serve a pasta 'D:\garagem2\'
+// É crucial que isso venha DEPOIS de app.use('/api/...')
 app.use(express.static(__dirname)); 
 
 // Middleware de Tratamento de Erros Centralizado
@@ -55,6 +56,5 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`Servidor backend rodando na porta ${PORT}`);
-    console.log(`Acesse http://localhost:${PORT}`);
-    console.log(`Frontend acessível em http://localhost:${PORT}/index.html (ou use Live Server na raiz)`);
+    console.log(`Acesse http://localhost:${PORT}/index.html (já que os arquivos frontend estão na raiz)`);
 });

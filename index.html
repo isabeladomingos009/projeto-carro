@@ -16,7 +16,6 @@
                 <ul>
                     <li><button class="nav-button active" data-view="garagem">Garagem</button></li>
                     <li><button class="nav-button" data-view="planejar">Planejar Viagem</button></li>
-                    <!-- A opção "Agendar Manutenções" será acessada pelos detalhes do veículo, se implementada -->
                 </ul>
             </nav>
         </header>
@@ -25,7 +24,7 @@
             <!-- Área para notificações de sucesso/erro -->
             <div id="notification-area" class="notification-area"></div>
 
-            <!-- Seção principal da Garagem -->
+            <!-- Seção principal da Garagem (visível por padrão) -->
             <section id="garagem-principal-section">
                 <!-- Formulário de Adicionar Veículo -->
                 <section id="add-veiculo-section">
@@ -67,7 +66,7 @@
                 </section>
             </section> <!-- Fim da Seção principal da Garagem -->
 
-            <!-- Nova Seção para Detalhes do Veículo e Manutenções -->
+            <!-- Nova Seção para Detalhes do Veículo e Manutenções (ESCONDIDA por padrão) -->
             <section id="detalhes-veiculo-section" style="display: none;">
                 <button id="btn-voltar-garagem" class="btn btn-secondary">Voltar para a Garagem</button>
                 <div id="detalhes-veiculo-container">
@@ -75,7 +74,7 @@
                 </div>
             </section>
 
-            <!-- Seção de Planejar Viagem (Clima) -->
+            <!-- Seção de Planejar Viagem (Clima) (ESCONDIDA por padrão) -->
              <section id="planejador-viagem-container" style="display: none;">
                  <div class="planejador-viagem-section">
                     <h2>Planejar Viagem</h2>
@@ -91,9 +90,6 @@
             </section>
 
             <!-- As seções de Destaque, Serviços e Ferramentas foram removidas conforme solicitado -->
-            <!-- <section id="veiculos-destaque-section" style="display: none;">...</section> -->
-            <!-- <section id="servicos-section" style="display: none;">...</section> -->
-            <!-- <section id="ferramentas-section" style="display: none;">...</section> -->
 
         </main>
 
@@ -103,7 +99,6 @@
 
     </div>
 
-    <!-- O script principal do frontend, como um módulo. Caminho ajustado para a pasta js/. -->
     <script type="module" src="js/script.js"></script>
 
     <!-- CÓDIGO INJETADO PELO LIVE-SERVER (DEVE FICAR AQUI, NÃO MOVA) -->
