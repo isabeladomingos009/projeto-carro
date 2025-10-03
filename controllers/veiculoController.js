@@ -1,145 +1,93 @@
-// controllers/veiculoController.js (arquivo completo)
 import Veiculo from '../models/veiculoModel.js';
-import Manutencao from '../models/manutencaoModel.js'; // Importa o modelo Manutencao
 
-// @desc    Obter todos os veículos
+// @desc    Obter todos os veículos DO USUÁRIO LOGADO
 // @route   GET /api/veiculos
-// @access  Public
+// @access  Private (Protegido)
 export const getVeiculos = async (req, res, next) => {
     try {
-        const veiculos = await Veiculo.find().populate('historicoManutencao'); // Popula as manutenções associadas
+        // Busca apenas os veículos cujo 'owner' é o ID do usuário logado
+        const veiculos = await Veiculo.find({ owner: req.user._id });
         res.status(200).json({ success: true, count: veiculos.length, data: veiculos });
-    } catch (error) {
-        next(error); // Passa para o middleware de erro
-    }
-};
-
-// @desc    Obter um único veículo
-// @route   GET /api/veiculos/:id
-// @access  Public
-export const getVeiculoById = async (req, res, next) => {
-    try {
-        const veiculo = await Veiculo.findById(req.params.id).populate('historicoManutencao');
-        if (!veiculo) {
-            return res.status(404).json({ success: false, error: 'Veículo não encontrado' });
-        }
-        res.status(200).json({ success: true, data: veiculo });
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Criar novo veículo
+// @desc    Criar novo veículo PARA O USUÁRIO LOGADO
 // @route   POST /api/veiculos
-// @access  Public
+// @access  Private (Protegido)
 export const createVeiculo = async (req, res, next) => {
     try {
+        // Adiciona o ID do usuário logado ao corpo da requisição antes de criar
+        req.body.owner = req.user._id;
+
         const veiculo = await Veiculo.create(req.body);
         res.status(201).json({ success: true, data: veiculo });
     } catch (error) {
-        // Erro de validação do Mongoose
-        if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map(val => val.message);
-            return res.status(400).json({ success: false, error: messages.join(', ') });
-        }
         next(error);
     }
 };
 
-// @desc    Atualizar veículo
-// @route   PUT /api/veiculos/:id
-// @access  Public
-export const updateVeiculo = async (req, res, next) => {
+// @desc    Obter um único veículo (e verificar se pertence ao usuário)
+// @route   GET /api/veiculos/:id
+// @access  Private (Protegido)
+export const getVeiculoById = async (req, res, next) => {
     try {
-        const veiculo = await Veiculo.findByIdAndUpdate(req.params.id, req.body, {
-            new: true, // Retorna o documento modificado
-            runValidators: true // Executa validadores do schema
-        });
+        const veiculo = await Veiculo.findById(req.params.id);
+
         if (!veiculo) {
             return res.status(404).json({ success: false, error: 'Veículo não encontrado' });
         }
+        
+        // Verifica se o dono do veículo é o mesmo usuário que está logado
+        if (veiculo.owner.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ success: false, error: 'Não autorizado a acessar este veículo' });
+        }
+
         res.status(200).json({ success: true, data: veiculo });
     } catch (error) {
-        // Erro de validação do Mongoose
-        if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map(val => val.message);
-            return res.status(400).json({ success: false, error: messages.join(', ') });
-        }
         next(error);
     }
 };
 
-// @desc    Deletar veículo
-// @route   DELETE /api/veiculos/:id
-// @access  Public
-export const deleteVeiculo = async (req, res, next) => {
+// @desc    Atualizar veículo (e verificar se pertence ao usuário)
+// @route   PUT /api/veiculos/:id
+// @access  Private (Protegido)
+export const updateVeiculo = async (req, res, next) => {
     try {
-        const veiculo = await Veiculo.findByIdAndDelete(req.params.id);
+        let veiculo = await Veiculo.findById(req.params.id);
         if (!veiculo) {
             return res.status(404).json({ success: false, error: 'Veículo não encontrado' });
         }
-        // Opcional: Deletar manutenções associadas (se não for fazer isso em cascata no Schema)
-        await Manutencao.deleteMany({ veiculo: req.params.id }); 
-        res.status(200).json({ success: true, data: {} }); // Retorna objeto vazio em caso de sucesso
+
+        if (veiculo.owner.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ success: false, error: 'Não autorizado a atualizar este veículo' });
+        }
+
+        veiculo = await Veiculo.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        res.status(200).json({ success: true, data: veiculo });
     } catch (error) {
         next(error);
     }
 };
 
-// --- NOVA FUNÇÃO: Criar Manutenção para um Veículo Específico ---
-// @desc    Adicionar manutenção a um veículo específico
-// @route   POST /api/veiculos/:veiculoId/manutencoes
-// @access  Public
-export const createManutencaoForVeiculo = async (req, res, next) => {
+// @desc    Deletar veículo (e verificar se pertence ao usuário)
+// @route   DELETE /api/veiculos/:id
+// @access  Private (Protegido)
+export const deleteVeiculo = async (req, res, next) => {
     try {
-        const { veiculoId } = req.params; // Extrai veiculoId dos parâmetros da rota
-
-        // 1. Validar se o veículo existe
-        const veiculo = await Veiculo.findById(veiculoId);
+        const veiculo = await Veiculo.findById(req.params.id);
         if (!veiculo) {
-            return res.status(404).json({ success: false, error: 'Veículo não encontrado para adicionar manutenção.' });
+            return res.status(404).json({ success: false, error: 'Veículo não encontrado' });
         }
 
-        // 2. Criar a manutenção, associando-a ao veiculoId
-        const manutencaoData = { ...req.body, veiculo: veiculoId }; // Combina dados do corpo com o veiculoId
-        const novaManutencao = await Manutencao.create(manutencaoData);
+        if (veiculo.owner.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ success: false, error: 'Não autorizado a deletar este veículo' });
+        }
 
-        // 3. Adicionar o ID da nova manutenção ao histórico do veículo e salvar o veículo
-        veiculo.historicoManutencao.push(novaManutencao._id);
-        await veiculo.save();
-
-        res.status(201).json({ success: true, data: novaManutencao }); // Retorna a nova manutenção criada
-
+        await veiculo.deleteOne(); // Usa .deleteOne() no documento encontrado
+        res.status(200).json({ success: true, data: {} });
     } catch (error) {
-        // Lida com erros de validação do Mongoose ou outros erros
-        if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map(val => val.message);
-            return res.status(400).json({ success: false, error: messages.join(', ') });
-        }
-        next(error); // Passa outros erros para o middleware de tratamento de erros
-    }
-};
-
-// --- NOVA FUNÇÃO: Listar Manutenções de um Veículo Específico ---
-// @desc    Listar todas as manutenções de um veículo específico
-// @route   GET /api/veiculos/:veiculoId/manutencoes
-// @access  Public
-export const getManutencoesForVeiculo = async (req, res, next) => {
-    try {
-        const { veiculoId } = req.params; // Extrai veiculoId dos parâmetros da rota
-
-        // Opcional (mas boa prática): Validar se o veículo existe
-        const veiculo = await Veiculo.findById(veiculoId);
-        if (!veiculo) {
-            return res.status(404).json({ success: false, error: 'Veículo não encontrado para listar manutenções.' });
-        }
-
-        // Busca todas as manutenções cujo campo 'veiculo' corresponde ao 'veiculoId'
-        const manutencoes = await Manutencao.find({ veiculo: veiculoId }).sort({ data: -1 }); // Ordena da mais recente para a mais antiga
-
-        res.status(200).json({ success: true, count: manutencoes.length, data: manutencoes });
-
-    } catch (error) {
-        next(error); // Passa erros para o middleware de tratamento de erros
+        next(error);
     }
 };

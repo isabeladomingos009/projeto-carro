@@ -3,7 +3,7 @@ const errorHandler = (err, req, res, next) => {
     console.error(`[ErrorHandler] Erro: ${err.message}`);
     // console.error(err.stack); // Para mais detalhes do stack trace em desenvolvimento
 
-    const statusCode = err.statusCode || 500; // Se o erro tem statusCode, usa ele, senão 500
+    const statusCode = err.statusCode || 500;
 
     res.status(statusCode).json({
         success: false,

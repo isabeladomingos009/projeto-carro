@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 const servicoSchema = new mongoose.Schema({
   nome: { type: String, required: true, unique: true },
   descricao: { type: String, required: true },
-  precoEstimado: { type: Number, required: true }
+  precoEstimado: { type: Number, required: true, default: 0 }
 }, { timestamps: true });
 
 const Servico = mongoose.model('Servico', servicoSchema);

@@ -4,140 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Garagem Virtual</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <div class="site-container">
-
         <header>
-            <h1>Minha Garagem Virtual</h1>
+            <h1>Garagem Virtual</h1>
             <nav class="main-nav">
-                <ul>
-                    <li><button class="nav-button active" data-view="garagem">Garagem</button></li>
-                    <li><button class="nav-button" data-view="planejar">Planejar Viagem</button></li>
+                <ul id="main-navigation">
+                    <!-- Gerenciado pelo JavaScript -->
                 </ul>
             </nav>
         </header>
 
         <main>
-            <!-- Área para notificações de sucesso/erro -->
-            <div id="notification-area" class="notification-area"></div>
+            <!-- Seção de Login -->
+            <section id="login-section" style="display: none;">
+                <h2>Login</h2>
+                <form id="form-login" class="auth-form">
+                    <div class="form-group">
+                        <label for="login-email">Email:</label>
+                        <input type="email" id="login-email" name="email" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Senha:</label>
+                        <input type="password" id="login-password" name="password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn">Entrar</button>
+                    <p class="auth-switch">Não tem uma conta? <a href="#" id="show-register">Registre-se</a></p>
+                </form>
+            </section>
 
-            <!-- Seção principal da Garagem (visível por padrão) -->
-            <section id="garagem-principal-section">
-                <!-- Formulário de Adicionar Veículo -->
+            <!-- Seção de Registro -->
+            <section id="register-section" style="display: none;">
+                <h2>Registrar</h2>
+                <form id="form-register" class="auth-form">
+                    <div class="form-group">
+                        <label for="register-email">Email:</label>
+                        <input type="email" id="register-email" name="email" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Senha (mínimo 6 caracteres):</label>
+                        <input type="password" id="register-password" name="password" required autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn">Criar Conta</button>
+                    <p class="auth-switch">Já tem uma conta? <a href="#" id="show-login">Faça Login</a></p>
+                </form>
+            </section>
+
+            <!-- Seção Principal da Garagem -->
+            <section id="garagem-principal-section" style="display: none;">
                 <section id="add-veiculo-section">
                     <h2>Adicionar Novo Veículo</h2>
                     <form id="form-add-veiculo">
-                        <div class="form-group">
-                            <label for="modelo">Modelo:</label>
-                            <input type="text" id="modelo" name="modelo" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="cor">Cor:</label>
-                            <input type="text" id="cor" name="cor" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="tipoVeiculo">Tipo:</label>
-                            <select id="tipoVeiculo" name="tipoVeiculo" required>
-                                <option value="Carro">Carro</option>
-                                <option value="Moto">Moto</option>
-                                <option value="Caminhão">Caminhão</option>
-                                <option value="Bicicleta">Bicicleta</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="maxVelocidade">Velocidade Máxima (km/h):</label>
-                            <input type="number" id="maxVelocidade" name="maxVelocidade" required>
-                        </div>
-                        <button type="submit" class="btn">Adicionar Veículo</button>
+                        <div class="form-group"><label for="modelo">Modelo:</label><input type="text" id="modelo" name="modelo" required></div>
+                        <div class="form-group"><label for="cor">Cor:</label><input type="text" id="cor" name="cor" required></div>
+                        <div class="form-group"><label for="tipoVeiculo">Tipo:</label><select id="tipoVeiculo" name="tipoVeiculo" required><option value="Carro">Carro</option><option value="Moto">Moto</option><option value="Outro">Outro</option></select></div>
+                        <div class="form-group"><label for="maxVelocidade">Vel. Máxima (km/h):</label><input type="number" id="maxVelocidade" name="maxVelocidade" required></div>
+                        <input type="hidden" name="imageUrl" value="imagemilustrativa.png">
+                        <div class="form-group form-group-full"><button type="submit" class="btn"><span class="btn-icon">+</span> Adicionar à Garagem</button></div>
                     </form>
                 </section>
-
-                <!-- Lista de Meus Veículos -->
                 <section id="veiculos-section">
-                    <h2>Meus Veículos</h2>
-                    <button id="btn-reset-veiculos" class="btn btn-warn">Resetar Veículos</button>
-                    <div id="veiculos-loader" class="loader">Carregando veículos...</div>
-                    <div id="veiculos-list" class="grid-container">
-                        <!-- Os veículos do backend serão inseridos aqui pelo JavaScript -->
-                    </div>
+                    <h2>Veículos na Garagem</h2>
+                    <div id="veiculos-loader" class="loader" style="display: none;"></div>
+                    <div id="veiculos-list" class="grid-container"></div>
                 </section>
-            </section> <!-- Fim da Seção principal da Garagem -->
+            </section>
 
-            <!-- Nova Seção para Detalhes do Veículo e Manutenções (ESCONDIDA por padrão) -->
+            <!-- Seção de Detalhes do Veículo -->
             <section id="detalhes-veiculo-section" style="display: none;">
-                <button id="btn-voltar-garagem" class="btn btn-secondary">Voltar para a Garagem</button>
-                <div id="detalhes-veiculo-container">
-                    <!-- Conteúdo dos detalhes do veículo e manutenções será renderizado aqui -->
-                </div>
+                <button id="btn-voltar-garagem" class="btn btn--secondary">‹ Voltar para a Garagem</button>
+                <div id="detalhes-veiculo-container"></div>
             </section>
-
-            <!-- Seção de Planejar Viagem (Clima) (ESCONDIDA por padrão) -->
-             <section id="planejador-viagem-container" style="display: none;">
-                 <div class="planejador-viagem-section">
-                    <h2>Planejar Viagem</h2>
-                    <div class="form-planejador">
-                        <label for="destino-viagem">Destino:</label>
-                        <input type="text" id="destino-viagem" placeholder="Digite a cidade de destino">
-                        <button id="verificar-clima-btn" class="btn">Verificar Clima</button>
-                    </div>
-                    <div id="previsao-tempo-resultado" class="resultado-previsao">
-                         <p>Digite uma cidade e clique em "Verificar Clima".</p>
-                    </div>
+            
+            <!-- Seção do Planejador de Viagem -->
+            <section id="planejador-viagem-container" style="display: none;">
+                <h2>Planejar Viagem</h2>
+                <div class="form-clima">
+                    <label for="destino-viagem">Destino:</label>
+                    <input type="text" id="destino-viagem" placeholder="Digite o nome da cidade">
+                    <button id="verificar-clima-btn" class="btn">Verificar Clima</button>
                 </div>
+                <div id="previsao-tempo-resultado"></div>
             </section>
-
-            <!-- As seções de Destaque, Serviços e Ferramentas foram removidas conforme solicitado -->
-
         </main>
-
+        
         <footer>
-            <p>&copy; 2025 Garagem Virtual</p>
+            <p>&copy; 2025 Garagem Virtual. Todos os direitos reservados.</p>
         </footer>
-
     </div>
 
+    <div id="notification-area"></div>
     <script type="module" src="js/script.js"></script>
-
-    <!-- CÓDIGO INJETADO PELO LIVE-SERVER (DEVE FICAR AQUI, NÃO MOVA) -->
-    <script>
-        // <![CDATA[
-        if ('WebSocket' in window) {
-            (function () {
-                function refreshCSS() {
-                    var sheets = [].slice.call(document.getElementsByTagName("link"));
-                    var head = document.getElementsByTagName("head")[0];
-                    for (var i = 0; i < sheets.length; ++i) {
-                        var elem = sheets[i];
-                        var parent = elem.parentElement || head;
-                        parent.removeChild(elem);
-                        var rel = elem.rel;
-                        if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
-                            var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
-                            elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
-                        }
-                        parent.appendChild(elem);
-                    }
-                }
-                var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
-                var address = protocol + window.location.host + window.location.pathname + '/ws';
-                var socket = new WebSocket(address);
-                socket.onmessage = function (msg) {
-                    if (msg.data == 'reload') window.location.reload();
-                    else if (msg.data == 'refreshcss') refreshCSS();
-                };
-                if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
-                    console.log('Live reload enabled.');
-                    sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
-                }
-            })();
-        }
-        else {
-            console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
-        }
-        // ]]>
-    </script>
 </body>
 </html>

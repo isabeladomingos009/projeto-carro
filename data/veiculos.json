@@ -3,45 +3,21 @@
     "modelo": "Fusca TSI",
     "cor": "Branco",
     "tipoVeiculo": "Carro",
-    "imageUrl": "fusca.png",
-    "ligado": false,
-    "velocidade": 0,
-    "maxVelocidade": 220
+    "maxVelocidade": 220,
+    "imageUrl": "fuscaTSI.jpg"
   },
   {
     "modelo": "Honda CB 500F",
     "cor": "Vermelha",
     "tipoVeiculo": "Moto",
-    "imageUrl": "moto.png",
-    "ligado": false,
-    "velocidade": 0,
-    "maxVelocidade": 180
+    "maxVelocidade": 180,
+    "imageUrl": "moto.jpg"
   },
   {
     "modelo": "Chevrolet Onix",
     "cor": "Prata",
     "tipoVeiculo": "Carro",
-    "imageUrl": "carro.png",
-    "ligado": true,
-    "velocidade": 25,
-    "maxVelocidade": 170
-  },
-  {
-    "modelo": "Mustang GT",
-    "cor": "Vermelho",
-    "tipoVeiculo": "Carro",
-    "imageUrl": "mustang.png",
-    "ligado": false,
-    "velocidade": 0,
-    "maxVelocidade": 280
-  },
-  {
-    "modelo": "Tesla Model S Plaid",
-    "cor": "Preto",
-    "tipoVeiculo": "Carro",
-    "imageUrl": "teslaplaid.png",
-    "ligado": false,
-    "velocidade": 0,
-    "maxVelocidade": 320
+    "maxVelocidade": 185,
+    "imageUrl": "onix.jpg"
   }
 ]

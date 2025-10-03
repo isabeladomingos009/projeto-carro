@@ -1,6 +1,6 @@
 // routes/clima.js (arquivo completo)
 import express from 'express';
-import { getPrevisaoDetalhada } from '../controllers/climaController.js'; // Importa a função do controller
+import { getPrevisaoDetalhada } from '../controllers/climaController.js'; 
 
 const router = express.Router();
 

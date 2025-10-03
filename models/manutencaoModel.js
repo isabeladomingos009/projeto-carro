@@ -2,11 +2,30 @@
 import mongoose from 'mongoose';
 
 const manutencaoSchema = new mongoose.Schema({
-  data: { type: Date, default: Date.now, required: true },
-  tipo: { type: String, required: [true, 'O tipo da manutenção é obrigatório.'] },
-  custo: { type: Number, required: true, default: 0 },
-  descricao: { type: String, default: '' },
-  status: { type: String, enum: ['Agendada', 'Em andamento', 'Concluída', 'Cancelada'], default: 'Agendada' }
+  descricaoServico: { 
+    type: String, 
+    required: [true, 'A descrição do serviço é obrigatória.'] 
+  },
+  data: { 
+    type: Date, 
+    default: Date.now, 
+    required: true 
+  },
+  custo: { 
+    type: Number, 
+    required: [true, 'O custo da manutenção é obrigatório.'], 
+    min: [0, 'O custo não pode ser negativo.'] 
+  },
+  quilometragem: { 
+    type: Number, 
+    required: [true, 'A quilometragem da manutenção é obrigatória.'], 
+    min: [0, 'A quilometragem não pode ser negativa.'] 
+  },
+  veiculo: { // Campo de relacionamento com Veiculo
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Veiculo', 
+    required: [true, 'A manutenção deve estar associada a um veículo.']
+  }
 }, { timestamps: true });
 
 const Manutencao = mongoose.model('Manutencao', manutencaoSchema);

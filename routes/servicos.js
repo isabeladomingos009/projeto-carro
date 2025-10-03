@@ -1,4 +1,4 @@
-// routes/servicos.js (arquivo completo e CORRIGIDO)
+// routes/servicos.js (arquivo completo)
 import express from 'express';
 import {
   getServicos,
@@ -6,7 +6,7 @@ import {
   getServicoById, 
   updateServico, 
   deleteServico 
-} from '../controllers/servicoController.js'; // Importa funções do controller
+} from '../controllers/servicoController.js';
 
 const router = express.Router();
 
@@ -21,5 +21,4 @@ router.route('/')
 //   .put(updateServico) 
 //   .delete(deleteServico); 
 
-// É ESSENCIAL que este módulo exporte o 'router' como default
-export default router; 
+export default router;
