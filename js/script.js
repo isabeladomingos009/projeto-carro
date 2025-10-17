@@ -1,130 +1,164 @@
 import * as api from './modules/api-service.js';
 import * as ui from './modules/ui-manager.js';
 
-/**
- * Função principal que inicializa a aplicação.
- */
 function init() {
-    console.log("Aplicação iniciada.");
-    
-    // Configura os listeners dos formulários de autenticação
     setupAuthListeners();
-    
-    // Verifica o estado de login do usuário
     checkLoginState();
 }
 
-/**
- * Verifica se existe um token de login e atualiza a UI de acordo.
- */
 function checkLoginState() {
     const token = localStorage.getItem('token');
-    
-    ui.hideAllContentSections(); // Esconde tudo primeiro
-
+    ui.hideAllContentSections();
     if (token) {
-        // Se o usuário está logado
-        console.log("Usuário está logado. Mostrando garagem.");
-        ui.updateNav(true); // Mostra navegação de usuário logado
-        setupAppListeners(); // Configura os listeners da aplicação principal
-        ui.showSection('garagem-principal-section');
-        carregarVeiculos();
+        ui.updateNav(true);
+        setupAppListeners();
+        navigateToView('garagem');
     } else {
-        // Se o usuário não está logado
-        console.log("Usuário não está logado. Mostrando tela de login.");
-        ui.updateNav(false); // Mostra navegação de usuário deslogado
+        ui.updateNav(false);
         ui.showSection('login-section');
     }
 }
 
-/**
- * Configura os listeners para os formulários de login e registro.
- */
 function setupAuthListeners() {
-    // Formulário de Login
-    document.getElementById('form-login').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = e.target.email.value;
-        const password = e.target.password.value;
-        try {
-            const data = await api.login(email, password);
-            localStorage.setItem('token', data.token);
-            ui.showNotification('Login bem-sucedido!', 'success');
-            checkLoginState(); // Reavalia o estado da aplicação
-        } catch (error) {
-            ui.showNotification(error.message, 'error');
-        }
-    });
-
-    // Formulário de Registro
-    document.getElementById('form-register').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = e.target.email.value;
-        const password = e.target.password.value;
-        try {
-            await api.register(email, password);
-            ui.showNotification('Registro bem-sucedido! Por favor, faça o login.', 'success');
-            ui.showSection('login-section'); // Mostra a tela de login após o registro
-            document.getElementById('register-section').style.display = 'none';
-        } catch (error) {
-            ui.showNotification(error.message, 'error');
-        }
-    });
-
-    // Links para alternar entre login e registro
-    document.getElementById('show-register').addEventListener('click', (e) => {
-        e.preventDefault();
-        ui.hideAllContentSections();
-        ui.showSection('register-section');
-    });
-    document.getElementById('show-login').addEventListener('click', (e) => {
-        e.preventDefault();
-        ui.hideAllContentSections();
-        ui.showSection('login-section');
-    });
+    document.getElementById('form-login').addEventListener('submit', async (e) => { e.preventDefault(); try { const data = await api.login(e.target.email.value, e.target.password.value); localStorage.setItem('token', data.token); window.location.reload(); } catch (error) { ui.showNotification(error.message, 'error'); } });
+    document.getElementById('form-register').addEventListener('submit', async (e) => { e.preventDefault(); try { await api.register(e.target.email.value, e.target.password.value); ui.showNotification('Registro bem-sucedido! Faça o login.', 'success'); ui.hideAllContentSections(); ui.showSection('login-section'); } catch (error) { ui.showNotification(error.message, 'error'); } });
+    document.getElementById('show-register').addEventListener('click', (e) => { e.preventDefault(); ui.hideAllContentSections(); ui.showSection('register-section'); });
+    document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); ui.hideAllContentSections(); ui.showSection('login-section'); });
 }
 
-/**
- * Configura os listeners para a aplicação principal (após o login).
- */
 function setupAppListeners() {
-    // Formulário de adicionar veículo
-    const formAddVeiculo = document.getElementById('form-add-veiculo');
-    if (formAddVeiculo) {
-        formAddVeiculo.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formData = new FormData(formAddVeiculo);
-            const veiculoData = Object.fromEntries(formData.entries());
-            veiculoData.maxVelocidade = Number(veiculoData.maxVelocidade);
-            try {
-                await api.createVeiculo(veiculoData);
-                ui.showNotification('Veículo adicionado com sucesso!', 'success');
-                formAddVeiculo.reset();
-                carregarVeiculos();
-            } catch (error) {
-                ui.showNotification(error.message, 'error');
-            }
-        });
-    }
-
-    // (Outros listeners como o de clique nos cards podem ser adicionados aqui se necessário)
+    document.getElementById('form-add-veiculo').addEventListener('submit', handleAddVeiculo);
+    document.getElementById('main-navigation').addEventListener('click', (e) => {
+        if (e.target.matches('.nav-button[data-view]')) {
+            navigateToView(e.target.dataset.view);
+        }
+    });
+    document.getElementById('veiculos-list').addEventListener('click', (e) => {
+        const button = e.target.closest('.card__button[data-veiculo-id]');
+        if (button) {
+            navigateToView('detalhes-veiculo', button.dataset.veiculoId);
+        }
+    });
+    document.getElementById('btn-voltar-garagem').addEventListener('click', () => navigateToView('garagem'));
+    document.getElementById('detalhes-veiculo-container').addEventListener('submit', (e) => {
+        if (e.target.id === 'form-share-veiculo') {
+            handleShareVeiculo(e);
+        }
+    });
+    // ADIÇÃO 1: Listener do clima de volta
+    document.getElementById('verificar-clima-btn').addEventListener('click', handleVerificarClimaClick);
 }
 
-/**
- * Carrega os veículos do usuário logado da API e os exibe na UI.
- */
+async function navigateToView(viewName, veiculoId = null) {
+    ui.hideAllContentSections();
+    document.querySelectorAll('#main-navigation .nav-button').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.querySelector(`#main-navigation .nav-button[data-view="${viewName}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    if (viewName === 'garagem') {
+        ui.showSection('garagem-principal-section');
+        await carregarVeiculos();
+    } else if (viewName === 'detalhes-veiculo' && veiculoId) {
+        ui.showSection('detalhes-veiculo-section');
+        await carregarDetalhesVeiculo(veiculoId);
+    } else if (viewName === 'planejar') { // ADIÇÃO 2: Lógica da view de clima de volta
+        ui.showSection('planejador-viagem-container');
+    }
+}
+
+async function handleAddVeiculo(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const veiculoData = Object.fromEntries(formData.entries());
+    veiculoData.maxVelocidade = Number(veiculoData.maxVelocidade);
+    try {
+        await api.createVeiculo(veiculoData);
+        ui.showNotification('Veículo adicionado com sucesso!', 'success');
+        form.reset();
+        await carregarVeiculos();
+    } catch (error) {
+        ui.showNotification(error.message, 'error');
+    }
+}
+
 async function carregarVeiculos() {
     ui.toggleLoader('veiculos-loader', true);
     try {
         const veiculos = await api.getVeiculos();
         ui.renderVeiculos(veiculos);
     } catch (error) {
-        ui.showNotification(error.message, 'error');
-        document.getElementById('veiculos-list').innerHTML = `<p class="error-message">${error.message}</p>`;
+        document.getElementById('veiculos-list').innerHTML = `<p class="error-message">Não foi possível carregar seus veículos.</p>`;
     } finally {
         ui.toggleLoader('veiculos-loader', false);
     }
 }
 
-// Inicia a aplicação quando o DOM estiver pronto
+async function carregarDetalhesVeiculo(veiculoId) {
+    const container = document.getElementById('detalhes-veiculo-container');
+    container.innerHTML = '<p class="loading-message">Carregando...</p>';
+    try {
+        const veiculo = await api.getVeiculoById(veiculoId);
+        ui.renderVeiculoDetalhes(veiculo, container);
+    } catch (error) {
+        ui.showNotification(error.message, 'error');
+        navigateToView('garagem');
+    }
+}
+
+async function handleShareVeiculo(event) {
+    event.preventDefault();
+    const form = event.target;
+    const veiculoId = form.dataset.veiculoId;
+    const email = form.email.value;
+    try {
+        const response = await api.shareVeiculo(veiculoId, email);
+        ui.showNotification(response.message, 'success');
+        form.reset();
+    } catch (error) {
+        ui.showNotification(error.message, 'error');
+    }
+}
+
+// ==========================================================
+// ADIÇÃO 3: Funções do clima de volta no final do arquivo
+// ==========================================================
+async function handleVerificarClimaClick() {
+    const destinoInput = document.getElementById('destino-viagem');
+    const nomeCidade = destinoInput.value.trim();
+    if (!nomeCidade) {
+        ui.showNotification("Por favor, digite o nome da cidade.", 'error');
+        return;
+    }
+    ui.displayClimaLoading(true);
+    try {
+        const dadosApi = await api.getClima(nomeCidade);
+        const previsaoProcessada = processarDadosForecast(dadosApi);
+        if (previsaoProcessada) {
+            ui.renderPrevisaoDetalhada(previsaoProcessada, dadosApi.city.name);
+        } else {
+            ui.displayClimaError('Não foi possível processar os dados da previsão.');
+        }
+    } catch (error) {
+        ui.displayClimaError(error.message);
+    }
+}
+
+function processarDadosForecast(dataApi) {
+    if (!dataApi || !dataApi.list) return null;
+    const previsoesPorDia = {};
+    dataApi.list.forEach(item => {
+        const diaStr = item.dt_txt.split(' ')[0];
+        if (!previsoesPorDia[diaStr]) { previsoesPorDia[diaStr] = { temps: [], weathers: [] }; }
+        previsoesPorDia[diaStr].temps.push(item.main.temp);
+        previsoesPorDia[diaStr].weathers.push(item.weather[0]);
+    });
+    return Object.keys(previsoesPorDia).map(dia => {
+        const diaData = previsoesPorDia[dia];
+        const weatherRep = diaData.weathers[Math.floor(diaData.weathers.length / 2)];
+        return { data: dia, temp_min: Math.min(...diaData.temps), temp_max: Math.max(...diaData.temps), descricao: weatherRep.description, icone: weatherRep.icon };
+    }).slice(0, 5);
+}
+
+
 document.addEventListener('DOMContentLoaded', init);
